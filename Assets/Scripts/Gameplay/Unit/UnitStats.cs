@@ -8,6 +8,20 @@ namespace DungeonCrawler.Gameplay.Unit
 {
     public class UnitStats
     {
+        private float _maxHealth;
+        private float _currentHealth;
+        private float _physicalDefense;
+        private float _magicDefense;
+        private float _absoluteDefense;
+        private float _minDamage;
+        private float _maxDamage;
+        private float _initiative;
+        private float _critChance;
+        private float _critMultiplier;
+        private float _missChance;
+        private int _level;
+        private float _experience;
+
         public event Action<UnitStats, string, object, object> OnChange;
 
         public AttackType AttackType { get; }
@@ -16,31 +30,31 @@ namespace DungeonCrawler.Gameplay.Unit
 
         public UnitKind Kind { get; }
 
-        public float MaxHealth { get; private set; }
+        public float MaxHealth => _maxHealth;
 
-        public float CurrentHealth { get; private set; }
+        public float CurrentHealth => _currentHealth;
 
-        public float PhysicalDefense { get; private set; }
+        public float PhysicalDefense => _physicalDefense;
 
-        public float MagicDefense { get; private set; }
+        public float MagicDefense => _magicDefense;
 
-        public float AbsoluteDefense { get; private set; }
+        public float AbsoluteDefense => _absoluteDefense;
 
-        public float MinDamage { get; private set; }
+        public float MinDamage => _minDamage;
 
-        public float MaxDamage { get; private set; }
+        public float MaxDamage => _maxDamage;
 
-        public float Initiative { get; private set; }
+        public float Initiative => _initiative;
 
-        public float CritChance { get; private set; }
+        public float CritChance => _critChance;
 
-        public float CritMultiplier { get; private set; }
+        public float CritMultiplier => _critMultiplier;
 
-        public float MissChance { get; private set; }
+        public float MissChance => _missChance;
 
-        public int Level { get; private set; }
+        public int Level => _level;
 
-        public float Experience { get; private set; }
+        public float Experience => _experience;
 
         public bool IsDead => CurrentHealth <= 0;
 
@@ -50,79 +64,79 @@ namespace DungeonCrawler.Gameplay.Unit
             DamageType = def.DamageType;
             Kind = def.Kind;
 
-            Level = level;
+            _level = level;
 
-            MaxHealth = def.BaseHealth;
-            CurrentHealth = MaxHealth;
+            _maxHealth = def.BaseHealth;
+            _currentHealth = _maxHealth;
 
-            PhysicalDefense = def.BasePhysicalDefense;
-            MagicDefense = def.BaseMagicDefense;
-            AbsoluteDefense = def.BaseAbsoluteDefense;
+            _physicalDefense = def.BasePhysicalDefense;
+            _magicDefense = def.BaseMagicDefense;
+            _absoluteDefense = def.BaseAbsoluteDefense;
 
-            MinDamage = def.MinDamage;
-            MaxDamage = def.MaxDamage;
+            _minDamage = def.MinDamage;
+            _maxDamage = def.MaxDamage;
 
-            Initiative = def.Initiative;
+            _initiative = def.Initiative;
 
-            CritChance = def.BaseCritChance;
-            CritMultiplier = def.BaseCritMultiplier;
-            MissChance = def.BaseMissChance;
+            _critChance = def.BaseCritChance;
+            _critMultiplier = def.BaseCritMultiplier;
+            _missChance = def.BaseMissChance;
         }
 
         public void TakeDamage(float amount)
         {
-            SetStat(ref CurrentHealth, Math.Max(0, CurrentHealth - amount), nameof(CurrentHealth));
+            SetStat(ref _currentHealth, Math.Max(0, _currentHealth - amount), nameof(CurrentHealth));
         }
 
         public void Heal(float amount)
         {
-            SetStat(ref CurrentHealth, Math.Min(MaxHealth, CurrentHealth + amount), nameof(CurrentHealth));
+            SetStat(ref _currentHealth, Math.Min(_maxHealth, _currentHealth + amount), nameof(CurrentHealth));
         }
 
         public void AddMaxHealth(float value)
         {
-            var newMaxHealth = MaxHealth + value;
-            SetStat(ref MaxHealth, newMaxHealth, nameof(MaxHealth));
-            SetStat(ref CurrentHealth, Math.Min(CurrentHealth, newMaxHealth), nameof(CurrentHealth));
+            var newMaxHealth = _maxHealth + value;
+            SetStat(ref _maxHealth, newMaxHealth, nameof(MaxHealth));
+            SetStat(ref _currentHealth, Math.Min(_currentHealth, newMaxHealth), nameof(CurrentHealth));
         }
 
         public void AddDefense(float phys, float magic, float absolute)
         {
-            SetStat(ref PhysicalDefense, PhysicalDefense + phys, nameof(PhysicalDefense));
-            SetStat(ref MagicDefense, MagicDefense + magic, nameof(MagicDefense));
-            SetStat(ref AbsoluteDefense, AbsoluteDefense + absolute, nameof(AbsoluteDefense));
+            SetStat(ref _physicalDefense, _physicalDefense + phys, nameof(PhysicalDefense));
+            SetStat(ref _magicDefense, _magicDefense + magic, nameof(MagicDefense));
+            SetStat(ref _absoluteDefense, _absoluteDefense + absolute, nameof(AbsoluteDefense));
         }
 
         public void AddDamageRange(float minDelta, float maxDelta)
         {
-            SetStat(ref MinDamage, MinDamage + minDelta, nameof(MinDamage));
-            SetStat(ref MaxDamage, MaxDamage + maxDelta, nameof(MaxDamage));
+            SetStat(ref _minDamage, _minDamage + minDelta, nameof(MinDamage));
+            SetStat(ref _maxDamage, _maxDamage + maxDelta, nameof(MaxDamage));
         }
 
         public void ModifyCrit(float chanceDelta, float multiplierDelta)
         {
-            SetStat(ref CritChance, CritChance + chanceDelta, nameof(CritChance));
-            SetStat(ref CritMultiplier, CritMultiplier + multiplierDelta, nameof(CritMultiplier));
+            SetStat(ref _critChance, _critChance + chanceDelta, nameof(CritChance));
+            SetStat(ref _critMultiplier, _critMultiplier + multiplierDelta, nameof(CritMultiplier));
         }
 
         public void ModifyInitiative(float delta)
         {
-            SetStat(ref Initiative, Initiative + delta, nameof(Initiative));
+            SetStat(ref _initiative, _initiative + delta, nameof(Initiative));
         }
 
         public void ModifyMissChance(float delta)
         {
-            SetStat(ref MissChance, MissChance + delta, nameof(MissChance));
+            SetStat(ref _missChance, _missChance + delta, nameof(MissChance));
         }
 
         public void AddExperience(float xp)
         {
-            SetStat(ref Experience, Experience + xp, nameof(Experience));
+            SetStat(ref _experience, _experience + xp, nameof(Experience));
         }
 
         public void LevelUp()
         {
-            SetStat(ref Level, Level + 1, nameof(Level));
+            SetStat(ref _level, _level + 1, nameof(Level));
         }
 
         private void SetStat<T>(ref T field, T newValue, string fieldName)
