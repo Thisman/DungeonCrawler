@@ -12,6 +12,10 @@ namespace DungeonCrawler.Gameplay.Battle
         private readonly BattleLogger _logger;
         private BattleState _currentState;
 
+        public BattleState CurrentState => _currentState;
+
+        public BattleContext Context => _context;
+
         public BattleStateMachine(BattleContext context, BattleState initialState = BattleState.Preparation, BattleLogger logger = null)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
@@ -24,9 +28,10 @@ namespace DungeonCrawler.Gameplay.Battle
             _stateMachine.OnUnhandledTrigger((state, trigger) => _logger.LogUnhandledTrigger(state, trigger.ToString()));
         }
 
-        public BattleState CurrentState => _currentState;
-
-        public BattleContext Context => _context;
+        public void Start()
+        {
+            EnterState(_currentState);
+        }
 
         private void ConfigureTransitions()
         {
