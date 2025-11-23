@@ -13,6 +13,8 @@ namespace DungeonCrawler.Gameplay.Battle
         private BattleState _currentState;
         private bool _isStopped;
 
+        public Action<BattleState, BattleState, string, BattleContext> OnTransitioned;
+
         public BattleState CurrentState => _currentState;
 
         public BattleContext Context => _context;
@@ -27,6 +29,7 @@ namespace DungeonCrawler.Gameplay.Battle
             ConfigureTransitions();
             _stateMachine.OnTransitioned(transition => {
                 _logger.LogTransition(transition.Source, transition.Destination, transition.Trigger.ToString());
+                OnTransitioned?.Invoke(transition.Source, transition.Destination, transition.Trigger.ToString(), _context);
             });
             _stateMachine.OnUnhandledTrigger((state, trigger) => {
                 _logger.LogUnhandledTrigger(state, trigger.ToString());
