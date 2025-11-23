@@ -207,7 +207,7 @@ namespace DungeonCrawler.Gameplay.Battle
 
         private void ExitTurnStart() { }
 
-        protected virtual async void EnterWaitForAction() {
+        private async void EnterWaitForAction() {
             await Task.Delay(TimeSpan.FromSeconds(5));
             Fire(Trigger.NextState);
         }
