@@ -24,6 +24,12 @@ namespace DungeonCrawler.UI.Battle
 
         protected VisualElement Root => _document?.rootVisualElement;
 
+        public virtual void Init(BattleSceneLauncher launcher)
+        {
+            Launcher = launcher;
+            SceneEventBus = launcher?.SceneEventBus;
+        }
+
         protected virtual void Awake()
         {
             _document ??= GetComponent<UIDocument>();
@@ -112,7 +118,7 @@ namespace DungeonCrawler.UI.Battle
             }
 
             Launcher = FindObjectOfType<BattleSceneLauncher>();
-            SceneEventBus = Launcher?.SceneEventBus;
+            Init(Launcher);
         }
 
         private void HandleAttachToPanel(AttachToPanelEvent _)

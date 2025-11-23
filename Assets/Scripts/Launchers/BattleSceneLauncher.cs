@@ -5,6 +5,7 @@ using DungeonCrawler.Core.EventBus;
 using DungeonCrawler.Gameplay.Squad;
 using DungeonCrawler.Gameplay.Unit;
 using UnityEngine;
+using DungeonCrawler.UI.Battle;
 
 namespace DungeonCrawler.Gameplay.Battle
 {
@@ -34,6 +35,8 @@ namespace DungeonCrawler.Gameplay.Battle
 
             _sceneEventBus = new GameEventBus();
             _stateMachine = new BattleStateMachine(context, _sceneEventBus, logger);
+
+            InitializeUIPanels();
         }
 
         private void Start()
@@ -44,6 +47,14 @@ namespace DungeonCrawler.Gameplay.Battle
         private void OnDestroy()
         {
             _stateMachine?.Stop();
+        }
+
+        private void InitializeUIPanels()
+        {
+            foreach (var uiPanel in FindObjectsOfType<BattleUIPanel>(true))
+            {
+                uiPanel.Init(this);
+            }
         }
 
         private IEnumerable<SquadModel> BuildSquads()
