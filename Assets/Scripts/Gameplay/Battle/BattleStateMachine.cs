@@ -1,5 +1,6 @@
 // Coordinates battle round and turn flow using Stateless for state transitions with entry/exit hooks for every state.
 using System;
+using System.Threading.Tasks;
 using Stateless;
 
 namespace DungeonCrawler.Gameplay.Battle
@@ -188,7 +189,8 @@ namespace DungeonCrawler.Gameplay.Battle
 
         protected virtual void ExitTurnStart() { }
 
-        protected virtual void EnterWaitForAction() {
+        protected virtual async void EnterWaitForAction() {
+            await Task.Delay(TimeSpan.FromSeconds(5));
             _stateMachine.Fire(Trigger.NextState);
         }
 
