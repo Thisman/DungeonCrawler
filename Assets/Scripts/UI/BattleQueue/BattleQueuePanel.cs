@@ -10,15 +10,10 @@ namespace DungeonCrawler.UI.Battle
     {
         private VisualElement _queueContainer;
 
-        protected override void Awake()
-        {
-            base.Awake();
-        }
-
-        protected override void OnEnable()
+        protected override void OnPanelAttachedToPanel()
         {
             ResolveElements();
-            base.OnEnable();
+            base.OnPanelAttachedToPanel();
         }
 
         protected override void RegisterSubscriptions()

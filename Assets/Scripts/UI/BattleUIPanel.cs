@@ -16,6 +16,8 @@ namespace DungeonCrawler.UI.Battle
 
         private readonly List<IDisposable> _subscriptions = new();
 
+        private bool _panelAttached;
+
         protected BattleSceneLauncher Launcher { get; private set; }
 
         protected GameEventBus SceneEventBus { get; private set; }
@@ -25,22 +27,40 @@ namespace DungeonCrawler.UI.Battle
         protected virtual void Awake()
         {
             _document ??= GetComponent<UIDocument>();
+            RegisterPanelLifecycleCallbacks();
             Hide();
         }
 
         protected virtual void OnEnable()
         {
-            EnsureEventBus();
-            RegisterSubscriptions();
+            RegisterPanelLifecycleCallbacks();
+
+            if (Root?.panel != null && !_panelAttached)
+            {
+                HandleAttachToPanel(null);
+            }
         }
 
         protected virtual void OnDisable()
         {
-            UnregisterUiCallbacks();
-            DisposeSubscriptions();
+            if (_panelAttached)
+            {
+                HandleDetachFromPanel(null);
+            }
         }
 
         protected abstract void RegisterSubscriptions();
+
+        protected virtual void OnPanelAttachedToPanel()
+        {
+            RegisterSubscriptions();
+        }
+
+        protected virtual void OnPanelDetachedFromPanel()
+        {
+            UnregisterUiCallbacks();
+            DisposeSubscriptions();
+        }
 
         protected virtual void UnregisterUiCallbacks()
         {
@@ -70,6 +90,20 @@ namespace DungeonCrawler.UI.Battle
             }
         }
 
+        private void RegisterPanelLifecycleCallbacks()
+        {
+            if (Root == null)
+            {
+                return;
+            }
+
+            Root.UnregisterCallback<AttachToPanelEvent>(HandleAttachToPanel);
+            Root.UnregisterCallback<DetachFromPanelEvent>(HandleDetachFromPanel);
+
+            Root.RegisterCallback<AttachToPanelEvent>(HandleAttachToPanel);
+            Root.RegisterCallback<DetachFromPanelEvent>(HandleDetachFromPanel);
+        }
+
         private void EnsureEventBus()
         {
             if (SceneEventBus != null)
@@ -79,6 +113,29 @@ namespace DungeonCrawler.UI.Battle
 
             Launcher = FindObjectOfType<BattleSceneLauncher>();
             SceneEventBus = Launcher?.SceneEventBus;
+        }
+
+        private void HandleAttachToPanel(AttachToPanelEvent _)
+        {
+            if (_panelAttached)
+            {
+                return;
+            }
+
+            _panelAttached = true;
+            EnsureEventBus();
+            OnPanelAttachedToPanel();
+        }
+
+        private void HandleDetachFromPanel(DetachFromPanelEvent _)
+        {
+            if (!_panelAttached)
+            {
+                return;
+            }
+
+            _panelAttached = false;
+            OnPanelDetachedFromPanel();
         }
 
         private void DisposeSubscriptions()

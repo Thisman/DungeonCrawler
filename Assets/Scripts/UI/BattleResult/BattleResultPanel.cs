@@ -8,16 +8,11 @@ namespace DungeonCrawler.UI.Battle
     {
         private Button _finishButton;
 
-        protected override void Awake()
-        {
-            base.Awake();
-        }
-
-        protected override void OnEnable()
+        protected override void OnPanelAttachedToPanel()
         {
             ResolveElements();
-            base.OnEnable();
             RegisterUiCallbacks();
+            base.OnPanelAttachedToPanel();
         }
 
         protected override void RegisterSubscriptions()
