@@ -8,15 +8,19 @@ namespace DungeonCrawler.Gameplay.Battle
     {
         private readonly BattleContext _context;
         private readonly StateMachine<BattleState, Trigger> _stateMachine;
+        private readonly BattleLogger _logger;
         private BattleState _currentState;
 
-        public BattleStateMachine(BattleContext context, BattleState initialState = BattleState.Preparation)
+        public BattleStateMachine(BattleContext context, BattleState initialState = BattleState.Preparation, BattleLogger logger = null)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
+            _logger = logger ?? new BattleLogger();
             _currentState = initialState;
             _stateMachine = new StateMachine<BattleState, Trigger>(() => _currentState, state => _currentState = state);
 
             ConfigureTransitions();
+            _stateMachine.OnTransitioned(transition => _logger.LogTransition(transition.Source, transition.Destination, transition.Trigger.ToString()));
+            _stateMachine.OnUnhandledTrigger((state, trigger) => _logger.LogUnhandledTrigger(state, trigger.ToString()));
         }
 
         public BattleState CurrentState => _currentState;
@@ -68,6 +72,8 @@ namespace DungeonCrawler.Gameplay.Battle
 
         private void EnterState(BattleState state)
         {
+            _logger.LogStateEnter(state);
+
             switch (state)
             {
                 case BattleState.Preparation:
@@ -102,6 +108,8 @@ namespace DungeonCrawler.Gameplay.Battle
 
         private void ExitState(BattleState state)
         {
+            _logger.LogStateExit(state);
+
             switch (state)
             {
                 case BattleState.Preparation:
@@ -136,12 +144,12 @@ namespace DungeonCrawler.Gameplay.Battle
 
         protected virtual void EnterPreparation()
         {
-            _context.Status = BattleStatus.Preparation;
+            SetStatus(BattleStatus.Preparation);
         }
 
         protected virtual void ExitPreparation()
         {
-            _context.Status = BattleStatus.Progress;
+            SetStatus(BattleStatus.Progress);
             _context.Queue = new BattleQueue(_context.Squads);
             _context.Queue.GetAvailableQueue(_context.Squads.Count);
         }
@@ -184,12 +192,18 @@ namespace DungeonCrawler.Gameplay.Battle
 
         protected virtual void EnterResult()
         {
-            _context.Status = BattleStatus.Result;
+            SetStatus(BattleStatus.Result);
         }
 
         protected virtual void ExitResult()
         {
-            _context.Status = BattleStatus.Finished;
+            SetStatus(BattleStatus.Finished);
+        }
+
+        private void SetStatus(BattleStatus status)
+        {
+            _context.Status = status;
+            _logger.LogStatusChange(status);
         }
 
         private enum Trigger
