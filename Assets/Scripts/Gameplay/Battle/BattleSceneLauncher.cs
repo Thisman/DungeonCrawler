@@ -30,6 +30,11 @@ namespace DungeonCrawler.Gameplay.Battle
             _stateMachine.Start();
         }
 
+        private void OnDestroy()
+        {
+            _stateMachine?.Stop();
+        }
+
         private IEnumerable<SquadModel> BuildSquads()
         {
             foreach (var config in _squads)

@@ -11,6 +11,7 @@ namespace DungeonCrawler.Gameplay.Battle
         private readonly StateMachine<BattleState, Trigger> _stateMachine;
         private readonly BattleLogger _logger;
         private BattleState _currentState;
+        private bool _isStopped;
 
         public BattleState CurrentState => _currentState;
 
@@ -31,6 +32,11 @@ namespace DungeonCrawler.Gameplay.Battle
         public void Start()
         {
             EnterState(_currentState);
+        }
+
+        public void Stop()
+        {
+            _isStopped = true;
         }
 
         private void ConfigureTransitions()
@@ -151,7 +157,7 @@ namespace DungeonCrawler.Gameplay.Battle
         protected virtual void EnterPreparation()
         {
             SetStatus(BattleStatus.Preparation);
-            _stateMachine.Fire(Trigger.NextState);
+            Fire(Trigger.NextState);
         }
 
         protected virtual void ExitPreparation()
@@ -162,13 +168,13 @@ namespace DungeonCrawler.Gameplay.Battle
         }
 
         protected virtual void EnterRoundInit() {
-            _stateMachine.Fire(Trigger.NextState);
+            Fire(Trigger.NextState);
         }
 
         protected virtual void ExitRoundInit() { }
 
         protected virtual void EnterRoundStart() {
-            _stateMachine.Fire(Trigger.NextState);
+            Fire(Trigger.NextState);
         }
 
         protected virtual void ExitRoundStart() { }
@@ -179,36 +185,36 @@ namespace DungeonCrawler.Gameplay.Battle
 
             if (_context.ActiveUnit == null)
             {
-                _stateMachine.Fire(Trigger.EndRound);
+                Fire(Trigger.EndRound);
                 return;
             }
 
-            _stateMachine.Fire(Trigger.NextState);
+            Fire(Trigger.NextState);
         }
 
         protected virtual void ExitTurnInit() { }
 
         protected virtual void EnterTurnStart() {
-            _stateMachine.Fire(Trigger.NextState);
+            Fire(Trigger.NextState);
         }
 
         protected virtual void ExitTurnStart() { }
 
         protected virtual async void EnterWaitForAction() {
             await Task.Delay(TimeSpan.FromSeconds(5));
-            _stateMachine.Fire(Trigger.NextState);
+            Fire(Trigger.NextState);
         }
 
         protected virtual void ExitWaitForAction() { }
 
         protected virtual void EnterTurnEnd() {
-            _stateMachine.Fire(Trigger.NextState);
+            Fire(Trigger.NextState);
         }
 
         protected virtual void ExitTurnEnd() { }
 
         protected virtual void EnterRoundEnd() {
-            _stateMachine.Fire(Trigger.NextState);
+            Fire(Trigger.NextState);
         }
 
         protected virtual void ExitRoundEnd() { }
@@ -216,7 +222,7 @@ namespace DungeonCrawler.Gameplay.Battle
         protected virtual void EnterResult()
         {
             SetStatus(BattleStatus.Result);
-            _stateMachine.Fire(Trigger.NextState);
+            Fire(Trigger.NextState);
         }
 
         protected virtual void ExitResult()
@@ -228,6 +234,16 @@ namespace DungeonCrawler.Gameplay.Battle
         {
             _context.Status = status;
             _logger.LogStatusChange(status);
+        }
+
+        private void Fire(Trigger trigger)
+        {
+            if (_isStopped)
+            {
+                return;
+            }
+
+            _stateMachine.Fire(trigger);
         }
 
         private enum Trigger
