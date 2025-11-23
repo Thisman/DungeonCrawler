@@ -1,6 +1,7 @@
 // Boots the battle scene by building squads from inspector data and running the battle state machine.
 using System;
 using System.Collections.Generic;
+using DungeonCrawler.Core.EventBus;
 using DungeonCrawler.Gameplay.Squad;
 using DungeonCrawler.Gameplay.Unit;
 using UnityEngine;
@@ -20,13 +21,15 @@ namespace DungeonCrawler.Gameplay.Battle
         private bool _useLogging = true;
 
         private BattleStateMachine _stateMachine;
+        private GameEventBus _sceneEventBus;
 
         private void Start()
         {
             var context = new BattleContext(BuildSquads());
             var logger = _useLogging ? new BattleLogger() : null;
 
-            _stateMachine = new BattleStateMachine(context, _initialState, logger);
+            _sceneEventBus = new GameEventBus();
+            _stateMachine = new BattleStateMachine(context, _sceneEventBus, logger);
             _stateMachine.Start();
         }
 

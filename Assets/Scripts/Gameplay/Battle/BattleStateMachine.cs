@@ -1,7 +1,8 @@
 // Coordinates battle round and turn flow using Stateless for state transitions with entry/exit hooks for every state.
+using DungeonCrawler.Core.EventBus;
+using Stateless;
 using System;
 using System.Threading.Tasks;
-using Stateless;
 
 namespace DungeonCrawler.Gameplay.Battle
 {
@@ -11,25 +12,25 @@ namespace DungeonCrawler.Gameplay.Battle
         private readonly StateMachine<BattleState, Trigger> _stateMachine;
         private readonly BattleLogger _logger;
         private BattleState _currentState;
+        private GameEventBus _sceneEventBus;
         private bool _isStopped;
-
-        public Action<BattleState, BattleState, string, BattleContext> OnTransitioned;
 
         public BattleState CurrentState => _currentState;
 
         public BattleContext Context => _context;
 
-        public BattleStateMachine(BattleContext context, BattleState initialState = BattleState.Preparation, BattleLogger logger = null)
+        public BattleStateMachine(BattleContext context, GameEventBus sceneEventBus, BattleLogger logger = null)
         {
-            _context = context ?? throw new ArgumentNullException(nameof(context));
-            _logger = logger ?? new BattleLogger();
-            _currentState = initialState;
+            _logger = logger;
+            _context = context;
+            _sceneEventBus = sceneEventBus;
+            _currentState = BattleState.Preparation;
             _stateMachine = new StateMachine<BattleState, Trigger>(() => _currentState, state => _currentState = state);
 
             ConfigureTransitions();
             _stateMachine.OnTransitioned(transition => {
                 _logger.LogTransition(transition.Source, transition.Destination, transition.Trigger.ToString());
-                OnTransitioned?.Invoke(transition.Source, transition.Destination, transition.Trigger.ToString(), _context);
+                _sceneEventBus.Publish(new BattleStateChanged(transition.Source, transition.Destination, _context));
             });
             _stateMachine.OnUnhandledTrigger((state, trigger) => {
                 _logger.LogUnhandledTrigger(state, trigger.ToString());

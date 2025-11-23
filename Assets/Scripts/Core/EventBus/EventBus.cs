@@ -243,3 +243,8 @@ namespace DungeonCrawler.Core.EventBus
         }
     }
 }
+
+namespace System.Runtime.CompilerServices
+{
+    internal static class IsExternalInit { }
+}
