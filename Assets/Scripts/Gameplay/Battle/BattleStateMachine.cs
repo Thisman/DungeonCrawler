@@ -57,10 +57,12 @@ namespace DungeonCrawler.Gameplay.Battle
                 .Permit(Trigger.NextState, BattleState.RoundInit);
 
             ConfigureState(BattleState.RoundInit)
-                .Permit(Trigger.NextState, BattleState.RoundStart);
+                .Permit(Trigger.NextState, BattleState.RoundStart)
+                .Permit(Trigger.Finish, BattleState.Result);
 
             ConfigureState(BattleState.RoundStart)
-                .Permit(Trigger.NextState, BattleState.TurnInit);
+                .Permit(Trigger.NextState, BattleState.TurnInit)
+                .Permit(Trigger.Finish, BattleState.Result);
 
             ConfigureState(BattleState.TurnInit)
                 .Permit(Trigger.NextState, BattleState.TurnStart)
@@ -68,10 +70,12 @@ namespace DungeonCrawler.Gameplay.Battle
                 .Permit(Trigger.Finish, BattleState.Result);
 
             ConfigureState(BattleState.TurnStart)
-                .Permit(Trigger.NextState, BattleState.WaitForAction);
+                .Permit(Trigger.NextState, BattleState.WaitForAction)
+                .Permit(Trigger.Finish, BattleState.Result);
 
             ConfigureState(BattleState.WaitForAction)
-                .Permit(Trigger.NextState, BattleState.TurnEnd);
+                .Permit(Trigger.NextState, BattleState.TurnEnd)
+                .Permit(Trigger.Finish, BattleState.Result);
 
             ConfigureState(BattleState.TurnEnd)
                 .Permit(Trigger.NextState, BattleState.TurnInit)
@@ -259,9 +263,26 @@ namespace DungeonCrawler.Gameplay.Battle
             _stateMachine.Fire(trigger);
         }
 
+        private void TryFire(Trigger trigger)
+        {
+            if (_isStopped)
+            {
+                return;
+            }
+
+            if (_stateMachine.CanFire(trigger))
+            {
+                Fire(trigger);
+            }
+        }
+
         private void SubscribeToSceneEvents()
         {
-            _subscribtions.Add(_sceneEventBus.Subscribe<RequestBattlePreparationFinish>((RequestBattlePreparationFinish _) => Fire(Trigger.NextState)));
+            _subscribtions.Add(_sceneEventBus.Subscribe<RequestBattlePreparationFinish>((RequestBattlePreparationFinish _) => TryFire(Trigger.NextState)));
+            _subscribtions.Add(_sceneEventBus.Subscribe<RequestSkipTurnAction>((RequestSkipTurnAction _) => TryFire(Trigger.NextState)));
+            _subscribtions.Add(_sceneEventBus.Subscribe<RequestWaitAction>((RequestWaitAction _) => TryFire(Trigger.NextState)));
+            _subscribtions.Add(_sceneEventBus.Subscribe<RequestFleeFromBattle>((RequestFleeFromBattle _) => TryFire(Trigger.Finish)));
+            _subscribtions.Add(_sceneEventBus.Subscribe<RequestFinishBattle>((RequestFinishBattle _) => TryFire(Trigger.Finish)));
         }
 
         private void UnsubscribeFromSceneEvents()

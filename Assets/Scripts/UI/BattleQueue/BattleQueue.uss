@@ -1,0 +1,18 @@
+.battle-queue {
+    width: 100%;
+    height: 100%;
+    justify-content: flex-start;
+    align-items: flex-start;
+    padding: 12px;
+}
+
+.battle-queue__list {
+    flex-direction: row;
+    gap: 10px;
+}
+
+.battle-queue__entry {
+    padding: 4px 8px;
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+}

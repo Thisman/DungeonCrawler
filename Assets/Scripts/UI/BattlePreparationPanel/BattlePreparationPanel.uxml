@@ -1,0 +1,7 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <ui:Style src="BattlePreparationPanel.uss" />
+    <ui:VisualElement class="battle-preparation">
+        <ui:Label text="Тактическая фаза" class="battle-preparation__title" />
+        <ui:Button name="start-battle-button" text="Начать битву" class="battle-preparation__start" />
+    </ui:VisualElement>
+</ui:UXML>

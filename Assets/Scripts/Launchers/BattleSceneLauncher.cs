@@ -23,13 +23,21 @@ namespace DungeonCrawler.Gameplay.Battle
         private BattleStateMachine _stateMachine;
         private GameEventBus _sceneEventBus;
 
-        private void Start()
+        public GameEventBus SceneEventBus => _sceneEventBus;
+
+        public BattleState CurrentBattleState => _stateMachine?.CurrentState ?? _initialState;
+
+        private void Awake()
         {
             var context = new BattleContext(BuildSquads());
             var logger = _useLogging ? new BattleLogger() : null;
 
             _sceneEventBus = new GameEventBus();
             _stateMachine = new BattleStateMachine(context, _sceneEventBus, logger);
+        }
+
+        private void Start()
+        {
             _stateMachine.Start();
         }
 
