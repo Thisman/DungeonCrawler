@@ -5,6 +5,7 @@ namespace DungeonCrawler.Gameplay.Battle
     {
         Preparation,
         Progress,
-        Result
+        Result,
+        Finished
     }
 }

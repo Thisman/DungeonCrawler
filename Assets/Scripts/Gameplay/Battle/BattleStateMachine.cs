@@ -1,4 +1,5 @@
 // Coordinates battle round and turn flow using Stateless for state transitions with entry/exit hooks for every state.
+using System;
 using Stateless;
 
 namespace DungeonCrawler.Gameplay.Battle
@@ -18,11 +19,13 @@ namespace DungeonCrawler.Gameplay.Battle
 
     public class BattleStateMachine
     {
+        private readonly BattleContext _context;
         private readonly StateMachine<BattleState, Trigger> _stateMachine;
         private BattleState _currentState;
 
-        public BattleStateMachine(BattleState initialState = BattleState.Preparation)
+        public BattleStateMachine(BattleContext context, BattleState initialState = BattleState.Preparation)
         {
+            _context = context ?? throw new ArgumentNullException(nameof(context));
             _currentState = initialState;
             _stateMachine = new StateMachine<BattleState, Trigger>(() => _currentState, state => _currentState = state);
 
@@ -30,6 +33,8 @@ namespace DungeonCrawler.Gameplay.Battle
         }
 
         public BattleState CurrentState => _currentState;
+
+        public BattleContext Context => _context;
 
         public bool IsTerminal => CurrentState == BattleState.Result;
 
@@ -156,9 +161,15 @@ namespace DungeonCrawler.Gameplay.Battle
             }
         }
 
-        protected virtual void EnterPreparation() { }
+        protected virtual void EnterPreparation()
+        {
+            _context.Status = BattleStatus.Preparation;
+        }
 
-        protected virtual void ExitPreparation() { }
+        protected virtual void ExitPreparation()
+        {
+            _context.Status = BattleStatus.Progress;
+        }
 
         protected virtual void EnterRoundInit() { }
 
@@ -188,9 +199,15 @@ namespace DungeonCrawler.Gameplay.Battle
 
         protected virtual void ExitRoundEnd() { }
 
-        protected virtual void EnterResult() { }
+        protected virtual void EnterResult()
+        {
+            _context.Status = BattleStatus.Result;
+        }
 
-        protected virtual void ExitResult() { }
+        protected virtual void ExitResult()
+        {
+            _context.Status = BattleStatus.Finished;
+        }
 
         private enum Trigger
         {
