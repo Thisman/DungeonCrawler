@@ -145,6 +145,7 @@ namespace DungeonCrawler.Gameplay.Battle
         protected virtual void EnterPreparation()
         {
             SetStatus(BattleStatus.Preparation);
+            _stateMachine.Fire(Trigger.NextState);
         }
 
         protected virtual void ExitPreparation()
@@ -154,11 +155,15 @@ namespace DungeonCrawler.Gameplay.Battle
             _context.Queue.GetAvailableQueue(_context.Squads.Count);
         }
 
-        protected virtual void EnterRoundInit() { }
+        protected virtual void EnterRoundInit() {
+            _stateMachine.Fire(Trigger.NextState);
+        }
 
         protected virtual void ExitRoundInit() { }
 
-        protected virtual void EnterRoundStart() { }
+        protected virtual void EnterRoundStart() {
+            _stateMachine.Fire(Trigger.NextState);
+        }
 
         protected virtual void ExitRoundStart() { }
 
@@ -169,30 +174,42 @@ namespace DungeonCrawler.Gameplay.Battle
             if (_context.ActiveUnit == null)
             {
                 _stateMachine.Fire(Trigger.EndRound);
+                return;
             }
+
+            _stateMachine.Fire(Trigger.NextState);
         }
 
         protected virtual void ExitTurnInit() { }
 
-        protected virtual void EnterTurnStart() { }
+        protected virtual void EnterTurnStart() {
+            _stateMachine.Fire(Trigger.NextState);
+        }
 
         protected virtual void ExitTurnStart() { }
 
-        protected virtual void EnterWaitForAction() { }
+        protected virtual void EnterWaitForAction() {
+            _stateMachine.Fire(Trigger.NextState);
+        }
 
         protected virtual void ExitWaitForAction() { }
 
-        protected virtual void EnterTurnEnd() { }
+        protected virtual void EnterTurnEnd() {
+            _stateMachine.Fire(Trigger.NextState);
+        }
 
         protected virtual void ExitTurnEnd() { }
 
-        protected virtual void EnterRoundEnd() { }
+        protected virtual void EnterRoundEnd() {
+            _stateMachine.Fire(Trigger.NextState);
+        }
 
         protected virtual void ExitRoundEnd() { }
 
         protected virtual void EnterResult()
         {
             SetStatus(BattleStatus.Result);
+            _stateMachine.Fire(Trigger.NextState);
         }
 
         protected virtual void ExitResult()
