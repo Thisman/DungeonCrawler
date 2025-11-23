@@ -1,6 +1,7 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <ui:Style src="../Global.uss" />
     <ui:Style src="BattleProgressPanel.uss" />
-    <ui:VisualElement class="battle-progress">
+    <ui:VisualElement class="panel battle-progress">
         <ui:VisualElement class="battle-progress__bottom">
             <ui:VisualElement class="battle-progress__left">
                 <ui:Button name="skip-turn-button" text="Пропустить" class="battle-progress__button" />

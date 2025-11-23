@@ -1,101 +1,30 @@
 // Shows in-battle action controls for skipping, waiting, or fleeing during combat.
 using DungeonCrawler.Gameplay.Battle;
+using DungeonCrawler.UI.Common;
 using UnityEngine.UIElements;
 
 namespace DungeonCrawler.UI.Battle
 {
-    public class BattleProgressPanel : BattleUIPanel
+    public class BattleProgressPanel : BaseUIController
     {
-        private Button _skipButton;
-        private Button _waitButton;
-        private Button _fleeButton;
-
-        protected override void OnPanelAttachedToPanel()
+        protected override void RegisterUIElements()
         {
-            ResolveElements();
-            RegisterUiCallbacks();
-            base.OnPanelAttachedToPanel();
         }
 
-        protected override void RegisterSubscriptions()
+        protected override void SubscriveToGameEvents()
         {
-            if (SceneEventBus == null)
-            {
-                return;
-            }
-
-            AddSubscription(SceneEventBus.Subscribe<BattleStateChanged>(HandleBattleStateChanged));
         }
 
-        protected override void UnregisterUiCallbacks()
+        protected override void UnsubscribeFromGameEvents()
         {
-            if (_skipButton != null)
-            {
-                _skipButton.clicked -= OnSkipTurnClicked;
-            }
-
-            if (_waitButton != null)
-            {
-                _waitButton.clicked -= OnWaitClicked;
-            }
-
-            if (_fleeButton != null)
-            {
-                _fleeButton.clicked -= OnFleeClicked;
-            }
         }
 
-        private void RegisterUiCallbacks()
+        protected override void SubcribeToUIEvents()
         {
-            if (_skipButton != null)
-            {
-                _skipButton.clicked += OnSkipTurnClicked;
-            }
-
-            if (_waitButton != null)
-            {
-                _waitButton.clicked += OnWaitClicked;
-            }
-
-            if (_fleeButton != null)
-            {
-                _fleeButton.clicked += OnFleeClicked;
-            }
         }
 
-        private void ResolveElements()
+        protected override void UnsubscriveFromUIEvents()
         {
-            _skipButton ??= Root?.Q<Button>("skip-turn-button");
-            _waitButton ??= Root?.Q<Button>("wait-button");
-            _fleeButton ??= Root?.Q<Button>("flee-button");
-        }
-
-        private void HandleBattleStateChanged(BattleStateChanged stateChanged)
-        {
-            if (stateChanged.FromState == BattleState.Preparation)
-            {
-                Show();
-            }
-
-            if (stateChanged.ToState == BattleState.Result)
-            {
-                Hide();
-            }
-        }
-
-        private void OnSkipTurnClicked()
-        {
-            SceneEventBus?.Publish(new RequestSkipTurnAction());
-        }
-
-        private void OnWaitClicked()
-        {
-            SceneEventBus?.Publish(new RequestWaitAction());
-        }
-
-        private void OnFleeClicked()
-        {
-            SceneEventBus?.Publish(new RequestFleeFromBattle());
         }
     }
 }

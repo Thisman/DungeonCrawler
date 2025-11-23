@@ -2,14 +2,15 @@
     flex-direction: column;
     justify-content: flex-start;
     align-items: stretch;
-    padding: 24px;
+    padding: 16px;
     width: 100%;
     height: 100%;
 }
 
 .battle-preparation__title {
     align-self: center;
-    font-size: 24px;
+    font-size: 70px;
+    color: rgb(255, 255, 255);
     unity-font-style: bold;
     margin-top: 8px;
     margin-bottom: auto;

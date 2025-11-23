@@ -2,68 +2,31 @@
 using System.Collections.Generic;
 using DungeonCrawler.Gameplay.Battle;
 using DungeonCrawler.Gameplay.Squad;
+using DungeonCrawler.UI.Common;
 using UnityEngine.UIElements;
 
 namespace DungeonCrawler.UI.Battle
 {
-    public class BattleQueuePanel : BattleUIPanel
+    public class BattleQueuePanel : BaseUIController
     {
-        private VisualElement _queueContainer;
-
-        protected override void OnPanelAttachedToPanel()
+        protected override void RegisterUIElements()
         {
-            ResolveElements();
-            base.OnPanelAttachedToPanel();
         }
 
-        protected override void RegisterSubscriptions()
+        protected override void SubscriveToGameEvents()
         {
-            if (SceneEventBus == null)
-            {
-                return;
-            }
-
-            AddSubscription(SceneEventBus.Subscribe<BattleStateChanged>(HandleBattleStateChanged));
         }
 
-        private void HandleBattleStateChanged(BattleStateChanged stateChanged)
+        protected override void UnsubscribeFromGameEvents()
         {
-            UpdateQueue(stateChanged.Context);
-
-            if (stateChanged.FromState == BattleState.Preparation)
-            {
-                Show();
-            }
-
-            if (stateChanged.ToState == BattleState.Result)
-            {
-                Hide();
-            }
         }
 
-        private void UpdateQueue(BattleContext context)
+        protected override void SubcribeToUIEvents()
         {
-            if (_queueContainer == null)
-            {
-                return;
-            }
-
-            var items = context?.Queue?.GetAvailableQueue(context.Squads.Count) ?? new List<SquadModel?>();
-
-            _queueContainer.Clear();
-
-            foreach (var entry in items)
-            {
-                var label = new Label(entry?.Unit.Definition.Name ?? ">>");
-                label.AddToClassList("battle-queue__entry");
-
-                _queueContainer.Add(label);
-            }
         }
 
-        private void ResolveElements()
+        protected override void UnsubscriveFromUIEvents()
         {
-            _queueContainer ??= Root?.Q<VisualElement>("queue-container");
         }
     }
 }

@@ -1,76 +1,29 @@
 // Displays the tactical phase UI with the start battle action button.
-using DungeonCrawler.Gameplay.Battle;
+using DungeonCrawler.UI.Common;
 using UnityEngine.UIElements;
 
 namespace DungeonCrawler.UI.Battle
 {
-    public class BattlePreparationPanel : BattleUIPanel
+    public class BattlePreparationPanel : BaseUIController
     {
-        private Button _startButton;
-
-        protected override void OnPanelAttachedToPanel()
+        protected override void RegisterUIElements()
         {
-            ResolveElements();
-            RegisterUiCallbacks();
-            base.OnPanelAttachedToPanel();
-            UpdateInitialVisibility();
         }
 
-        protected override void RegisterSubscriptions()
+        protected override void SubscriveToGameEvents()
         {
-            if (SceneEventBus == null)
-            {
-                return;
-            }
-
-            AddSubscription(SceneEventBus.Subscribe<BattleStateChanged>(HandleBattleStateChanged));
         }
 
-        protected override void UnregisterUiCallbacks()
+        protected override void UnsubscribeFromGameEvents()
         {
-            if (_startButton != null)
-            {
-                _startButton.clicked -= OnStartBattleClicked;
-            }
         }
 
-        private void RegisterUiCallbacks()
+        protected override void SubcribeToUIEvents()
         {
-            if (_startButton != null)
-            {
-                _startButton.clicked += OnStartBattleClicked;
-            }
         }
 
-        private void ResolveElements()
+        protected override void UnsubscriveFromUIEvents()
         {
-            _startButton ??= Root?.Q<Button>("start-battle-button");
-        }
-
-        private void HandleBattleStateChanged(BattleStateChanged stateChanged)
-        {
-            if (stateChanged.ToState == BattleState.Preparation)
-            {
-                Show();
-            }
-
-            if (stateChanged.FromState == BattleState.Preparation)
-            {
-                Hide();
-            }
-        }
-
-        private void UpdateInitialVisibility()
-        {
-            if (Launcher != null && Launcher.CurrentBattleState == BattleState.Preparation)
-            {
-                Show();
-            }
-        }
-
-        private void OnStartBattleClicked()
-        {
-            SceneEventBus?.Publish(new RequestBattlePreparationFinish());
         }
     }
 }

@@ -1,68 +1,30 @@
 // Presents the battle completion button once combat reaches the result state.
 using DungeonCrawler.Gameplay.Battle;
+using DungeonCrawler.UI.Common;
 using UnityEngine.UIElements;
 
 namespace DungeonCrawler.UI.Battle
 {
-    public class BattleResultPanel : BattleUIPanel
+    public class BattleResultPanel : BaseUIController
     {
-        private Button _finishButton;
-
-        protected override void OnPanelAttachedToPanel()
+        protected override void RegisterUIElements()
         {
-            ResolveElements();
-            RegisterUiCallbacks();
-            base.OnPanelAttachedToPanel();
         }
 
-        protected override void RegisterSubscriptions()
+        protected override void SubscriveToGameEvents()
         {
-            if (SceneEventBus == null)
-            {
-                return;
-            }
-
-            AddSubscription(SceneEventBus.Subscribe<BattleStateChanged>(HandleBattleStateChanged));
         }
 
-        protected override void UnregisterUiCallbacks()
+        protected override void UnsubscribeFromGameEvents()
         {
-            if (_finishButton != null)
-            {
-                _finishButton.clicked -= OnFinishClicked;
-            }
         }
 
-        private void RegisterUiCallbacks()
+        protected override void SubcribeToUIEvents()
         {
-            if (_finishButton != null)
-            {
-                _finishButton.clicked += OnFinishClicked;
-            }
         }
 
-        private void ResolveElements()
+        protected override void UnsubscriveFromUIEvents()
         {
-            _finishButton ??= Root?.Q<Button>("finish-battle-button");
-        }
-
-        private void HandleBattleStateChanged(BattleStateChanged stateChanged)
-        {
-            if (stateChanged.ToState == BattleState.Result)
-            {
-                Show();
-                return;
-            }
-
-            if (stateChanged.FromState == BattleState.Result)
-            {
-                Hide();
-            }
-        }
-
-        private void OnFinishClicked()
-        {
-            SceneEventBus?.Publish(new RequestFinishBattle());
         }
     }
 }

@@ -6,6 +6,7 @@ using DungeonCrawler.Gameplay.Squad;
 using DungeonCrawler.Gameplay.Unit;
 using UnityEngine;
 using DungeonCrawler.UI.Battle;
+using DungeonCrawler.UI.Common;
 
 namespace DungeonCrawler.Gameplay.Battle
 {
@@ -20,6 +21,9 @@ namespace DungeonCrawler.Gameplay.Battle
 
         [SerializeField]
         private bool _useLogging = true;
+
+        [SerializeField]
+        private BaseUIController[] _uiPanels;
 
         private BattleStateMachine _stateMachine;
         private GameEventBus _sceneEventBus;
@@ -51,9 +55,9 @@ namespace DungeonCrawler.Gameplay.Battle
 
         private void InitializeUIPanels()
         {
-            foreach (var uiPanel in FindObjectsOfType<BattleUIPanel>(true))
+            foreach (var uiPanel in _uiPanels)
             {
-                uiPanel.Init(this);
+                uiPanel.Initialize(_sceneEventBus);
             }
         }
 
