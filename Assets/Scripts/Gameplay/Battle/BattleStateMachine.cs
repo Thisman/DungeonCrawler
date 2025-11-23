@@ -4,19 +4,6 @@ using Stateless;
 
 namespace DungeonCrawler.Gameplay.Battle
 {
-    public enum BattleState
-    {
-        Preparation,
-        RoundInit,
-        RoundStart,
-        TurnInit,
-        TurnStart,
-        WaitForAction,
-        TurnEnd,
-        RoundEnd,
-        Result
-    }
-
     public class BattleStateMachine
     {
         private readonly BattleContext _context;
