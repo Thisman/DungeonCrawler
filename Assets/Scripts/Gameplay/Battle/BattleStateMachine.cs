@@ -25,8 +25,12 @@ namespace DungeonCrawler.Gameplay.Battle
             _stateMachine = new StateMachine<BattleState, Trigger>(() => _currentState, state => _currentState = state);
 
             ConfigureTransitions();
-            _stateMachine.OnTransitioned(transition => _logger.LogTransition(transition.Source, transition.Destination, transition.Trigger.ToString()));
-            _stateMachine.OnUnhandledTrigger((state, trigger) => _logger.LogUnhandledTrigger(state, trigger.ToString()));
+            _stateMachine.OnTransitioned(transition => {
+                _logger.LogTransition(transition.Source, transition.Destination, transition.Trigger.ToString());
+            });
+            _stateMachine.OnUnhandledTrigger((state, trigger) => {
+                _logger.LogUnhandledTrigger(state, trigger.ToString());
+            });
         }
 
         public void Start()
@@ -154,32 +158,32 @@ namespace DungeonCrawler.Gameplay.Battle
             }
         }
 
-        protected virtual void EnterPreparation()
+        private void EnterPreparation()
         {
             SetStatus(BattleStatus.Preparation);
             Fire(Trigger.NextState);
         }
 
-        protected virtual void ExitPreparation()
+        private void ExitPreparation()
         {
             SetStatus(BattleStatus.Progress);
             _context.Queue = new BattleQueue(_context.Squads);
             _context.Queue.GetAvailableQueue(_context.Squads.Count);
         }
 
-        protected virtual void EnterRoundInit() {
+        private void EnterRoundInit() {
             Fire(Trigger.NextState);
         }
 
-        protected virtual void ExitRoundInit() { }
+        private void ExitRoundInit() { }
 
-        protected virtual void EnterRoundStart() {
+        private void EnterRoundStart() {
             Fire(Trigger.NextState);
         }
 
-        protected virtual void ExitRoundStart() { }
+        private void ExitRoundStart() { }
 
-        protected virtual void EnterTurnInit()
+        private void EnterTurnInit()
         {
             _context.ActiveUnit = _context.Queue?.GetNext();
 
@@ -192,40 +196,40 @@ namespace DungeonCrawler.Gameplay.Battle
             Fire(Trigger.NextState);
         }
 
-        protected virtual void ExitTurnInit() { }
+        private void ExitTurnInit() { }
 
-        protected virtual void EnterTurnStart() {
+        private void EnterTurnStart() {
             Fire(Trigger.NextState);
         }
 
-        protected virtual void ExitTurnStart() { }
+        private void ExitTurnStart() { }
 
         protected virtual async void EnterWaitForAction() {
             await Task.Delay(TimeSpan.FromSeconds(5));
             Fire(Trigger.NextState);
         }
 
-        protected virtual void ExitWaitForAction() { }
+        private void ExitWaitForAction() { }
 
-        protected virtual void EnterTurnEnd() {
+        private void EnterTurnEnd() {
             Fire(Trigger.NextState);
         }
 
-        protected virtual void ExitTurnEnd() { }
+        private void ExitTurnEnd() { }
 
-        protected virtual void EnterRoundEnd() {
+        private void EnterRoundEnd() {
             Fire(Trigger.NextState);
         }
 
-        protected virtual void ExitRoundEnd() { }
+        private void ExitRoundEnd() { }
 
-        protected virtual void EnterResult()
+        private void EnterResult()
         {
             SetStatus(BattleStatus.Result);
             Fire(Trigger.NextState);
         }
 
-        protected virtual void ExitResult()
+        private void ExitResult()
         {
             SetStatus(BattleStatus.Finished);
         }
