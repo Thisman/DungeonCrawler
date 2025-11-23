@@ -156,6 +156,8 @@ namespace DungeonCrawler.Gameplay.Battle
         protected virtual void ExitPreparation()
         {
             _context.Status = BattleStatus.Progress;
+            _context.Queue = new BattleQueue(_context.Squads);
+            _context.Queue.GetAvailableQueue(_context.Squads.Count);
         }
 
         protected virtual void EnterRoundInit() { }
@@ -166,7 +168,16 @@ namespace DungeonCrawler.Gameplay.Battle
 
         protected virtual void ExitRoundStart() { }
 
-        protected virtual void EnterTurnInit() { }
+        protected virtual void EnterTurnInit()
+        {
+            _context.ActiveUnit = _context.Queue?.GetNext();
+
+            if (_context.ActiveUnit == null)
+            {
+                SetState(BattleState.RoundEnd);
+                EnterState(BattleState.RoundEnd);
+            }
+        }
 
         protected virtual void ExitTurnInit() { }
 
