@@ -23,54 +23,40 @@ namespace DungeonCrawler.Gameplay.Battle
 
         public BattleContext Context => _context;
 
-        public bool IsTerminal => CurrentState == BattleState.Result;
-
-        public void MoveNext()
-        {
-            if (IsTerminal)
-            {
-                return;
-            }
-
-            _stateMachine.Fire(Trigger.Advance);
-        }
-
-        public void CompleteBattle()
-        {
-            if (IsTerminal)
-            {
-                return;
-            }
-
-            _stateMachine.Fire(Trigger.Finish);
-        }
-
-        public void SetState(BattleState state)
-        {
-            _currentState = state;
-        }
-
         private void ConfigureTransitions()
         {
-            ConfigureFlowState(BattleState.Preparation, BattleState.RoundInit);
-            ConfigureFlowState(BattleState.RoundInit, BattleState.RoundStart);
-            ConfigureFlowState(BattleState.RoundStart, BattleState.TurnInit);
-            ConfigureFlowState(BattleState.TurnInit, BattleState.TurnStart);
-            ConfigureFlowState(BattleState.TurnStart, BattleState.WaitForAction);
-            ConfigureFlowState(BattleState.WaitForAction, BattleState.TurnEnd);
-            ConfigureFlowState(BattleState.TurnEnd, BattleState.TurnInit);
-            ConfigureFlowState(BattleState.RoundEnd, BattleState.RoundInit);
+            ConfigureState(BattleState.Preparation)
+                .Permit(Trigger.NextState, BattleState.RoundInit);
+
+            ConfigureState(BattleState.RoundInit)
+                .Permit(Trigger.NextState, BattleState.RoundStart);
+
+            ConfigureState(BattleState.RoundStart)
+                .Permit(Trigger.NextState, BattleState.TurnInit);
+
+            ConfigureState(BattleState.TurnInit)
+                .Permit(Trigger.NextState, BattleState.TurnStart)
+                .Permit(Trigger.EndRound, BattleState.RoundEnd)
+                .Permit(Trigger.Finish, BattleState.Result);
+
+            ConfigureState(BattleState.TurnStart)
+                .Permit(Trigger.NextState, BattleState.WaitForAction);
+
+            ConfigureState(BattleState.WaitForAction)
+                .Permit(Trigger.NextState, BattleState.TurnEnd);
+
+            ConfigureState(BattleState.TurnEnd)
+                .Permit(Trigger.NextState, BattleState.TurnInit)
+                .Permit(Trigger.Finish, BattleState.Result);
+
+            ConfigureState(BattleState.RoundEnd)
+                .Permit(Trigger.NextState, BattleState.RoundInit)
+                .Permit(Trigger.Finish, BattleState.Result);
 
             ConfigureState(BattleState.Result)
-                .Ignore(Trigger.Advance)
-                .Ignore(Trigger.Finish);
-        }
-
-        private void ConfigureFlowState(BattleState from, BattleState advanceTo)
-        {
-            ConfigureState(from)
-                .Permit(Trigger.Advance, advanceTo)
-                .Permit(Trigger.Finish, BattleState.Result);
+                .Ignore(Trigger.NextState)
+                .Ignore(Trigger.Finish)
+                .Ignore(Trigger.EndRound);
         }
 
         private StateMachine<BattleState, Trigger>.StateConfiguration ConfigureState(BattleState state)
@@ -156,6 +142,8 @@ namespace DungeonCrawler.Gameplay.Battle
         protected virtual void ExitPreparation()
         {
             _context.Status = BattleStatus.Progress;
+            _context.Queue = new BattleQueue(_context.Squads);
+            _context.Queue.GetAvailableQueue(_context.Squads.Count);
         }
 
         protected virtual void EnterRoundInit() { }
@@ -166,7 +154,15 @@ namespace DungeonCrawler.Gameplay.Battle
 
         protected virtual void ExitRoundStart() { }
 
-        protected virtual void EnterTurnInit() { }
+        protected virtual void EnterTurnInit()
+        {
+            _context.ActiveUnit = _context.Queue?.GetNext();
+
+            if (_context.ActiveUnit == null)
+            {
+                _stateMachine.Fire(Trigger.EndRound);
+            }
+        }
 
         protected virtual void ExitTurnInit() { }
 
@@ -198,7 +194,8 @@ namespace DungeonCrawler.Gameplay.Battle
 
         private enum Trigger
         {
-            Advance,
+            NextState,
+            EndRound,
             Finish
         }
     }
