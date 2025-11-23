@@ -1,6 +1,6 @@
 # Architectural Roles
 
-1. *Model
+## Model
 
 Зона ответственности
 
@@ -47,7 +47,7 @@ public class HealthModel
     }
 }
 
-2. *View
+## View
 
 Зона ответственности
 
@@ -76,7 +76,7 @@ public class HealthView : MonoBehaviour
     }
 }
 
-3. *Controller
+## Controller
 
 Зона ответственности
 
@@ -122,7 +122,7 @@ public class HealthController
     }
 }
 
-4. *Manager
+## Manager
 
 Зона ответственности
 
@@ -168,7 +168,7 @@ public class UnitManager
     }
 }
 
-5. *System
+## System
 
 Зона ответственности
 
@@ -209,7 +209,7 @@ public class DamageSystem
     }
 }
 
-6. *Service
+## Service
 
 Зона ответственности
 
@@ -261,7 +261,7 @@ public class FileSaveService : ISaveService
     }
 }
 
-7. Сводка различий
+## Сводка различий
 
 Кратко в виде “если ты пишешь класс и думаешь, как его назвать”:
 
