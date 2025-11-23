@@ -1,18 +1,21 @@
 // Coordinates battle round and turn flow using Stateless for state transitions with entry/exit hooks for every state.
 using DungeonCrawler.Core.EventBus;
+using NUnit.Framework;
 using Stateless;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace DungeonCrawler.Gameplay.Battle
 {
     public class BattleStateMachine
     {
-        private readonly BattleContext _context;
-        private readonly StateMachine<BattleState, Trigger> _stateMachine;
         private readonly BattleLogger _logger;
+        private readonly BattleContext _context;
+        private readonly GameEventBus _sceneEventBus;
+        private readonly List<IDisposable> _subscribtions = new();
+        private readonly StateMachine<BattleState, Trigger> _stateMachine;
         private BattleState _currentState;
-        private GameEventBus _sceneEventBus;
         private bool _isStopped;
 
         public BattleState CurrentState => _currentState;
@@ -45,6 +48,7 @@ namespace DungeonCrawler.Gameplay.Battle
         public void Stop()
         {
             _isStopped = true;
+            UnsubscribeFromSceneEvents();
         }
 
         private void ConfigureTransitions()
@@ -165,7 +169,7 @@ namespace DungeonCrawler.Gameplay.Battle
         private void EnterPreparation()
         {
             SetStatus(BattleStatus.Preparation);
-            Fire(Trigger.NextState);
+            SubscribeToSceneEvents();
         }
 
         private void ExitPreparation()
@@ -236,6 +240,7 @@ namespace DungeonCrawler.Gameplay.Battle
         private void ExitResult()
         {
             SetStatus(BattleStatus.Finished);
+            UnsubscribeFromSceneEvents();
         }
 
         private void SetStatus(BattleStatus status)
@@ -252,6 +257,17 @@ namespace DungeonCrawler.Gameplay.Battle
             }
 
             _stateMachine.Fire(trigger);
+        }
+
+        private void SubscribeToSceneEvents()
+        {
+            _subscribtions.Add(_sceneEventBus.Subscribe<RequestBattlePreparationFinish>((RequestBattlePreparationFinish _) => Fire(Trigger.NextState)));
+        }
+
+        private void UnsubscribeFromSceneEvents()
+        {
+            _subscribtions.ForEach(subscribtion => subscribtion.Dispose());
+            _subscribtions.Clear();
         }
 
         private enum Trigger
