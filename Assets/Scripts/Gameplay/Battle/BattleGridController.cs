@@ -131,12 +131,14 @@ namespace DungeonCrawler.Gameplay.Battle
                 return Array.Empty<SquadModel>();
             }
 
-            var comparator = isEnemySide ^ isFrontRow ? Mathf.Max : Mathf.Min;
-            var edgePosition = slots.Count > 0 ? slots[0].LocalX : 0f;
+            var edgePosition = slots[0].LocalX;
+            var useMax = isEnemySide ^ isFrontRow;
 
             foreach (var slot in slots)
             {
-                edgePosition = comparator(edgePosition, slot.LocalX);
+                edgePosition = useMax
+                    ? Mathf.Max(edgePosition, slot.LocalX)
+                    : Mathf.Min(edgePosition, slot.LocalX);
             }
 
             var rowSquads = new List<SquadModel>();
