@@ -20,7 +20,7 @@ namespace DungeonCrawler.Gameplay.Battle
         private readonly List<IDisposable> _subscribtions = new();
         private readonly BattleActionExecutor _battleActionExecutor;
         private readonly StateMachine<BattleState, Trigger> _stateMachine;
-        private readonly Dictionary<string, IUnitController> _unitControllers = new();
+        private readonly Dictionary<string, IBattleController> _unitControllers = new();
 
         public BattleState CurrentState => _currentState;
 
@@ -35,7 +35,7 @@ namespace DungeonCrawler.Gameplay.Battle
             _stateMachine = new StateMachine<BattleState, Trigger>(() => _currentState, state => _currentState = state);
             _battleActionExecutor = new BattleActionExecutor(_sceneEventBus);
 
-            _unitControllers.Add("Player", new PlayerUnitController(_sceneEventBus));
+            _unitControllers.Add("Player", new PlayerController(_sceneEventBus));
             var availableActionForEnemies = new List<UnitAction>()
             {
                 new UnitAttackAction(),
@@ -43,7 +43,7 @@ namespace DungeonCrawler.Gameplay.Battle
                 new UnitAbilityAction(),
                 new UnitSkipTurnAction(),
             };
-            _unitControllers.Add("Enemy", new AiUnitController(availableActionForEnemies, _sceneEventBus));
+            _unitControllers.Add("Enemy", new AIController(availableActionForEnemies, _sceneEventBus));
 
             ConfigureTransitions();
             _stateMachine.OnTransitioned(transition => {
@@ -241,7 +241,7 @@ namespace DungeonCrawler.Gameplay.Battle
                 return;
             }
 
-            IUnitController controller = actor.Unit.Definition.IsFriendly() ?
+            IBattleController controller = actor.Unit.Definition.IsFriendly() ?
                 _unitControllers.GetValueOrDefault("Player") :
                 _unitControllers.GetValueOrDefault("Enemy");
 

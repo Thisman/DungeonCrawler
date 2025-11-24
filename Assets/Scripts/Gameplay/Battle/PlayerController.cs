@@ -5,36 +5,60 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Unity.VisualScripting;
 
 namespace DungeonCrawler.Gameplay.Battle
 {
-    public class AiUnitController : IUnitController
+    public class PlayerController : IBattleController
     {
-        private readonly IReadOnlyList<UnitAction> _availableActions;
         private readonly GameEventBus _sceneEventBus;
 
-        public AiUnitController(IReadOnlyList<UnitAction> availableActions, GameEventBus sceneEventBus)
+        public PlayerController(GameEventBus sceneEventBus)
         {
-            _availableActions = availableActions;
             _sceneEventBus = sceneEventBus;
         }
 
-        public async Task<PlannedUnitAction> DecideActionAsync(
+        public Task<PlannedUnitAction> DecideActionAsync(
             UnitModel actor,
             BattleContext context,
             CancellationToken cancellationToken)
         {
-            await Task.Delay(TimeSpan.FromSeconds(2));
-            var action = ChooseActionDefinition(actor, context);
-            var validTargets = action.GetValidTargets(actor, context);
-            var chosenTargets = ChooseTargets(action, validTargets, actor, context);
+            var tcs = new TaskCompletionSource<PlannedUnitAction>();
 
-            var planned = new PlannedUnitAction(action, actor, chosenTargets);
-            return planned;
-        }
+            IDisposable skipActionSubscribtion = null;
+            IDisposable waitActionSubscribtion = null;
+            skipActionSubscribtion = _sceneEventBus.Subscribe<RequestWaitAction>(evt =>
+            {
+                var action = new UnitSkipTurnAction();
+                var validTargets = action.GetValidTargets(actor, context);
+                var chosenTargets = ChooseTargets(action, validTargets, actor, context);
 
-        private UnitAction ChooseActionDefinition(UnitModel actor, BattleContext context) {
-            return _availableActions.First(a => a.Type == ActionType.SkipTurn);
+                var planned = new PlannedUnitAction(action, actor, chosenTargets);
+
+                skipActionSubscribtion.Dispose();
+                tcs.TrySetResult(planned);
+            });
+
+            waitActionSubscribtion = _sceneEventBus.Subscribe<RequestSkipTurnAction>(evt =>
+            {
+                var action = new UnitWaitAction();
+                var validTargets = action.GetValidTargets(actor, context);
+                var chosenTargets = ChooseTargets(action, validTargets, actor, context);
+
+                var planned = new PlannedUnitAction(action, actor, chosenTargets);
+
+                waitActionSubscribtion.Dispose();
+                tcs.TrySetResult(planned);
+            });
+
+            cancellationToken.Register(() =>
+            {
+                skipActionSubscribtion.Dispose();
+                waitActionSubscribtion.Dispose();
+                tcs.TrySetCanceled(cancellationToken);
+            });
+
+            return tcs.Task;
         }
 
         private IReadOnlyList<UnitModel> ChooseTargets(

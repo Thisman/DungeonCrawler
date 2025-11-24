@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace DungeonCrawler.Gameplay.Battle
 {
-    public interface IUnitController
+    public interface IBattleController
     {
         Task<PlannedUnitAction> DecideActionAsync(
             UnitModel actor,
