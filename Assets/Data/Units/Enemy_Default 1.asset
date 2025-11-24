@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d1f029b1efd6cb41a8a0ce2575f9e93, type: 3}
   m_Name: Enemy_Default 1
   m_EditorClassIdentifier: Assembly-CSharp::DungeonCrawler.Gameplay.Unit.UnitDefinition
-  Icon: {fileID: 0}
+  Icon: {fileID: 7482667652216324306, guid: 75f5f34dc1b5347e0b8351032682f224, type: 3}
   Name: Enemy_Default 2
   Kind: 2
   AttackType: 0
