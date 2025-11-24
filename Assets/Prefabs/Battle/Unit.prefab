@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 3554535419942507252}
   - component: {fileID: -4235598113487094184}
   - component: {fileID: -3801268468514071021}
+  - component: {fileID: 6727850948456637333}
   m_Layer: 6
   m_Name: Unit
   m_TagString: Untagged
@@ -95,6 +96,24 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DungeonCrawler.Gameplay.Squad.SquadController
   _iconRenderer: {fileID: 1659224501506304108}
   _info: {fileID: 1894299381623889394}
+  _animationController: {fileID: 0}
+--- !u!114 &6727850948456637333
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1632812892321294846}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 55b40bdee1e463a4a9632af1b2c40510, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DungeonCrawler.Gameplay.Squad.SquadAnimationController
+  _iconRenderer: {fileID: 1659224501506304108}
+  _targetHighlightColor: {r: 0, g: 1, b: 0, a: 1}
+  _skipTurnColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  _waitColor: {r: 1, g: 0.85, b: 0, a: 1}
+  _blinkDurationSeconds: 0.5
 --- !u!1 &3550713591584299746
 GameObject:
   m_ObjectHideFlags: 0

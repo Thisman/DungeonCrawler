@@ -56,13 +56,12 @@ namespace DungeonCrawler.Gameplay.Battle
         {
             var squads = BuildSquads();
             _sceneEventBus = new GameEventBus();
-            _unitSystem = new UnitSystem(_squadPrefab, transform, _friendlySquadsRoot, _enemySquadsRoot, _unitsPerRow, _squadSpacing);
-            _unitSystem.InitializeSquads(squads);
-
             var context = new BattleContext(squads);
+            _unitSystem = new UnitSystem(_sceneEventBus, _squadPrefab, transform, _friendlySquadsRoot, _enemySquadsRoot, _unitsPerRow, _squadSpacing, context);
+            _unitSystem.InitializeSquads(squads);
             var logger = _useLogging ? new BattleLogger() : null;
 
-            _stateMachine = new BattleStateMachine(context, _sceneEventBus, logger);
+            _stateMachine = new BattleStateMachine(context, _sceneEventBus, _unitSystem, logger);
             _battleTargetPicker.Initialize(_sceneEventBus);
 
             InitializeUIPanels();
