@@ -209,10 +209,7 @@ MonoBehaviour:
   - {fileID: 1334742676}
   - {fileID: 1234006799}
   _squadPrefab: {fileID: -3801268468514071021, guid: 98f35b6f4d06a1f4fb35f0fe9648450b, type: 3}
-  _friendlySquadsRoot: {fileID: 1188729728}
-  _enemySquadsRoot: {fileID: 1149120152}
-  _unitsPerRow: 1
-  _squadSpacing: {x: 1.5, y: 2}
+  _battleGridController: {fileID: 2039933355}
   _battleTargetPicker: {fileID: 67183018}
 --- !u!4 &67183017
 Transform:
@@ -3746,6 +3743,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2039933354}
   - component: {fileID: 2039933353}
+  - component: {fileID: 2039933355}
   m_Layer: 0
   m_Name: Map
   m_TagString: Untagged
@@ -3783,6 +3781,33 @@ Transform:
   - {fileID: 1149120152}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2039933355
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2039933352}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b7ca5f419e7192a498beb1af72c55bb8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DungeonCrawler.Gameplay.Battle.BattleGridController
+  _friendlySlots:
+  - {fileID: 1416644035}
+  - {fileID: 1438460618}
+  - {fileID: 1021292861}
+  - {fileID: 967260472}
+  - {fileID: 29364614}
+  - {fileID: 1869668218}
+  _enemySlots:
+  - {fileID: 1504418510}
+  - {fileID: 480546670}
+  - {fileID: 2037573008}
+  - {fileID: 326415139}
+  - {fileID: 766315769}
+  - {fileID: 1493665435}
+  _defaultParent: {fileID: 2039933354}
 --- !u!1 &2055049121
 GameObject:
   m_ObjectHideFlags: 0
