@@ -6,6 +6,7 @@ using DungeonCrawler.Gameplay.Squad;
 using DungeonCrawler.Gameplay.Unit;
 using DungeonCrawler.UI.Battle;
 using DungeonCrawler.UI.Common;
+using DungeonCrawler.Systems.Input;
 using UnityEngine;
 
 namespace DungeonCrawler.Gameplay.Battle
@@ -59,6 +60,7 @@ namespace DungeonCrawler.Gameplay.Battle
             _sceneEventBus = new GameEventBus();
             _stateMachine = new BattleStateMachine(context, _sceneEventBus, logger);
             _battleTargetPicker.Initialize(_sceneEventBus);
+            GameInputSystem.Instance.EnableMode(InputMode.Battle);
 
             ArrangeSquads(squads);
             InitializeUIPanels();
@@ -72,6 +74,7 @@ namespace DungeonCrawler.Gameplay.Battle
         private void OnDestroy()
         {
             _stateMachine?.Stop();
+            GameInputSystem.Instance.DisableMode(InputMode.Battle);
         }
 
         private void InitializeUIPanels()
