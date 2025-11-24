@@ -14,10 +14,7 @@ namespace DungeonCrawler.Systems.Battle
         private readonly GameEventBus _sceneEventBus;
         private readonly SquadController _squadPrefab;
         private readonly Transform _defaultParent;
-        private readonly Transform _friendlySquadsRoot;
-        private readonly Transform _enemySquadsRoot;
-        private readonly int _unitsPerRow;
-        private readonly Vector2 _squadSpacing;
+        private readonly BattleGridController _gridController;
         private readonly BattleContext _context;
         private readonly List<IDisposable> _subscriptions = new();
         private readonly Dictionary<SquadModel, SquadController> _squadControllers = new();
@@ -28,19 +25,13 @@ namespace DungeonCrawler.Systems.Battle
             GameEventBus sceneEventBus,
             SquadController squadPrefab,
             Transform defaultParent,
-            Transform friendlySquadsRoot,
-            Transform enemySquadsRoot,
-            int unitsPerRow,
-            Vector2 squadSpacing,
+            BattleGridController gridController,
             BattleContext context)
         {
             _sceneEventBus = sceneEventBus;
             _squadPrefab = squadPrefab;
             _defaultParent = defaultParent;
-            _friendlySquadsRoot = friendlySquadsRoot;
-            _enemySquadsRoot = enemySquadsRoot;
-            _unitsPerRow = Mathf.Max(1, unitsPerRow);
-            _squadSpacing = squadSpacing;
+            _gridController = gridController;
             _context = context;
 
             _subscriptions.Add(_sceneEventBus.Subscribe<RequestSelectAction>(HandleRequestSelectAction));
@@ -71,12 +62,20 @@ namespace DungeonCrawler.Systems.Battle
                 }
 
                 var isEnemy = squad.Unit.Definition.IsEnemy();
-                var parent = isEnemy ? _enemySquadsRoot : _friendlySquadsRoot;
-                var squadInstance = UnityEngine.Object.Instantiate(_squadPrefab, parent ? parent : _defaultParent);
                 var slotIndex = isEnemy ? enemyIndex++ : friendlyIndex++;
+                var squadInstance = _gridController != null
+                    ? _gridController.AddToSlot(slotIndex, isEnemy, squad, _squadPrefab)
+                    : UnityEngine.Object.Instantiate(_squadPrefab, _defaultParent);
 
-                squadInstance.transform.localPosition = CalculateLocalPosition(slotIndex, isEnemy);
-                squadInstance.Initalize(squad);
+                if (squadInstance == null)
+                {
+                    continue;
+                }
+
+                if (_gridController == null)
+                {
+                    squadInstance.transform.localPosition = Vector3.zero;
+                }
 
                 _squadControllers[squad] = squadInstance;
                 _unitControllers[squad.Unit] = squadInstance;
@@ -116,15 +115,6 @@ namespace DungeonCrawler.Systems.Battle
             }
 
             _subscriptions.Clear();
-        }
-
-        private Vector3 CalculateLocalPosition(int index, bool isEnemy)
-        {
-            var row = index / _unitsPerRow;
-            var column = index % _unitsPerRow;
-            var direction = isEnemy ? 1f : -1f;
-
-            return new Vector3(direction * column * _squadSpacing.x, -row * _squadSpacing.y, 0f);
         }
 
         private void HandleStateChanged(BattleStateChanged evt)

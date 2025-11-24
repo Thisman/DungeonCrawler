@@ -30,16 +30,7 @@ namespace DungeonCrawler.Gameplay.Battle
         private SquadController _squadPrefab;
 
         [SerializeField]
-        private Transform _friendlySquadsRoot;
-
-        [SerializeField]
-        private Transform _enemySquadsRoot;
-
-        [SerializeField]
-        private int _unitsPerRow = 3;
-
-        [SerializeField]
-        private Vector2 _squadSpacing = new Vector2(1.5f, 1.5f);
+        private BattleGridController _battleGridController;
 
         [SerializeField]
         private BattleTargetPicker _battleTargetPicker;
@@ -57,7 +48,7 @@ namespace DungeonCrawler.Gameplay.Battle
             var squads = BuildSquads();
             _sceneEventBus = new GameEventBus();
             var context = new BattleContext(squads);
-            _unitSystem = new UnitSystem(_sceneEventBus, _squadPrefab, transform, _friendlySquadsRoot, _enemySquadsRoot, _unitsPerRow, _squadSpacing, context);
+            _unitSystem = new UnitSystem(_sceneEventBus, _squadPrefab, transform, _battleGridController, context);
             _unitSystem.InitializeSquads(squads);
             var logger = _useLogging ? new BattleLogger() : null;
 
