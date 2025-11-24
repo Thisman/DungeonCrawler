@@ -96,7 +96,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DungeonCrawler.Gameplay.Squad.SquadController
   _iconRenderer: {fileID: 1659224501506304108}
   _info: {fileID: 1894299381623889394}
-  _animationController: {fileID: 0}
+  _animationController: {fileID: 6727850948456637333}
 --- !u!114 &6727850948456637333
 MonoBehaviour:
   m_ObjectHideFlags: 0

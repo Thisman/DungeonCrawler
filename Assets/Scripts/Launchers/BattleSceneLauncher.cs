@@ -15,13 +15,10 @@ namespace DungeonCrawler.Gameplay.Battle
     public class BattleSceneLauncher : MonoBehaviour
     {
         [SerializeField]
-        private List<SquadConfig> _squads = new List<SquadConfig>();
+        private List<SquadConfig> _squads = new();
 
         [SerializeField]
         private BattleState _initialState = BattleState.Preparation;
-
-        [SerializeField]
-        private bool _useLogging = true;
 
         [SerializeField]
         private BaseUIController[] _uiPanels;
@@ -35,9 +32,10 @@ namespace DungeonCrawler.Gameplay.Battle
         [SerializeField]
         private BattleTargetPicker _battleTargetPicker;
 
-        private BattleStateMachine _stateMachine;
         private UnitSystem _unitSystem;
         private GameEventBus _sceneEventBus;
+        private BattleStateMachine _stateMachine;
+        private List<SquadModel> _buildedSquads;
 
         public GameEventBus SceneEventBus => _sceneEventBus;
 
@@ -45,21 +43,20 @@ namespace DungeonCrawler.Gameplay.Battle
 
         private void Awake()
         {
-            var squads = BuildSquads();
+            _buildedSquads = BuildSquads();
             _sceneEventBus = new GameEventBus();
-            var context = new BattleContext(squads);
-            _unitSystem = new UnitSystem(_sceneEventBus, _squadPrefab, transform, _battleGridController, context);
-            _unitSystem.InitializeSquads(squads);
-            var logger = _useLogging ? new BattleLogger() : null;
 
-            _stateMachine = new BattleStateMachine(context, _sceneEventBus, _unitSystem, logger);
-            _battleTargetPicker.Initialize(_sceneEventBus);
+            var context = new BattleContext(_buildedSquads);
+            _unitSystem = new UnitSystem(_sceneEventBus, _squadPrefab, transform, _battleGridController, context);
+            _stateMachine = new BattleStateMachine(context, _sceneEventBus, _unitSystem);
 
             InitializeUIPanels();
         }
 
         private void Start()
         {
+            _unitSystem.InitializeSquads(_buildedSquads);
+            _battleTargetPicker.Initialize(_sceneEventBus);
             _stateMachine.Start();
         }
 

@@ -10,7 +10,7 @@ namespace DungeonCrawler.Gameplay.Battle
     {
         private readonly List<SquadModel> _squads;
         private readonly List<SquadModel> _roundOrder = new();
-        private readonly Queue<SquadModel?> _queue = new();
+        private readonly Queue<SquadModel> _queue = new();
         private int _roundPosition;
         private int _requestedUnitsCount;
 
@@ -31,7 +31,7 @@ namespace DungeonCrawler.Gameplay.Battle
             CalculateRoundOrder();
         }
 
-        public IReadOnlyList<SquadModel?> GetAvailableQueue(int unitsCount)
+        public IReadOnlyList<SquadModel> GetAvailableQueue(int unitsCount)
         {
             if (unitsCount < 0)
             {
@@ -43,7 +43,7 @@ namespace DungeonCrawler.Gameplay.Battle
             return _queue.ToList();
         }
 
-        public SquadModel? GetNext()
+        public SquadModel GetNext()
         {
             if (_queue.Count == 0)
             {
@@ -72,7 +72,7 @@ namespace DungeonCrawler.Gameplay.Battle
                 throw new ArgumentNullException(nameof(squad));
             }
 
-            var items = new List<SquadModel?>(1 + _queue.Count) { squad };
+            var items = new List<SquadModel>(1 + _queue.Count) { squad };
             items.AddRange(_queue);
 
             _queue.Clear();
@@ -117,7 +117,7 @@ namespace DungeonCrawler.Gameplay.Battle
 
             // Собираем очередь только из текущего раунда,
             // хвост и разделители даст EnsureQueueFilled
-            var rebuiltQueue = new List<SquadModel?>(currentRoundItems);
+            var rebuiltQueue = new List<SquadModel>(currentRoundItems);
 
             _queue.Clear();
             foreach (var item in rebuiltQueue)
@@ -174,7 +174,7 @@ namespace DungeonCrawler.Gameplay.Battle
             }
         }
 
-        private int CountUnits(IEnumerable<SquadModel?> items)
+        private int CountUnits(IEnumerable<SquadModel> items)
         {
             var count = 0;
 

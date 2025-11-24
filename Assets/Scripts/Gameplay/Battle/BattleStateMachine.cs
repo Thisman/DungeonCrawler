@@ -25,10 +25,10 @@ namespace DungeonCrawler.Gameplay.Battle
 
         public BattleContext Context => _context;
 
-        public BattleStateMachine(BattleContext context, GameEventBus sceneEventBus, UnitSystem unitSystem, BattleLogger logger = null)
+        public BattleStateMachine(BattleContext context, GameEventBus sceneEventBus, UnitSystem unitSystem)
         {
-            _logger = logger;
             _context = context;
+            _logger = new BattleLogger();
             _sceneEventBus = sceneEventBus;
             _currentState = BattleState.None;
             _stateMachine = new StateMachine<BattleState, Trigger>(() => _currentState, state => _currentState = state);

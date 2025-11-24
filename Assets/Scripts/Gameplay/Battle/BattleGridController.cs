@@ -47,9 +47,8 @@ namespace DungeonCrawler.Gameplay.Battle
             RemoveFromSlot(slotIndex, isEnemySide);
 
             var parent = slot.Root != null ? slot.Root : _defaultParent;
-            var instance = Instantiate(prefab, parent ? parent : transform);
-            instance.transform.localPosition = Vector3.zero;
-            instance.transform.localRotation = Quaternion.identity;
+            var instance = Instantiate(prefab, parent);
+            instance.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
             instance.transform.localScale = Vector3.one;
             instance.Initalize(squadModel);
 
