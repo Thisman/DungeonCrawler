@@ -76,7 +76,7 @@ namespace DungeonCrawler.UI.Battle
                 return;
             }
 
-            var availableQueue = context.Queue.GetAvailableQueue(context.Squads.Count);
+            var availableQueue = context.Queue.GetAvailableQueue(10);
             var nextRoundNumber = context.CurrentRoundNumber + 1;
 
             foreach (var squad in availableQueue)

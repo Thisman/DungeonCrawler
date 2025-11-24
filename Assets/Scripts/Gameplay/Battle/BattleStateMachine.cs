@@ -200,13 +200,13 @@ namespace DungeonCrawler.Gameplay.Battle
         }
 
         private void EnterRoundInit() {
+            _context.CurrentRoundNumber++;
             Fire(Trigger.NextState);
         }
 
         private void ExitRoundInit() { }
 
         private void EnterRoundStart() {
-            _context.CurrentRoundNumber++;
             Fire(Trigger.NextState);
         }
 

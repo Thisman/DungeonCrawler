@@ -111,25 +111,24 @@ namespace DungeonCrawler.Gameplay.Battle
                 ? queueItems.GetRange(0, roundBoundaryIndex)
                 : queueItems;
 
+            // Перемещаем юнита в конец текущего раунда
+            currentRoundItems.RemoveAll(item => item == squad); // на всякий случай, если он был только в хвосте
             currentRoundItems.Add(squad);
 
+            // Собираем очередь только из текущего раунда,
+            // хвост и разделители даст EnsureQueueFilled
             var rebuiltQueue = new List<SquadModel?>(currentRoundItems);
 
-            if (CountUnits(rebuiltQueue) > 0)
-            {
-                rebuiltQueue.Add(null);
-            }
-
             _queue.Clear();
-
             foreach (var item in rebuiltQueue)
             {
                 _queue.Enqueue(item);
             }
 
             _roundPosition = 0;
-            EnsureQueueFilled();
+            EnsureQueueFilled(); // он сам добавит один null между раундами, если нужно
         }
+
 
         public void Calculate()
         {
