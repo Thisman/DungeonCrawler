@@ -48,6 +48,8 @@ namespace DungeonCrawler.Gameplay.Battle
             {
                 await animationController.PlayWaitAnimation();
             }
+
+            context?.Queue?.MoveToCurrentRoundEnd(context.ActiveUnit);
         }
 
         private async Task HandleSkipTurnAsync(PlannedUnitAction plan, BattleContext context)

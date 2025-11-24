@@ -77,9 +77,17 @@ namespace DungeonCrawler.UI.Battle
             }
 
             var availableQueue = context.Queue.GetAvailableQueue(context.Squads.Count);
+            var nextRoundNumber = context.CurrentRoundNumber + 1;
 
             foreach (var squad in availableQueue)
             {
+                if (squad == null)
+                {
+                    _queueContainerUI.Add(CreateRoundSeparator(nextRoundNumber));
+                    nextRoundNumber++;
+                    continue;
+                }
+
                 _queueContainerUI.Add(CreateEntry(squad));
             }
         }
@@ -87,6 +95,17 @@ namespace DungeonCrawler.UI.Battle
         private VisualElement CreateEntry(SquadModel squad)
         {
             var entry = new Label(squad?.Unit.Definition.Name ?? ">>")
+            {
+                name = "battle-queue-entry"
+            };
+
+            entry.AddToClassList("battle-queue__entry");
+            return entry;
+        }
+
+        private VisualElement CreateRoundSeparator(int roundNumber)
+        {
+            var entry = new Label(roundNumber.ToString())
             {
                 name = "battle-queue-entry"
             };

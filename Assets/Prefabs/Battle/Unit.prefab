@@ -112,7 +112,7 @@ MonoBehaviour:
   _iconRenderer: {fileID: 1659224501506304108}
   _targetHighlightColor: {r: 0, g: 1, b: 0, a: 1}
   _skipTurnColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-  _waitColor: {r: 1, g: 0.85, b: 0, a: 1}
+  _waitColor: {r: 0, g: 0.4521885, b: 1, a: 1}
   _blinkDurationSeconds: 0.5
 --- !u!1 &3550713591584299746
 GameObject:
