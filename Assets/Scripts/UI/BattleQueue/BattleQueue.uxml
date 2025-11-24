@@ -1,0 +1,7 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <ui:Style src="../Global.uss" />
+    <ui:Style src="BattleQueue.uss" />
+    <ui:VisualElement class="panel battle-queue">
+        <ui:VisualElement name="queue-container" class="battle-queue__list" />
+    </ui:VisualElement>
+</ui:UXML>

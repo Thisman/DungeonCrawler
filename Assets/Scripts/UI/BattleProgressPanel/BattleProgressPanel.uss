@@ -1,0 +1,23 @@
+.battle-progress {
+    width: 100%;
+    height: 100%;
+}
+
+.battle-progress__bottom {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding: 16px;
+    width: 100%;
+    height: 100%;
+}
+
+.battle-progress__left,
+.battle-progress__right {
+    flex-direction: row;
+    gap: 8px;
+}
+
+.battle-progress__button {
+    min-width: 120px;
+}

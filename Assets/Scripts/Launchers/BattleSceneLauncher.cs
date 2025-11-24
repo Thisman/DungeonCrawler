@@ -5,6 +5,8 @@ using DungeonCrawler.Core.EventBus;
 using DungeonCrawler.Gameplay.Squad;
 using DungeonCrawler.Gameplay.Unit;
 using UnityEngine;
+using DungeonCrawler.UI.Battle;
+using DungeonCrawler.UI.Common;
 
 namespace DungeonCrawler.Gameplay.Battle
 {
@@ -20,22 +22,43 @@ namespace DungeonCrawler.Gameplay.Battle
         [SerializeField]
         private bool _useLogging = true;
 
+        [SerializeField]
+        private BaseUIController[] _uiPanels;
+
         private BattleStateMachine _stateMachine;
         private GameEventBus _sceneEventBus;
 
-        private void Start()
+        public GameEventBus SceneEventBus => _sceneEventBus;
+
+        public BattleState CurrentBattleState => _stateMachine?.CurrentState ?? _initialState;
+
+        private void Awake()
         {
             var context = new BattleContext(BuildSquads());
             var logger = _useLogging ? new BattleLogger() : null;
 
             _sceneEventBus = new GameEventBus();
             _stateMachine = new BattleStateMachine(context, _sceneEventBus, logger);
+
+            InitializeUIPanels();
+        }
+
+        private void Start()
+        {
             _stateMachine.Start();
         }
 
         private void OnDestroy()
         {
             _stateMachine?.Stop();
+        }
+
+        private void InitializeUIPanels()
+        {
+            foreach (var uiPanel in _uiPanels)
+            {
+                uiPanel.Initialize(_sceneEventBus);
+            }
         }
 
         private IEnumerable<SquadModel> BuildSquads()

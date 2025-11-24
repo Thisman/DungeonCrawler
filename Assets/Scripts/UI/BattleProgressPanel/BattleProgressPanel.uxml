@@ -1,0 +1,15 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <ui:Style src="../Global.uss" />
+    <ui:Style src="BattleProgressPanel.uss" />
+    <ui:VisualElement class="panel battle-progress">
+        <ui:VisualElement class="battle-progress__bottom">
+            <ui:VisualElement class="battle-progress__left">
+                <ui:Button name="skip-turn-button" text="Пропустить" class="battle-progress__button" />
+                <ui:Button name="wait-button" text="Ожидать" class="battle-progress__button" />
+            </ui:VisualElement>
+            <ui:VisualElement class="battle-progress__right">
+                <ui:Button name="flee-button" text="Сбежать" class="battle-progress__button" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
