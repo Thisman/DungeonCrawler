@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace DungeonCrawler.Gameplay.Battle
 {
-    public class BattleActionExecutor : IBattleActionExecutor
+    public class BattleActionExecutor
     {
         private readonly GameEventBus _eventBus;
 
