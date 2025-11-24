@@ -1,22 +1,26 @@
 // Coordinates battle round and turn flow using Stateless for state transitions with entry/exit hooks for every state.
 using DungeonCrawler.Core.EventBus;
+using DungeonCrawler.Gameplay.Squad;
 using NUnit.Framework;
 using Stateless;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace DungeonCrawler.Gameplay.Battle
 {
     public class BattleStateMachine
     {
+        private bool _isStopped;
+        private BattleState _currentState;
         private readonly BattleLogger _logger;
         private readonly BattleContext _context;
         private readonly GameEventBus _sceneEventBus;
         private readonly List<IDisposable> _subscribtions = new();
+        private readonly BattleActionExecutor _battleActionExecutor;
         private readonly StateMachine<BattleState, Trigger> _stateMachine;
-        private BattleState _currentState;
-        private bool _isStopped;
+        private readonly Dictionary<string, IUnitController> _unitControllers = new();
 
         public BattleState CurrentState => _currentState;
 
@@ -29,6 +33,17 @@ namespace DungeonCrawler.Gameplay.Battle
             _sceneEventBus = sceneEventBus;
             _currentState = BattleState.None;
             _stateMachine = new StateMachine<BattleState, Trigger>(() => _currentState, state => _currentState = state);
+            _battleActionExecutor = new BattleActionExecutor(_sceneEventBus);
+
+            _unitControllers.Add("Player", new PlayerUnitController(_sceneEventBus));
+            var availableActionForEnemies = new List<UnitAction>()
+            {
+                new UnitAttackAction(),
+                new UnitWaitAction(),
+                new UnitAbilityAction(),
+                new UnitSkipTurnAction(),
+            };
+            _unitControllers.Add("Enemy", new AiUnitController(availableActionForEnemies, _sceneEventBus));
 
             ConfigureTransitions();
             _stateMachine.OnTransitioned(transition => {
@@ -218,7 +233,41 @@ namespace DungeonCrawler.Gameplay.Battle
 
         private void ExitTurnStart() { }
 
-        private async void EnterWaitForAction() { }
+        private async void EnterWaitForAction() {
+            SquadModel actor = _context.ActiveUnit;
+            if (actor == null)
+            {
+                TryFire(Trigger.NextState);
+                return;
+            }
+
+            await Task.Delay(TimeSpan.FromSeconds(2));
+
+            IUnitController controller = actor.Unit.Definition.IsFriendly() ?
+                _unitControllers.GetValueOrDefault("Player") :
+                _unitControllers.GetValueOrDefault("Enemy");
+
+            try
+            {
+                using var cts = new CancellationTokenSource();
+                if (_isStopped)
+                    cts.Cancel();
+
+                var planned = await controller.DecideActionAsync(actor.Unit, _context, cts.Token);
+                _context.PlannedActiion = planned;
+                _sceneEventBus.Publish<UnitActionSelected>(new UnitActionSelected(planned));
+
+                if (_isStopped)
+                    return;
+
+                await _battleActionExecutor.ExecuteAsync(planned, _context);
+                Fire(Trigger.NextState);
+            }
+            catch (OperationCanceledException)
+            {
+                // бой остановлен – ничего не делаем
+            }
+        }
 
         private void ExitWaitForAction() { }
 
@@ -278,8 +327,6 @@ namespace DungeonCrawler.Gameplay.Battle
         private void SubscribeToSceneEvents()
         {
             _subscribtions.Add(_sceneEventBus.Subscribe<RequestBattlePreparationFinish>((RequestBattlePreparationFinish _) => TryFire(Trigger.NextState)));
-            _subscribtions.Add(_sceneEventBus.Subscribe<RequestSkipTurnAction>((RequestSkipTurnAction _) => TryFire(Trigger.NextState)));
-            _subscribtions.Add(_sceneEventBus.Subscribe<RequestWaitAction>((RequestWaitAction _) => TryFire(Trigger.NextState)));
             _subscribtions.Add(_sceneEventBus.Subscribe<RequestFleeFromBattle>((RequestFleeFromBattle _) => TryFire(Trigger.Result)));
             _subscribtions.Add(_sceneEventBus.Subscribe<RequestFinishBattle>((RequestFinishBattle _) => TryFire(Trigger.Finish)));
         }

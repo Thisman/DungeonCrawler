@@ -19,5 +19,7 @@ namespace DungeonCrawler.Gameplay.Battle
         public SquadModel ActiveUnit { get; set; }
 
         public BattleStatus Status { get; set; }
+
+        public PlannedUnitAction PlannedActiion { get; set; }
     }
 }

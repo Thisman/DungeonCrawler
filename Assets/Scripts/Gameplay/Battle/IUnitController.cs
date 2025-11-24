@@ -1,0 +1,17 @@
+﻿using DungeonCrawler.Gameplay.Battle;
+using DungeonCrawler.Gameplay.Unit;
+using System.Collections;
+using System.Threading;
+using System.Threading.Tasks;
+using UnityEngine;
+
+namespace DungeonCrawler.Gameplay.Battle
+{
+    public interface IUnitController
+    {
+        Task<PlannedUnitAction> DecideActionAsync(
+            UnitModel actor,
+            BattleContext context,
+            CancellationToken cancellationToken);
+    }
+}
