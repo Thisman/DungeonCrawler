@@ -1,6 +1,7 @@
 // Coordinates battle round and turn flow using Stateless for state transitions with entry/exit hooks for every state.
 using DungeonCrawler.Core.EventBus;
 using DungeonCrawler.Gameplay.Squad;
+using DungeonCrawler.System.Battle;
 using NUnit.Framework;
 using Stateless;
 using System;
