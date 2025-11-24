@@ -17,7 +17,7 @@ namespace DungeonCrawler.Gameplay.Squad
 
         private SquadModel _model;
 
-        public SquadModel Model;
+        public SquadModel Model => _model;
 
         public void Initalize(SquadModel squad)
         {

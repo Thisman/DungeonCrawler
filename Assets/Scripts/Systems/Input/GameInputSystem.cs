@@ -1,138 +1,72 @@
-// Centralizes input handling with support for enabling mode-specific action sets like battle input.
 using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 namespace DungeonCrawler.Systems.Input
 {
-    [DefaultExecutionOrder(-5000)]
     public class GameInputSystem : MonoBehaviour
     {
-        private static GameInputSystem _instance;
-
-        private readonly InputAction _battleClickAction = new InputAction(
-            "BattleClick",
-            InputActionType.Button,
-            "<Mouse>/leftButton");
-
-        private readonly InputAction _battlePointerAction = new InputAction(
-            "BattlePointer",
-            InputActionType.PassThrough,
-            "<Pointer>/position");
-
-        private InputMode _activeMode = InputMode.None;
-
-        public static GameInputSystem Instance
-        {
-            get
-            {
-                if (_instance != null)
-                {
-                    return _instance;
-                }
-
-                _instance = FindFirstObjectByType<GameInputSystem>();
-                if (_instance != null)
-                {
-                    return _instance;
-                }
-
-                var inputSystemObject = new GameObject(nameof(GameInputSystem));
-                _instance = inputSystemObject.AddComponent<GameInputSystem>();
-                DontDestroyOnLoad(inputSystemObject);
-
-                return _instance;
-            }
-        }
+        public static GameInputSystem Instance { get; private set; }
 
         public event Action<Vector2> BattleClick;
 
+        [Header("Input System")]
+        [SerializeField] private InputActionAsset _inputActions; // сюда кидаешь GameInputActions.asset в инспекторе
+
+        private InputAction _battlePointAction;
+        private InputAction _battleClickAction;
+
         private void Awake()
         {
-            if (_instance != null && _instance != this)
+            if (Instance != null && Instance != this)
             {
                 Destroy(gameObject);
                 return;
             }
 
-            _instance = this;
+            Instance = this;
             DontDestroyOnLoad(gameObject);
+
+            // Ищем action map и actions
+            var battleMap = _inputActions.FindActionMap("Battle", throwIfNotFound: true);
+            _battlePointAction = battleMap.FindAction("Point", throwIfNotFound: true);
+            _battleClickAction = battleMap.FindAction("Click", throwIfNotFound: true);
         }
 
-        private void OnDestroy()
+        private void OnEnable()
         {
-            DisableCurrentMode();
-            _battleClickAction.Dispose();
-            _battlePointerAction.Dispose();
-        }
-
-        public void EnableMode(InputMode mode)
-        {
-            if (_activeMode == mode)
-            {
-                return;
-            }
-
-            DisableCurrentMode();
-            _activeMode = mode;
-
-            switch (mode)
-            {
-                case InputMode.Battle:
-                    EnableBattleMode();
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        public void DisableMode(InputMode mode)
-        {
-            if (_activeMode != mode)
-            {
-                return;
-            }
-
-            DisableCurrentMode();
-        }
-
-        private void EnableBattleMode()
-        {
-            _battlePointerAction.Enable();
+            _battlePointAction.Enable();
             _battleClickAction.Enable();
-            _battleClickAction.performed += HandleBattleClick;
+
+            _battleClickAction.performed += OnBattleClickPerformed;
         }
 
-        private void DisableBattleMode()
+        private void OnDisable()
         {
-            _battleClickAction.performed -= HandleBattleClick;
+            _battleClickAction.performed -= OnBattleClickPerformed;
+
+            _battlePointAction.Disable();
             _battleClickAction.Disable();
-            _battlePointerAction.Disable();
         }
 
-        private void HandleBattleClick(InputAction.CallbackContext context)
+        private void OnBattleClickPerformed(InputAction.CallbackContext ctx)
         {
-            if (_activeMode != InputMode.Battle || BattleClick == null)
-            {
-                return;
-            }
-
-            var screenPosition = _battlePointerAction.ReadValue<Vector2>();
-            BattleClick?.Invoke(screenPosition);
+            // Берём текущую позицию указателя
+            var screenPos = _battlePointAction.ReadValue<Vector2>();
+            BattleClick?.Invoke(screenPos);
         }
 
-        private void DisableCurrentMode()
+        // Опционально: включение/отключение карты "Battle" по состоянию боя
+        public void EnableBattleControls()
         {
-            switch (_activeMode)
-            {
-                case InputMode.Battle:
-                    DisableBattleMode();
-                    break;
-                default:
-                    break;
-            }
+            _battlePointAction.Enable();
+            _battleClickAction.Enable();
+        }
 
-            _activeMode = InputMode.None;
+        public void DisableBattleControls()
+        {
+            _battlePointAction.Disable();
+            _battleClickAction.Disable();
         }
     }
 }
