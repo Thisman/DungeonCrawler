@@ -1,4 +1,6 @@
 // Declares battle scene events exchanged through the scene event bus.
+using System;
+using System.Collections.Generic;
 using DungeonCrawler.Gameplay.Squad;
 
 namespace DungeonCrawler.Gameplay.Battle
@@ -29,4 +31,10 @@ namespace DungeonCrawler.Gameplay.Battle
 
     // Event published when a unit plan action.
     public record UnitPlanSelected(PlannedUnitAction Plan);
+
+    // Event published when a system needs a controller for a specific squad model.
+    public record RequestSquadController(SquadModel Squad, Action<SquadController?> OnResolved);
+
+    // Event published when a system needs controllers for multiple squad models.
+    public record RequestSquadControllers(IEnumerable<SquadModel> Squads, Action<IReadOnlyList<SquadController>> OnResolved);
 }
