@@ -1,4 +1,6 @@
 // Declares battle scene events exchanged through the scene event bus.
+using DungeonCrawler.Gameplay.Squad;
+
 namespace DungeonCrawler.Gameplay.Battle
 {
     // Event published when the battle state changes.
@@ -19,6 +21,12 @@ namespace DungeonCrawler.Gameplay.Battle
     // Event published when a unit requests to finish the battle.
     public record RequestFinishBattle();
 
+    // Event published when user select action.
+    public record RequestSelectAction(UnitAction Action);
+
+    // Event publisehd whe user select action target.
+    public record RequestSelectTarget(SquadModel Target);
+
     // Event published when a unit plan action.
-    public record UnitActionSelected(PlannedUnitAction Plan);
+    public record UnitPlanSelected(PlannedUnitAction Plan);
 }

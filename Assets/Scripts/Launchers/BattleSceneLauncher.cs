@@ -40,6 +40,9 @@ namespace DungeonCrawler.Gameplay.Battle
         [SerializeField]
         private Vector2 _squadSpacing = new Vector2(1.5f, 1.5f);
 
+        [SerializeField]
+        private BattleTargetPicker _battleTargetPicker;
+
         private BattleStateMachine _stateMachine;
         private GameEventBus _sceneEventBus;
 
@@ -55,6 +58,7 @@ namespace DungeonCrawler.Gameplay.Battle
 
             _sceneEventBus = new GameEventBus();
             _stateMachine = new BattleStateMachine(context, _sceneEventBus, logger);
+            _battleTargetPicker.Initialize(_sceneEventBus);
 
             ArrangeSquads(squads);
             InitializeUIPanels();

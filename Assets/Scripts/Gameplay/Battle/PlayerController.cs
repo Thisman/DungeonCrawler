@@ -25,36 +25,77 @@ namespace DungeonCrawler.Gameplay.Battle
         {
             var tcs = new TaskCompletionSource<PlannedUnitAction>();
 
-            IDisposable skipActionSubscribtion = null;
-            IDisposable waitActionSubscribtion = null;
-            skipActionSubscribtion = _sceneEventBus.Subscribe<RequestWaitAction>(evt =>
+            // 1. Экшен по умолчанию — атака
+            UnitAction currentAction = new UnitAttackAction();
+            IReadOnlyList<UnitModel> currentValidTargets = currentAction.GetValidTargets(actor, context);
+
+            // Дать знать UI, что сейчас выбрана атака
+            _sceneEventBus.Publish(new RequestSelectAction(currentAction));
+
+            IDisposable clickSubscription = null;
+            IDisposable skipActionSubscription = null;
+            IDisposable waitActionSubscription = null;
+
+            void Cleanup()
             {
+                clickSubscription?.Dispose();
+                skipActionSubscription?.Dispose();
+                waitActionSubscription?.Dispose();
+            }
+
+            // 2. Клик по юниту -> проверяем, что он валидный, и завершаем планирование
+            clickSubscription = _sceneEventBus.Subscribe<RequestSelectTarget>(evt =>
+            {
+                if (tcs.Task.IsCompleted)
+                    return;
+
+                var target = evt.Target;
+                if (!currentValidTargets.Contains(target.Unit))
+                    return; // кликнули по невалидной цели — игнорируем
+
+                var chosenTargets = new List<UnitModel> { target.Unit };
+                var planned = new PlannedUnitAction(currentAction, actor, chosenTargets);
+
+                Cleanup();
+                tcs.TrySetResult(planned);
+            });
+
+            // 3. Нажатие "Пропустить ход"
+            skipActionSubscription = _sceneEventBus.Subscribe<RequestSkipTurnAction>(evt =>
+            {
+                if (tcs.Task.IsCompleted)
+                    return;
+
                 var action = new UnitSkipTurnAction();
                 var validTargets = action.GetValidTargets(actor, context);
                 var chosenTargets = ChooseTargets(action, validTargets, actor, context);
 
                 var planned = new PlannedUnitAction(action, actor, chosenTargets);
 
-                skipActionSubscribtion.Dispose();
+                Cleanup();
                 tcs.TrySetResult(planned);
             });
 
-            waitActionSubscribtion = _sceneEventBus.Subscribe<RequestSkipTurnAction>(evt =>
+            // 4. Нажатие "Подождать"
+            waitActionSubscription = _sceneEventBus.Subscribe<RequestWaitAction>(evt =>
             {
+                if (tcs.Task.IsCompleted)
+                    return;
+
                 var action = new UnitWaitAction();
                 var validTargets = action.GetValidTargets(actor, context);
                 var chosenTargets = ChooseTargets(action, validTargets, actor, context);
 
                 var planned = new PlannedUnitAction(action, actor, chosenTargets);
 
-                waitActionSubscribtion.Dispose();
+                Cleanup();
                 tcs.TrySetResult(planned);
             });
 
+            // 5. Отмена (например, стейт-машина завершила бой)
             cancellationToken.Register(() =>
             {
-                skipActionSubscribtion.Dispose();
-                waitActionSubscribtion.Dispose();
+                Cleanup();
                 tcs.TrySetCanceled(cancellationToken);
             });
 
