@@ -61,32 +61,32 @@ namespace DungeonCrawler.Gameplay.Battle
 
             ConfigureState(BattleState.RoundInit)
                 .Permit(Trigger.NextState, BattleState.RoundStart)
-                .Permit(Trigger.Finish, BattleState.Result);
+                .Permit(Trigger.Result, BattleState.Result);
 
             ConfigureState(BattleState.RoundStart)
                 .Permit(Trigger.NextState, BattleState.TurnInit)
-                .Permit(Trigger.Finish, BattleState.Result);
+                .Permit(Trigger.Result, BattleState.Result);
 
             ConfigureState(BattleState.TurnInit)
                 .Permit(Trigger.NextState, BattleState.TurnStart)
                 .Permit(Trigger.EndRound, BattleState.RoundEnd)
-                .Permit(Trigger.Finish, BattleState.Result);
+                .Permit(Trigger.Result, BattleState.Result);
 
             ConfigureState(BattleState.TurnStart)
                 .Permit(Trigger.NextState, BattleState.WaitForAction)
-                .Permit(Trigger.Finish, BattleState.Result);
+                .Permit(Trigger.Result, BattleState.Result);
 
             ConfigureState(BattleState.WaitForAction)
                 .Permit(Trigger.NextState, BattleState.TurnEnd)
-                .Permit(Trigger.Finish, BattleState.Result);
+                .Permit(Trigger.Result, BattleState.Result);
 
             ConfigureState(BattleState.TurnEnd)
                 .Permit(Trigger.NextState, BattleState.TurnInit)
-                .Permit(Trigger.Finish, BattleState.Result);
+                .Permit(Trigger.Result, BattleState.Result);
 
             ConfigureState(BattleState.RoundEnd)
                 .Permit(Trigger.NextState, BattleState.RoundInit)
-                .Permit(Trigger.Finish, BattleState.Result);
+                .Permit(Trigger.Result, BattleState.Result);
 
             ConfigureState(BattleState.Result)
                 .Permit(Trigger.Finish, BattleState.Finish)
@@ -218,10 +218,7 @@ namespace DungeonCrawler.Gameplay.Battle
 
         private void ExitTurnStart() { }
 
-        private async void EnterWaitForAction() {
-            await Task.Delay(TimeSpan.FromSeconds(5));
-            Fire(Trigger.NextState);
-        }
+        private async void EnterWaitForAction() { }
 
         private void ExitWaitForAction() { }
 
@@ -283,7 +280,7 @@ namespace DungeonCrawler.Gameplay.Battle
             _subscribtions.Add(_sceneEventBus.Subscribe<RequestBattlePreparationFinish>((RequestBattlePreparationFinish _) => TryFire(Trigger.NextState)));
             _subscribtions.Add(_sceneEventBus.Subscribe<RequestSkipTurnAction>((RequestSkipTurnAction _) => TryFire(Trigger.NextState)));
             _subscribtions.Add(_sceneEventBus.Subscribe<RequestWaitAction>((RequestWaitAction _) => TryFire(Trigger.NextState)));
-            _subscribtions.Add(_sceneEventBus.Subscribe<RequestFleeFromBattle>((RequestFleeFromBattle _) => TryFire(Trigger.Finish)));
+            _subscribtions.Add(_sceneEventBus.Subscribe<RequestFleeFromBattle>((RequestFleeFromBattle _) => TryFire(Trigger.Result)));
             _subscribtions.Add(_sceneEventBus.Subscribe<RequestFinishBattle>((RequestFinishBattle _) => TryFire(Trigger.Finish)));
         }
 
@@ -297,6 +294,7 @@ namespace DungeonCrawler.Gameplay.Battle
         {
             NextState,
             EndRound,
+            Result,
             Finish
         }
     }
