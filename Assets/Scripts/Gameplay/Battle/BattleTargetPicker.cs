@@ -17,11 +17,6 @@ namespace DungeonCrawler.Gameplay.Battle
         {
             _eventBus = eventBus;
             _inputSystem = GameInputSystem.Instance;
-        }
-
-        private void OnEnable()
-        {
-            _inputSystem ??= GameInputSystem.Instance;
             if (_inputSystem != null)
             {
                 _inputSystem.BattleClick += OnBattleClick;

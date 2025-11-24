@@ -55,8 +55,8 @@ namespace DungeonCrawler.Gameplay.Battle
 
         private void Start()
         {
-            _unitSystem.InitializeSquads(_buildedSquads);
             _battleTargetPicker.Initialize(_sceneEventBus);
+            _unitSystem.InitializeSquads(_buildedSquads);
             _stateMachine.Start();
         }
 
