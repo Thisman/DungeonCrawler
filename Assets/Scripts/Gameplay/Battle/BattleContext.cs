@@ -10,6 +10,7 @@ namespace DungeonCrawler.Gameplay.Battle
         {
             Squads = squads != null ? new List<SquadModel>(squads) : new List<SquadModel>();
             Status = status;
+            CurrentRoundNumber = -1;
         }
 
         public List<SquadModel> Squads { get; }
@@ -21,5 +22,7 @@ namespace DungeonCrawler.Gameplay.Battle
         public BattleStatus Status { get; set; }
 
         public PlannedUnitAction PlannedActiion { get; set; }
+
+        public int CurrentRoundNumber { get; set; }
     }
 }
