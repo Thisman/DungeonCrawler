@@ -27,7 +27,7 @@ namespace DungeonCrawler.Gameplay.Battle
             _logger = logger;
             _context = context;
             _sceneEventBus = sceneEventBus;
-            _currentState = BattleState.Preparation;
+            _currentState = BattleState.None;
             _stateMachine = new StateMachine<BattleState, Trigger>(() => _currentState, state => _currentState = state);
 
             ConfigureTransitions();
@@ -42,7 +42,7 @@ namespace DungeonCrawler.Gameplay.Battle
 
         public void Start()
         {
-            EnterState(_currentState);
+            Fire(Trigger.NextState);
         }
 
         public void Stop()
@@ -53,6 +53,9 @@ namespace DungeonCrawler.Gameplay.Battle
 
         private void ConfigureTransitions()
         {
+            ConfigureState(BattleState.None)
+                .Permit(Trigger.NextState, BattleState.Preparation);
+
             ConfigureState(BattleState.Preparation)
                 .Permit(Trigger.NextState, BattleState.RoundInit);
 
@@ -86,8 +89,8 @@ namespace DungeonCrawler.Gameplay.Battle
                 .Permit(Trigger.Finish, BattleState.Result);
 
             ConfigureState(BattleState.Result)
+                .Permit(Trigger.Finish, BattleState.Finish)
                 .Ignore(Trigger.NextState)
-                .Ignore(Trigger.Finish)
                 .Ignore(Trigger.EndRound);
         }
 

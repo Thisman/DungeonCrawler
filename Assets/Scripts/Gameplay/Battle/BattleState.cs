@@ -5,6 +5,7 @@ namespace DungeonCrawler.Gameplay.Battle
 {
     public enum BattleState
     {
+        None,
         Preparation,
         RoundInit,
         RoundStart,
@@ -13,6 +14,7 @@ namespace DungeonCrawler.Gameplay.Battle
         WaitForAction,
         TurnEnd,
         RoundEnd,
-        Result
+        Result,
+        Finish,
     }
 }

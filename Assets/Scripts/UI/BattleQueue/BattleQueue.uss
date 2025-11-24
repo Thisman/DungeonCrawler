@@ -15,4 +15,5 @@
     padding: 4px 8px;
     background-color: rgba(0, 0, 0, 0.1);
     border-radius: 4px;
+    color: rgb(255, 255, 255);
 }
