@@ -150,15 +150,23 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DungeonCrawler.Gameplay.Battle.BattleSceneLauncher
   _squads:
   - Definition: {fileID: 11400000, guid: 703d8e3756d4db44a8c3f9d4a19583bf, type: 2}
-    Id: Default
+    Id: Hero Default
     UnitCount: 10
     Level: 0
   - Definition: {fileID: 11400000, guid: 2d51902cf15ac3b4fb3639f08468879a, type: 2}
-    Id: Default 1
+    Id: Unit Default 1
     UnitCount: 10
     Level: 0
   - Definition: {fileID: 11400000, guid: 733081a3d0c46484f8b35adaba75b9b4, type: 2}
-    Id: Default 2
+    Id: Unit Default 2
+    UnitCount: 10
+    Level: 0
+  - Definition: {fileID: 11400000, guid: 57eda35d38d716f4ea7e6666a99afb86, type: 2}
+    Id: Enemy Default
+    UnitCount: 10
+    Level: 0
+  - Definition: {fileID: 11400000, guid: 9636c7b22b301a742a8db8aaeec41ba9, type: 2}
+    Id: Enemy Default 2
     UnitCount: 10
     Level: 0
   _initialState: 0

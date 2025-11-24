@@ -183,7 +183,6 @@ namespace DungeonCrawler.Gameplay.Battle
         {
             SetStatus(BattleStatus.Progress);
             _context.Queue = new BattleQueue(_context.Squads);
-            _context.Queue.GetAvailableQueue(_context.Squads.Count);
         }
 
         private void EnterRoundInit() {

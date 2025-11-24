@@ -42,8 +42,6 @@ namespace DungeonCrawler.UI.Battle
 
         private void HandleBattleStateChanged(BattleStateChanged stateChanged)
         {
-            UpdateQueue(stateChanged.Context);
-
             if (stateChanged.FromState == BattleState.Preparation)
             {
                 Show();
@@ -52,6 +50,15 @@ namespace DungeonCrawler.UI.Battle
             if (stateChanged.ToState == BattleState.Result)
             {
                 Hide();
+            }
+
+            switch(stateChanged.ToState)
+            {
+                case BattleState.TurnEnd:
+                case BattleState.RoundStart:
+                case BattleState.RoundEnd:
+                    UpdateQueue(stateChanged.Context);
+                    break;
             }
         }
 

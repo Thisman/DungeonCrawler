@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DungeonCrawler.Gameplay.Unit.UnitDefinition
   Icon: {fileID: 0}
   Name: Unit_Default 1
-  Kind: 3
+  Kind: 1
   AttackType: 0
   DamageType: 0
   BaseHealth: 100
