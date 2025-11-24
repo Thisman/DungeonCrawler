@@ -29,4 +29,5 @@ namespace DungeonCrawler.Gameplay.Battle
 
     // Event published when a unit plan action.
     public record UnitPlanSelected(PlannedUnitAction Plan);
+
 }
