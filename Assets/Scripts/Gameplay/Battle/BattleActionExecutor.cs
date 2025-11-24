@@ -1,3 +1,4 @@
+// Executes planned battle actions and updates battle context accordingly.
 ﻿using DungeonCrawler.Core.EventBus;
 using System.Threading.Tasks;
 
@@ -35,8 +36,18 @@ namespace DungeonCrawler.Gameplay.Battle
 
         private Task HandleWait(PlannedUnitAction plan, BattleContext context)
         {
-            // Переставить юнита в конец текущего раунда
-            //context.Queue.MoveToRoundEnd(action.Actor);
+            if (context == null)
+            {
+                return Task.CompletedTask;
+            }
+
+            var activeSquad = context.ActiveUnit;
+
+            if (activeSquad != null)
+            {
+                context.Queue?.MoveToCurrentRoundEnd(activeSquad);
+            }
+
             return Task.CompletedTask;
 
         }

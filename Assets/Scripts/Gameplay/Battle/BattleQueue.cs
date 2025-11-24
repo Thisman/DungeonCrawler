@@ -104,6 +104,45 @@ namespace DungeonCrawler.Gameplay.Battle
             EnsureQueueFilled();
         }
 
+        public void MoveToCurrentRoundEnd(SquadModel squad)
+        {
+            if (squad == null)
+            {
+                throw new ArgumentNullException(nameof(squad));
+            }
+
+            if (_queue.Count == 0)
+            {
+                return;
+            }
+
+            var items = _queue.ToList();
+            var separatorIndex = items.FindIndex(item => item == null);
+            var currentRoundEnd = separatorIndex >= 0 ? separatorIndex : items.Count;
+
+            for (var i = 0; i < currentRoundEnd; i++)
+            {
+                if (items[i] == squad)
+                {
+                    items.RemoveAt(i);
+                    currentRoundEnd--;
+                    break;
+                }
+            }
+
+            var insertIndex = currentRoundEnd;
+            items.Insert(insertIndex, squad);
+
+            _queue.Clear();
+
+            foreach (var item in items)
+            {
+                _queue.Enqueue(item);
+            }
+
+            EnsureQueueFilled();
+        }
+
         private void CalculateRoundOrder()
         {
             _roundOrder.Clear();

@@ -199,6 +199,7 @@ namespace DungeonCrawler.Gameplay.Battle
         }
 
         private void EnterRoundInit() {
+            _context.CurrentRoundNumber++;
             Fire(Trigger.NextState);
         }
 
@@ -261,7 +262,7 @@ namespace DungeonCrawler.Gameplay.Battle
             }
             catch (OperationCanceledException)
             {
-                // бой остановлен – ничего не делаем
+                //      
             }
         }
 

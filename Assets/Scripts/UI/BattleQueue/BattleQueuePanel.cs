@@ -1,5 +1,9 @@
-// Renders the upcoming unit order for the active battle queue.
+// Renders the upcoming unit order for the active battle queue with animated transitions.
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using DG.Tweening;
 using DungeonCrawler.Gameplay.Battle;
 using DungeonCrawler.Gameplay.Squad;
 using DungeonCrawler.UI.Common;
@@ -9,9 +13,12 @@ namespace DungeonCrawler.UI.Battle
 {
     public class BattleQueuePanel : BaseUIController
     {
+        private const float FadeDuration = 0.25f;
+
         private VisualElement _panelRootUI;
         private VisualElement _queueContainerUI;
         private IDisposable _battleStateChangedSubscription;
+        private int _animationVersion;
 
         protected override void RegisterUIElements()
         {
@@ -52,7 +59,7 @@ namespace DungeonCrawler.UI.Battle
                 Hide();
             }
 
-            switch(stateChanged.ToState)
+            switch (stateChanged.ToState)
             {
                 case BattleState.TurnEnd:
                 case BattleState.RoundStart:
@@ -62,37 +69,58 @@ namespace DungeonCrawler.UI.Battle
             }
         }
 
-        private void UpdateQueue(BattleContext context)
+        private async void UpdateQueue(BattleContext context)
         {
             if (_queueContainerUI == null)
             {
                 return;
             }
 
-            _queueContainerUI.Clear();
+            var entries = BuildEntries(context);
+            var currentKeys = _queueContainerUI.Children().Select(child => child.userData as string).ToList();
+            var targetKeys = entries.Select(entry => entry.Key).ToList();
 
-            if (context?.Queue == null)
+            if (currentKeys.SequenceEqual(targetKeys))
             {
                 return;
             }
 
-            var availableQueue = context.Queue.GetAvailableQueue(context.Squads.Count);
+            CancelActiveAnimations();
+            var localVersion = ++_animationVersion;
 
-            foreach (var squad in availableQueue)
+            await FadeOutExistingEntriesAsync();
+
+            if (localVersion != _animationVersion)
             {
-                _queueContainerUI.Add(CreateEntry(squad));
+                return;
             }
+
+            var createdEntries = new List<VisualElement>();
+
+            _queueContainerUI.Clear();
+
+            foreach (var entry in entries)
+            {
+                var element = CreateEntry(entry);
+                element.style.opacity = 0f;
+                createdEntries.Add(element);
+                _queueContainerUI.Add(element);
+            }
+
+            await FadeInEntriesAsync(createdEntries);
         }
 
-        private VisualElement CreateEntry(SquadModel squad)
+        private VisualElement CreateEntry(BattleQueueEntry entry)
         {
-            var entry = new Label(squad?.Unit.Definition.Name ?? ">>")
+            var entryElement = new Label(entry.Label)
             {
                 name = "battle-queue-entry"
             };
 
-            entry.AddToClassList("battle-queue__entry");
-            return entry;
+            entryElement.userData = entry.Key;
+            entryElement.AddToClassList("battle-queue__entry");
+            entryElement.AddToClassList("battle-queue__entry--transition");
+            return entryElement;
         }
 
         private void Show()
@@ -103,6 +131,96 @@ namespace DungeonCrawler.UI.Battle
         private void Hide()
         {
             _panelRootUI?.RemoveFromClassList("panel--active");
+        }
+
+        private List<BattleQueueEntry> BuildEntries(BattleContext context)
+        {
+            var entries = new List<BattleQueueEntry>();
+
+            if (context?.Queue == null || context.Squads == null)
+            {
+                return entries;
+            }
+
+            var availableQueue = context.Queue.GetAvailableQueue(context.Squads.Count);
+
+            var upcomingRoundNumber = context.CurrentRoundNumber + 1;
+
+            foreach (var squad in availableQueue)
+            {
+                if (squad == null)
+                {
+                    entries.Add(new BattleQueueEntry($"round-{upcomingRoundNumber}", upcomingRoundNumber.ToString()));
+                    upcomingRoundNumber++;
+                    continue;
+                }
+
+                entries.Add(new BattleQueueEntry($"squad-{squad.Unit.Id}", squad.Unit.Definition.Name));
+            }
+
+            return entries;
+        }
+
+        private Task FadeOutExistingEntriesAsync()
+        {
+            return FadeEntriesAsync(_queueContainerUI.Children(), 0f, removeAfterFade: true);
+        }
+
+        private Task FadeInEntriesAsync(IEnumerable<VisualElement> elements)
+        {
+            return FadeEntriesAsync(elements, 1f, removeAfterFade: false);
+        }
+
+        private Task FadeEntriesAsync(IEnumerable<VisualElement> elements, float endValue, bool removeAfterFade)
+        {
+            var targets = elements.ToList();
+
+            if (targets.Count == 0)
+            {
+                return Task.CompletedTask;
+            }
+
+            var completionSource = new TaskCompletionSource<bool>();
+            var sequence = DOTween.Sequence();
+
+            foreach (var element in targets)
+            {
+                var tween = DOTween.To(() => element.resolvedStyle.opacity, value => element.style.opacity = value, endValue, FadeDuration)
+                    .SetTarget(element);
+
+                if (removeAfterFade)
+                {
+                    tween.OnComplete(() => element.RemoveFromHierarchy());
+                }
+
+                sequence.Join(tween);
+            }
+
+            sequence.OnComplete(() => completionSource.TrySetResult(true));
+            sequence.Play();
+
+            return completionSource.Task;
+        }
+
+        private void CancelActiveAnimations()
+        {
+            foreach (var child in _queueContainerUI.Children())
+            {
+                DOTween.Kill(child, complete: false);
+            }
+        }
+
+        private sealed class BattleQueueEntry
+        {
+            public BattleQueueEntry(string key, string label)
+            {
+                Key = key;
+                Label = label;
+            }
+
+            public string Key { get; }
+
+            public string Label { get; }
         }
     }
 }
