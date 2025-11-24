@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d1f029b1efd6cb41a8a0ce2575f9e93, type: 3}
   m_Name: Unit_Default 1
   m_EditorClassIdentifier: Assembly-CSharp::DungeonCrawler.Gameplay.Unit.UnitDefinition
-  Icon: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
+  Icon: {fileID: -5918137915363136097, guid: 8a944d486a57f4f409dadb0989e78db0, type: 3}
   Name: Unit_Default 1
   Kind: 1
   AttackType: 0
