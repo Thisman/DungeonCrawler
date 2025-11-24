@@ -1,5 +1,5 @@
 // Renders the upcoming unit order for the active battle queue.
-using System.Collections.Generic;
+using System;
 using DungeonCrawler.Gameplay.Battle;
 using DungeonCrawler.Gameplay.Squad;
 using DungeonCrawler.UI.Common;
@@ -9,16 +9,27 @@ namespace DungeonCrawler.UI.Battle
 {
     public class BattleQueuePanel : BaseUIController
     {
+        private VisualElement _panelRootUI;
+        private VisualElement _queueContainerUI;
+        private IDisposable _battleStateChangedSubscription;
+
         protected override void RegisterUIElements()
         {
+            _panelRootUI = _uiDocument.rootVisualElement.Q<VisualElement>(className: "battle-queue");
+            _queueContainerUI = _uiDocument.rootVisualElement.Q<VisualElement>("queue-container");
+
+            Hide();
         }
 
         protected override void SubscriveToGameEvents()
         {
+            _battleStateChangedSubscription ??= _sceneEventBusService?.Subscribe<BattleStateChanged>(HandleBattleStateChanged);
         }
 
         protected override void UnsubscribeFromGameEvents()
         {
+            _battleStateChangedSubscription?.Dispose();
+            _battleStateChangedSubscription = null;
         }
 
         protected override void SubcribeToUIEvents()
@@ -27,6 +38,64 @@ namespace DungeonCrawler.UI.Battle
 
         protected override void UnsubscriveFromUIEvents()
         {
+        }
+
+        private void HandleBattleStateChanged(BattleStateChanged stateChanged)
+        {
+            UpdateQueue(stateChanged.Context);
+
+            if (stateChanged.FromState == BattleState.Preparation)
+            {
+                Show();
+            }
+
+            if (stateChanged.ToState == BattleState.Result)
+            {
+                Hide();
+            }
+        }
+
+        private void UpdateQueue(BattleContext context)
+        {
+            if (_queueContainerUI == null)
+            {
+                return;
+            }
+
+            _queueContainerUI.Clear();
+
+            if (context?.Queue == null)
+            {
+                return;
+            }
+
+            var availableQueue = context.Queue.GetAvailableQueue(context.Squads.Count);
+
+            foreach (var squad in availableQueue)
+            {
+                _queueContainerUI.Add(CreateEntry(squad));
+            }
+        }
+
+        private VisualElement CreateEntry(SquadModel squad)
+        {
+            var entry = new Label(squad?.Unit.Definition.Name ?? ">>")
+            {
+                name = "battle-queue-entry"
+            };
+
+            entry.AddToClassList("battle-queue__entry");
+            return entry;
+        }
+
+        private void Show()
+        {
+            _panelRootUI?.AddToClassList("panel--active");
+        }
+
+        private void Hide()
+        {
+            _panelRootUI?.RemoveFromClassList("panel--active");
         }
     }
 }

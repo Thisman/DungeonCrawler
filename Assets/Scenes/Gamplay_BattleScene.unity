@@ -472,7 +472,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d840cb2bf06e80d46bb71af2638b92e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DungeonCrawler.UI.Battle.BattleResultPanel
-  _document: {fileID: 1234006797}
+  _uiDocument: {fileID: 1234006797}
 --- !u!1 &1334742673
 GameObject:
   m_ObjectHideFlags: 0
@@ -541,7 +541,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3fcec6bca9d3afc4db39b30f9ace7e4d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DungeonCrawler.UI.Battle.BattleQueuePanel
-  _document: {fileID: 1334742674}
+  _uiDocument: {fileID: 1334742674}
 --- !u!1 &1925583474
 GameObject:
   m_ObjectHideFlags: 0
@@ -610,7 +610,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f4ddd2bcd656264a94b52cbd70bdc84, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DungeonCrawler.UI.Battle.BattleProgressPanel
-  _document: {fileID: 1925583475}
+  _uiDocument: {fileID: 1925583475}
 --- !u!1 &2055049121
 GameObject:
   m_ObjectHideFlags: 0
@@ -679,7 +679,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 77e056ace6f230540a8892f1f43268cb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DungeonCrawler.UI.Battle.BattlePreparationPanel
-  _document: {fileID: 2055049122}
+  _uiDocument: {fileID: 2055049122}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
