@@ -15,9 +15,25 @@ namespace DungeonCrawler.Gameplay.Squad
         [SerializeField]
         private TextMeshProUGUI _info;
 
+        [SerializeField]
+        private SquadAnimationController _animationController;
+
         private SquadModel _model;
 
         public SquadModel Model => _model;
+
+        public SquadAnimationController AnimationController
+        {
+            get
+            {
+                if (_animationController == null)
+                {
+                    _animationController = GetComponent<SquadAnimationController>();
+                }
+
+                return _animationController;
+            }
+        }
 
         public void Initalize(SquadModel squad)
         {

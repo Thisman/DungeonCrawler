@@ -3,34 +3,48 @@ using System;
 using System.Collections.Generic;
 using DungeonCrawler.Gameplay.Battle;
 using DungeonCrawler.Gameplay.Squad;
+using DungeonCrawler.Gameplay.Unit;
 using UnityEngine;
+using DungeonCrawler.Core.EventBus;
 
 namespace DungeonCrawler.Systems.Battle
 {
     public class UnitSystem : IDisposable
     {
+        private readonly GameEventBus _sceneEventBus;
         private readonly SquadController _squadPrefab;
         private readonly Transform _defaultParent;
         private readonly Transform _friendlySquadsRoot;
         private readonly Transform _enemySquadsRoot;
         private readonly int _unitsPerRow;
         private readonly Vector2 _squadSpacing;
+        private readonly BattleContext _context;
+        private readonly List<IDisposable> _subscriptions = new();
         private readonly Dictionary<SquadModel, SquadController> _squadControllers = new();
+        private readonly Dictionary<UnitModel, SquadController> _unitControllers = new();
+        private readonly List<SquadController> _highlightedControllers = new();
 
         public UnitSystem(
+            GameEventBus sceneEventBus,
             SquadController squadPrefab,
             Transform defaultParent,
             Transform friendlySquadsRoot,
             Transform enemySquadsRoot,
             int unitsPerRow,
-            Vector2 squadSpacing)
+            Vector2 squadSpacing,
+            BattleContext context)
         {
+            _sceneEventBus = sceneEventBus;
             _squadPrefab = squadPrefab;
             _defaultParent = defaultParent;
             _friendlySquadsRoot = friendlySquadsRoot;
             _enemySquadsRoot = enemySquadsRoot;
             _unitsPerRow = Mathf.Max(1, unitsPerRow);
             _squadSpacing = squadSpacing;
+            _context = context;
+
+            _subscriptions.Add(_sceneEventBus.Subscribe<RequestSelectAction>(HandleRequestSelectAction));
+            _subscriptions.Add(_sceneEventBus.Subscribe<BattleStateChanged>(HandleStateChanged));
         }
 
         public void InitializeSquads(IReadOnlyList<SquadModel> squads)
@@ -65,6 +79,7 @@ namespace DungeonCrawler.Systems.Battle
                 squadInstance.Initalize(squad);
 
                 _squadControllers[squad] = squadInstance;
+                _unitControllers[squad.Unit] = squadInstance;
             }
         }
 
@@ -95,6 +110,12 @@ namespace DungeonCrawler.Systems.Battle
 
         public void Dispose()
         {
+            foreach (var subscription in _subscriptions)
+            {
+                subscription.Dispose();
+            }
+
+            _subscriptions.Clear();
         }
 
         private Vector3 CalculateLocalPosition(int index, bool isEnemy)
@@ -104,6 +125,51 @@ namespace DungeonCrawler.Systems.Battle
             var direction = isEnemy ? 1f : -1f;
 
             return new Vector3(direction * column * _squadSpacing.x, -row * _squadSpacing.y, 0f);
+        }
+
+        private void HandleStateChanged(BattleStateChanged evt)
+        {
+            if (evt.ToState == BattleState.TurnEnd)
+            {
+                ClearHighlights();
+            }
+        }
+
+        private void HandleRequestSelectAction(RequestSelectAction evt)
+        {
+            ClearHighlights();
+
+            if (evt?.Action == null || _context?.ActiveUnit == null)
+            {
+                return;
+            }
+
+            var validTargets = evt.Action.GetValidTargets(_context.ActiveUnit.Unit, _context);
+            if (validTargets == null)
+            {
+                return;
+            }
+
+            foreach (var target in validTargets)
+            {
+                if (target == null || !_unitControllers.TryGetValue(target, out var controller))
+                {
+                    continue;
+                }
+
+                controller.AnimationController?.HighlightAsTarget();
+                _highlightedControllers.Add(controller);
+            }
+        }
+
+        private void ClearHighlights()
+        {
+            foreach (var controller in _highlightedControllers)
+            {
+                controller?.AnimationController?.ResetColor();
+            }
+
+            _highlightedControllers.Clear();
         }
     }
 }

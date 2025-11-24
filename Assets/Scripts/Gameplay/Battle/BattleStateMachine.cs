@@ -1,6 +1,7 @@
 // Coordinates battle round and turn flow using Stateless for state transitions with entry/exit hooks for every state.
 using DungeonCrawler.Core.EventBus;
 using DungeonCrawler.Gameplay.Squad;
+using DungeonCrawler.Systems.Battle;
 using Stateless;
 using System;
 using System.Collections.Generic;
@@ -24,14 +25,14 @@ namespace DungeonCrawler.Gameplay.Battle
 
         public BattleContext Context => _context;
 
-        public BattleStateMachine(BattleContext context, GameEventBus sceneEventBus, BattleLogger logger = null)
+        public BattleStateMachine(BattleContext context, GameEventBus sceneEventBus, UnitSystem unitSystem, BattleLogger logger = null)
         {
             _logger = logger;
             _context = context;
             _sceneEventBus = sceneEventBus;
             _currentState = BattleState.None;
             _stateMachine = new StateMachine<BattleState, Trigger>(() => _currentState, state => _currentState = state);
-            _battleActionExecutor = new BattleActionExecutor(_sceneEventBus);
+            _battleActionExecutor = new BattleActionExecutor(_sceneEventBus, unitSystem);
 
             _unitControllers.Add("Player", new PlayerController(_sceneEventBus));
             var availableActionForEnemies = new List<UnitAction>()
@@ -261,7 +262,7 @@ namespace DungeonCrawler.Gameplay.Battle
             }
             catch (OperationCanceledException)
             {
-                // бой остановлен – ничего не делаем
+                //      
             }
         }
 
