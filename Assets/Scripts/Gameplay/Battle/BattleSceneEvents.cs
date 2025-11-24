@@ -19,6 +19,9 @@ namespace DungeonCrawler.Gameplay.Battle
     // Event published when a unit requests to finish the battle.
     public record RequestFinishBattle();
 
+    // Event published when an action is selected for a unit.
+    public record RequestActionSelect(UnitAction Action);
+
     // Event published when a unit plan action.
     public record UnitActionSelected(PlannedUnitAction Plan);
 }

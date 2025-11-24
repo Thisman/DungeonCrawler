@@ -1,11 +1,12 @@
-﻿using DungeonCrawler.Core.EventBus;
+// Handles player decision-making, default action selection, and interactive target picking during battle turns.
+using DungeonCrawler.Core.EventBus;
+using DungeonCrawler.Gameplay.Squad;
 using DungeonCrawler.Gameplay.Unit;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Unity.VisualScripting;
+using UnityEngine;
 
 namespace DungeonCrawler.Gameplay.Battle
 {
@@ -25,57 +26,111 @@ namespace DungeonCrawler.Gameplay.Battle
         {
             var tcs = new TaskCompletionSource<PlannedUnitAction>();
 
+            var defaultAction = new UnitAttackAction();
+            _sceneEventBus.Publish(new RequestActionSelect(defaultAction));
+            var defaultValidTargets = defaultAction.GetValidTargets(actor, context);
+
             IDisposable skipActionSubscribtion = null;
             IDisposable waitActionSubscribtion = null;
+
             skipActionSubscribtion = _sceneEventBus.Subscribe<RequestWaitAction>(evt =>
             {
                 var action = new UnitSkipTurnAction();
-                var validTargets = action.GetValidTargets(actor, context);
-                var chosenTargets = ChooseTargets(action, validTargets, actor, context);
+                var chosenTargets = ChooseTargets(action, action.GetValidTargets(actor, context));
 
-                var planned = new PlannedUnitAction(action, actor, chosenTargets);
-
-                skipActionSubscribtion.Dispose();
-                tcs.TrySetResult(planned);
+                CompletePlanning(tcs, action, actor, chosenTargets);
+                skipActionSubscribtion?.Dispose();
+                waitActionSubscribtion?.Dispose();
             });
 
             waitActionSubscribtion = _sceneEventBus.Subscribe<RequestSkipTurnAction>(evt =>
             {
                 var action = new UnitWaitAction();
-                var validTargets = action.GetValidTargets(actor, context);
-                var chosenTargets = ChooseTargets(action, validTargets, actor, context);
+                var chosenTargets = ChooseTargets(action, action.GetValidTargets(actor, context));
 
-                var planned = new PlannedUnitAction(action, actor, chosenTargets);
-
-                waitActionSubscribtion.Dispose();
-                tcs.TrySetResult(planned);
+                CompletePlanning(tcs, action, actor, chosenTargets);
+                waitActionSubscribtion?.Dispose();
+                skipActionSubscribtion?.Dispose();
             });
 
             cancellationToken.Register(() =>
             {
-                skipActionSubscribtion.Dispose();
-                waitActionSubscribtion.Dispose();
+                skipActionSubscribtion?.Dispose();
+                waitActionSubscribtion?.Dispose();
                 tcs.TrySetCanceled(cancellationToken);
             });
+
+            _ = ChooseTargetsAsync(defaultAction, defaultValidTargets, actor, tcs, cancellationToken);
 
             return tcs.Task;
         }
 
-        private IReadOnlyList<UnitModel> ChooseTargets(
+        private void CompletePlanning(
+            TaskCompletionSource<PlannedUnitAction> tcs,
+            UnitAction action,
+            UnitModel actor,
+            IReadOnlyList<UnitModel> chosenTargets)
+        {
+            if (tcs.Task.IsCompleted)
+            {
+                return;
+            }
+
+            var planned = new PlannedUnitAction(action, actor, chosenTargets);
+            tcs.TrySetResult(planned);
+        }
+
+        private async Task ChooseTargetsAsync(
             UnitAction action,
             IReadOnlyList<UnitModel> validTargets,
             UnitModel actor,
-            BattleContext context)
+            TaskCompletionSource<PlannedUnitAction> tcs,
+            CancellationToken cancellationToken)
         {
+            if (action.Type != ActionType.Attack)
+            {
+                CompletePlanning(tcs, action, actor, ChooseTargets(action, validTargets));
+                return;
+            }
 
+            while (!cancellationToken.IsCancellationRequested && !tcs.Task.IsCompleted)
+            {
+                if (Input.GetMouseButtonDown(0))
+                {
+                    var target = TryGetTargetUnderCursor(validTargets);
+                    if (target != null)
+                    {
+                        CompletePlanning(tcs, action, actor, new List<UnitModel> { target });
+                        break;
+                    }
+                }
+
+                await Task.Yield();
+            }
+        }
+
+        private UnitModel TryGetTargetUnderCursor(IReadOnlyList<UnitModel> validTargets)
+        {
+            var camera = Camera.main;
+            if (camera == null || validTargets == null)
+            {
+                return null;
+            }
+
+            var worldPoint = camera.ScreenToWorldPoint(Input.mousePosition);
+            var hit = Physics2D.Raycast(worldPoint, Vector2.zero, Mathf.Infinity, LayerMask.GetMask("Unit"));
+            var squadController = hit.collider ? hit.collider.GetComponentInParent<SquadController>() : null;
+            var targetModel = squadController?.Model?.Unit;
+
+            return validTargets?.FirstOrDefault(target => target == targetModel || target?.Id == targetModel?.Id);
+        }
+
+        private IReadOnlyList<UnitModel> ChooseTargets(
+            UnitAction action,
+            IReadOnlyList<UnitModel> validTargets)
+        {
             switch (action.Type)
             {
-                case ActionType.Attack:
-                    {
-                        // цель с минимальным здоровьем
-                        var best = validTargets.OrderBy(t => t.Stats.CurrentHealth).First();
-                        return new List<UnitModel>() { best };
-                    }
                 case ActionType.SkipTurn:
                     {
                         return new List<UnitModel>();
@@ -86,7 +141,6 @@ namespace DungeonCrawler.Gameplay.Battle
                     }
                 case ActionType.Ability:
                     {
-                        // для MVP просто выбираем первую цель
                         var target = validTargets.First();
                         return new List<UnitModel>() { target };
                     }
