@@ -1,5 +1,6 @@
 ﻿using DungeonCrawler.Core.EventBus;
 using DungeonCrawler.Gameplay.Unit;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -18,17 +19,18 @@ namespace DungeonCrawler.Gameplay.Battle
             _sceneEventBus = sceneEventBus;
         }
 
-        public Task<PlannedUnitAction> DecideActionAsync(
+        public async Task<PlannedUnitAction> DecideActionAsync(
             UnitModel actor,
             BattleContext context,
             CancellationToken cancellationToken)
         {
+            await Task.Delay(TimeSpan.FromSeconds(2));
             var action = ChooseActionDefinition(actor, context);
             var validTargets = action.GetValidTargets(actor, context);
             var chosenTargets = ChooseTargets(action, validTargets, actor, context);
 
             var planned = new PlannedUnitAction(action, actor, chosenTargets);
-            return Task.FromResult(planned);
+            return planned;
         }
 
         private UnitAction ChooseActionDefinition(UnitModel actor, BattleContext context) {

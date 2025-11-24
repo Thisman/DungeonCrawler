@@ -241,8 +241,6 @@ namespace DungeonCrawler.Gameplay.Battle
                 return;
             }
 
-            await Task.Delay(TimeSpan.FromSeconds(2));
-
             IUnitController controller = actor.Unit.Definition.IsFriendly() ?
                 _unitControllers.GetValueOrDefault("Player") :
                 _unitControllers.GetValueOrDefault("Enemy");
@@ -258,7 +256,7 @@ namespace DungeonCrawler.Gameplay.Battle
                 _sceneEventBus.Publish<UnitActionSelected>(new UnitActionSelected(planned));
 
                 if (_isStopped)
-                    return;
+                    cts.Cancel();
 
                 await _battleActionExecutor.ExecuteAsync(planned, _context);
                 Fire(Trigger.NextState);

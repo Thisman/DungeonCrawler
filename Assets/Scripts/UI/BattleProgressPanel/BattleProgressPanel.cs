@@ -73,9 +73,13 @@ namespace DungeonCrawler.UI.Battle
 
         private void HandleBattleStateChanged(BattleStateChanged stateChanged)
         {
-            if (stateChanged.FromState == BattleState.Preparation)
+            if (stateChanged.ToState == BattleState.TurnStart)
             {
-                Show();
+                var activeUnit = stateChanged.Context.ActiveUnit;
+                if (activeUnit != null && activeUnit.Unit.Definition.IsFriendly())
+                    Show();
+                else
+                    Hide();
             }
 
             if (stateChanged.ToState == BattleState.Result)

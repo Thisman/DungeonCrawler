@@ -23,12 +23,42 @@ namespace DungeonCrawler.Gameplay.Battle
             BattleContext context,
             CancellationToken cancellationToken)
         {
-            var action = new UnitSkipTurnAction();
-            var validTargets = action.GetValidTargets(actor, context);
-            var chosenTargets = ChooseTargets(action, validTargets, actor, context);
+            var tcs = new TaskCompletionSource<PlannedUnitAction>();
 
-            var planned = new PlannedUnitAction(action, actor, chosenTargets);
-            return Task.FromResult(planned);
+            IDisposable skipActionSubscribtion = null;
+            IDisposable waitActionSubscribtion = null;
+            skipActionSubscribtion = _sceneEventBus.Subscribe<RequestWaitAction>(evt =>
+            {
+                var action = new UnitSkipTurnAction();
+                var validTargets = action.GetValidTargets(actor, context);
+                var chosenTargets = ChooseTargets(action, validTargets, actor, context);
+
+                var planned = new PlannedUnitAction(action, actor, chosenTargets);
+
+                skipActionSubscribtion.Dispose();
+                tcs.TrySetResult(planned);
+            });
+
+            waitActionSubscribtion = _sceneEventBus.Subscribe<RequestSkipTurnAction>(evt =>
+            {
+                var action = new UnitWaitAction();
+                var validTargets = action.GetValidTargets(actor, context);
+                var chosenTargets = ChooseTargets(action, validTargets, actor, context);
+
+                var planned = new PlannedUnitAction(action, actor, chosenTargets);
+
+                waitActionSubscribtion.Dispose();
+                tcs.TrySetResult(planned);
+            });
+
+            cancellationToken.Register(() =>
+            {
+                skipActionSubscribtion.Dispose();
+                waitActionSubscribtion.Dispose();
+                tcs.TrySetCanceled(cancellationToken);
+            });
+
+            return tcs.Task;
         }
 
         private IReadOnlyList<UnitModel> ChooseTargets(
