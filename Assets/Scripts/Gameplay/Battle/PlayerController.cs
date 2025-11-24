@@ -117,9 +117,12 @@ namespace DungeonCrawler.Gameplay.Battle
                 return null;
             }
 
-            var worldPoint = camera.ScreenToWorldPoint(Input.mousePosition);
-            var hit = Physics2D.Raycast(worldPoint, Vector2.zero, Mathf.Infinity, LayerMask.GetMask("Unit"));
-            var squadController = hit.collider ? hit.collider.GetComponentInParent<SquadController>() : null;
+            var screenPoint = Input.mousePosition;
+            screenPoint.z = -camera.transform.position.z;
+            var worldPoint = (Vector2)camera.ScreenToWorldPoint(screenPoint);
+
+            var hit = Physics2D.OverlapPoint(worldPoint, LayerMask.GetMask("Unit"));
+            var squadController = hit ? hit.GetComponentInParent<SquadController>() : null;
             var targetModel = squadController?.Model?.Unit;
 
             return validTargets?.FirstOrDefault(target => target == targetModel || target?.Id == targetModel?.Id);
