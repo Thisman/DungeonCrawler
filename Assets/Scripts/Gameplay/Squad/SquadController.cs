@@ -49,6 +49,26 @@ namespace DungeonCrawler.Gameplay.Squad
             RefreshInfo();
         }
 
+        public Task Wait()
+        {
+            if (AnimationController == null)
+            {
+                return Task.CompletedTask;
+            }
+
+            return AnimationController.PlayWaitAnimation();
+        }
+
+        public Task SkipTurn()
+        {
+            if (AnimationController == null)
+            {
+                return Task.CompletedTask;
+            }
+
+            return AnimationController.PlaySkipTurnAnimation();
+        }
+
         public void SetAsTarget(bool isTarget)
         {
             if (AnimationController == null)
