@@ -1,6 +1,6 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
     <ui:Style src="../Global.uss" />
-    <ui:Style src="BattleResult.uss" />
+    <ui:Style src="BattleResultPanel.uss" />
     <ui:VisualElement class="panel battle-result">
         <ui:Button name="finish-battle-button" text="Завершить" class="battle-result__button" />
     </ui:VisualElement>

@@ -46,9 +46,6 @@ namespace DungeonCrawler.Gameplay.Squad
         [SerializeField]
         private float _shakeStrength = 0.1f;
 
-        [SerializeField]
-        private int _shakeVibrato = 10;
-
         [SerializeField, Range(0.1f, 1f)]
         private float _dodgeFadeAlpha = 0.35f;
 
