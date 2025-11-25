@@ -25,14 +25,14 @@ namespace DungeonCrawler.Gameplay.Battle
 
         public BattleContext Context => _context;
 
-        public BattleStateMachine(BattleContext context, GameEventBus sceneEventBus, UnitSystem unitSystem)
+        public BattleStateMachine(BattleContext context, GameEventBus sceneEventBus, UnitSystem unitSystem, BattleDamageSystem battleDamageSystem)
         {
             _context = context;
             _logger = new BattleLogger();
             _sceneEventBus = sceneEventBus;
             _currentState = BattleState.None;
             _stateMachine = new StateMachine<BattleState, Trigger>(() => _currentState, state => _currentState = state);
-            _battleActionExecutor = new BattleActionExecutor(_sceneEventBus, unitSystem);
+            _battleActionExecutor = new BattleActionExecutor(_sceneEventBus, unitSystem, battleDamageSystem);
 
             _unitControllers.Add("Player", new PlayerController(_sceneEventBus));
             var availableActionForEnemies = new List<UnitAction>()

@@ -21,6 +21,12 @@ namespace DungeonCrawler.Gameplay.Squad
         private Color _waitColor = new Color(1f, 0.85f, 0f);
 
         [SerializeField]
+        private Color _attackColor = Color.cyan;
+
+        [SerializeField]
+        private Color _damageColor = Color.red;
+
+        [SerializeField]
         private float _blinkDurationSeconds = 0.5f;
 
         private Coroutine _currentAnimation;
@@ -32,6 +38,8 @@ namespace DungeonCrawler.Gameplay.Squad
             if (_iconRenderer != null)
             {
                 _originalColor = _iconRenderer.color;
+                _pendingResetColor = _originalColor;
+                _iconRenderer.flipX = transform.position.x < 0f;
             }
         }
 
@@ -59,6 +67,16 @@ namespace DungeonCrawler.Gameplay.Squad
         public Task PlayWaitAnimation()
         {
             return PlayBlinkAsync(_waitColor);
+        }
+
+        public Task PlayAttackAnimation()
+        {
+            return PlayBlinkAsync(_attackColor);
+        }
+
+        public Task PlayDamageAnimation()
+        {
+            return PlayBlinkAsync(_damageColor);
         }
 
         public void ResetColor()

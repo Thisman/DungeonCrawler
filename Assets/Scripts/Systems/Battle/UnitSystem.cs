@@ -6,6 +6,7 @@ using DungeonCrawler.Gameplay.Squad;
 using DungeonCrawler.Gameplay.Unit;
 using UnityEngine;
 using DungeonCrawler.Core.EventBus;
+using System.Threading.Tasks;
 
 namespace DungeonCrawler.Systems.Battle
 {
@@ -107,6 +108,26 @@ namespace DungeonCrawler.Systems.Battle
             return result;
         }
 
+        public async Task ApplyDamage(DamageInstance damage)
+        {
+            if (damage == null)
+            {
+                return;
+            }
+
+            var attackerAnimation = TryGetAnimationController(damage.Attacker);
+            if (attackerAnimation != null)
+            {
+                await attackerAnimation.PlayAttackAnimation();
+            }
+
+            var targetAnimation = TryGetAnimationController(damage.Target);
+            if (targetAnimation != null)
+            {
+                await targetAnimation.PlayDamageAnimation();
+            }
+        }
+
         public void Dispose()
         {
             foreach (var subscription in _subscriptions)
@@ -160,6 +181,16 @@ namespace DungeonCrawler.Systems.Battle
             }
 
             _highlightedControllers.Clear();
+        }
+
+        private SquadAnimationController TryGetAnimationController(UnitModel unit)
+        {
+            if (unit != null && _unitControllers.TryGetValue(unit, out var controller))
+            {
+                return controller.AnimationController;
+            }
+
+            return null;
         }
     }
 }

@@ -33,6 +33,7 @@ namespace DungeonCrawler.Gameplay.Battle
         private BattleTargetPicker _battleTargetPicker;
 
         private UnitSystem _unitSystem;
+        private BattleDamageSystem _battleDamageSystem;
         private GameEventBus _sceneEventBus;
         private BattleStateMachine _stateMachine;
         private List<SquadModel> _buildedSquads;
@@ -48,7 +49,8 @@ namespace DungeonCrawler.Gameplay.Battle
 
             var context = new BattleContext(_buildedSquads);
             _unitSystem = new UnitSystem(_sceneEventBus, _squadPrefab, transform, _battleGridController, context);
-            _stateMachine = new BattleStateMachine(context, _sceneEventBus, _unitSystem);
+            _battleDamageSystem = new BattleDamageSystem();
+            _stateMachine = new BattleStateMachine(context, _sceneEventBus, _unitSystem, _battleDamageSystem);
 
             InitializeUIPanels();
         }
