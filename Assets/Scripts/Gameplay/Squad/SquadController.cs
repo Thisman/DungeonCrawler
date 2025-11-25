@@ -1,4 +1,4 @@
-// Displays squad visuals by binding a model to icon and count text renderers and triggers squad-level animations.
+// Displays squad visuals, processes damage to update squad state, and triggers squad-level animations.
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -51,6 +51,11 @@ namespace DungeonCrawler.Gameplay.Squad
 
         public Task Wait()
         {
+            if (_model?.IsDead == true)
+            {
+                return Task.CompletedTask;
+            }
+
             if (AnimationController == null)
             {
                 return Task.CompletedTask;
@@ -61,6 +66,11 @@ namespace DungeonCrawler.Gameplay.Squad
 
         public Task SkipTurn()
         {
+            if (_model?.IsDead == true)
+            {
+                return Task.CompletedTask;
+            }
+
             if (AnimationController == null)
             {
                 return Task.CompletedTask;
@@ -71,6 +81,11 @@ namespace DungeonCrawler.Gameplay.Squad
 
         public void SetAsTarget(bool isTarget)
         {
+            if (_model?.IsDead == true)
+            {
+                return;
+            }
+
             if (AnimationController == null)
             {
                 return;
@@ -89,6 +104,11 @@ namespace DungeonCrawler.Gameplay.Squad
         public async Task ResolveAttack(DamageInstance damage)
         {
             if (damage == null)
+            {
+                return;
+            }
+
+            if (_model?.IsDead == true)
             {
                 return;
             }
@@ -115,10 +135,17 @@ namespace DungeonCrawler.Gameplay.Squad
                 return;
             }
 
+            if (_model?.IsDead == true)
+            {
+                return;
+            }
+
             var direction = GetDirectionToScreenCenter();
 
             if (damage.IsHit)
             {
+                _model.ApplyDamage(damage.Amount);
+
                 var animations = new List<Task>();
 
                 if (AnimationController != null)
@@ -168,6 +195,13 @@ namespace DungeonCrawler.Gameplay.Squad
                 return;
             }
 
+            if (_model.IsDead)
+            {
+                _info.text = "Dead";
+                DisableActiveComponents();
+                return;
+            }
+
             UnitDefinition unitDefinition = _model.Unit.Definition;
             _info.text = $"{unitDefinition.Name} x {_model.UnitCount}";
         }
@@ -182,6 +216,20 @@ namespace DungeonCrawler.Gameplay.Squad
             }
 
             return direction.normalized;
+        }
+
+        private void DisableActiveComponents()
+        {
+            var collider = GetComponent<Collider2D>();
+            if (collider != null)
+            {
+                collider.enabled = false;
+            }
+
+            if (AnimationController != null)
+            {
+                AnimationController.enabled = false;
+            }
         }
     }
 }

@@ -118,6 +118,7 @@ namespace DungeonCrawler.Gameplay.Battle
         private void EnterState(BattleState state)
         {
             _logger.LogStateEnter(state);
+            RecalculateQueue(state);
 
             switch (state)
             {
@@ -297,6 +298,22 @@ namespace DungeonCrawler.Gameplay.Battle
         {
             _context.Status = status;
             _logger.LogStatusChange(status);
+        }
+
+        private void RecalculateQueue(BattleState state)
+        {
+            if (_context?.Queue == null)
+            {
+                return;
+            }
+
+            if (state == BattleState.TurnEnd ||
+                state == BattleState.RoundEnd ||
+                state == BattleState.TurnStart ||
+                state == BattleState.RoundStart)
+            {
+                _context.Queue.Calculate();
+            }
         }
 
         private void Fire(Trigger trigger)

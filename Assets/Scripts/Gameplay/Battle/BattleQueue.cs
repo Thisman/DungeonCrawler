@@ -1,4 +1,4 @@
-// Builds and maintains an initiative-based turn queue for squads, supporting multi-round previews with separators.
+// Builds and maintains an initiative-based turn queue for living squads, supporting multi-round previews with separators.
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -72,6 +72,11 @@ namespace DungeonCrawler.Gameplay.Battle
                 throw new ArgumentNullException(nameof(squad));
             }
 
+            if (!IsAlive(squad))
+            {
+                return;
+            }
+
             var items = new List<SquadModel>(1 + _queue.Count) { squad };
             items.AddRange(_queue);
 
@@ -90,6 +95,11 @@ namespace DungeonCrawler.Gameplay.Battle
             if (squad == null)
             {
                 throw new ArgumentNullException(nameof(squad));
+            }
+
+            if (!IsAlive(squad))
+            {
+                return;
             }
 
             _queue.Enqueue(squad);
@@ -111,12 +121,12 @@ namespace DungeonCrawler.Gameplay.Battle
                 ? queueItems.GetRange(0, roundBoundaryIndex)
                 : queueItems;
 
-            // Перемещаем юнита в конец текущего раунда
-            currentRoundItems.RemoveAll(item => item == squad); // на всякий случай, если он был только в хвосте
+            // РџРµСЂРµРјРµС‰Р°РµРј СЋРЅРёС‚Р° РІ РєРѕРЅРµС† С‚РµРєСѓС‰РµРіРѕ СЂР°СѓРЅРґР°
+            currentRoundItems.RemoveAll(item => item == squad); // РЅР° РІСЃСЏРєРёР№ СЃР»СѓС‡Р°Р№, РµСЃР»Рё РѕРЅ Р±С‹Р» С‚РѕР»СЊРєРѕ РІ С…РІРѕСЃС‚Рµ
             currentRoundItems.Add(squad);
 
-            // Собираем очередь только из текущего раунда,
-            // хвост и разделители даст EnsureQueueFilled
+            // РЎРѕР±РёСЂР°РµРј РѕС‡РµСЂРµРґСЊ С‚РѕР»СЊРєРѕ РёР· С‚РµРєСѓС‰РµРіРѕ СЂР°СѓРЅРґР°,
+            // С…РІРѕСЃС‚ Рё СЂР°Р·РґРµР»РёС‚РµР»Рё РґР°СЃС‚ EnsureQueueFilled
             var rebuiltQueue = new List<SquadModel>(currentRoundItems);
 
             _queue.Clear();
@@ -126,7 +136,7 @@ namespace DungeonCrawler.Gameplay.Battle
             }
 
             _roundPosition = 0;
-            EnsureQueueFilled(); // он сам добавит один null между раундами, если нужно
+            EnsureQueueFilled(); // РѕРЅ СЃР°Рј РґРѕР±Р°РІРёС‚ РѕРґРёРЅ null РјРµР¶РґСѓ СЂР°СѓРЅРґР°РјРё, РµСЃР»Рё РЅСѓР¶РЅРѕ
         }
 
 
@@ -141,7 +151,9 @@ namespace DungeonCrawler.Gameplay.Battle
         private void CalculateRoundOrder()
         {
             _roundOrder.Clear();
-            _roundOrder.AddRange(_squads.OrderByDescending(s => s.Unit.Stats.Initiative));
+            _roundOrder.AddRange(_squads
+                .Where(IsAlive)
+                .OrderByDescending(s => s.Unit.Stats.Initiative));
         }
 
         private void EnsureQueueFilled()
@@ -187,6 +199,11 @@ namespace DungeonCrawler.Gameplay.Battle
             }
 
             return count;
+        }
+
+        private bool IsAlive(SquadModel squad)
+        {
+            return squad != null && !squad.IsDead && !squad.IsEmpty();
         }
     }
 }

@@ -55,6 +55,7 @@ namespace DungeonCrawler.UI.Battle
             switch(stateChanged.ToState)
             {
                 case BattleState.TurnEnd:
+                case BattleState.TurnStart:
                 case BattleState.RoundStart:
                 case BattleState.RoundEnd:
                     UpdateQueue(stateChanged.Context);

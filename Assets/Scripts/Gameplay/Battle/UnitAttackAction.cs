@@ -1,4 +1,4 @@
-﻿// Provides targeting logic for the basic attack action, selecting only opposing units.
+// Provides targeting logic for the basic attack action, selecting only opposing living units.
 using DungeonCrawler.Gameplay.Unit;
 using System.Collections.Generic;
 
@@ -28,7 +28,7 @@ namespace DungeonCrawler.Gameplay.Battle
 
             foreach (var squad in context.Squads)
             {
-                if (squad.IsEmpty())
+                if (squad.IsEmpty() || squad.IsDead)
                 {
                     continue;
                 }

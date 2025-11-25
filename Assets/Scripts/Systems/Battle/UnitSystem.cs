@@ -1,4 +1,4 @@
-// Manages squad controller instances for battle, including spawning and lookup by model.
+// Manages squad controller instances for battle, including spawning, lookup by model, and interactions limited to living squads.
 using System;
 using System.Collections.Generic;
 using DungeonCrawler.Gameplay.Battle;
@@ -76,6 +76,7 @@ namespace DungeonCrawler.Systems.Battle
                 if (_gridController == null)
                 {
                     squadInstance.transform.localPosition = Vector3.zero;
+                    squadInstance.Initalize(squad);
                 }
 
                 _squadControllers[squad] = squadInstance;
@@ -85,6 +86,11 @@ namespace DungeonCrawler.Systems.Battle
 
         public SquadController GetController(SquadModel squad)
         {
+            if (squad?.IsDead == true)
+            {
+                return null;
+            }
+
             _squadControllers.TryGetValue(squad, out var controller);
             return controller;
         }
@@ -117,12 +123,18 @@ namespace DungeonCrawler.Systems.Battle
 
             if (damage.Attacker != null && _unitControllers.TryGetValue(damage.Attacker, out var attackerController))
             {
-                await attackerController.ResolveAttack(damage);
+                if (attackerController.Model?.IsDead == false)
+                {
+                    await attackerController.ResolveAttack(damage);
+                }
             }
 
             if (damage.Target != null && _unitControllers.TryGetValue(damage.Target, out var targetController))
             {
-                await targetController.TakeDamage(damage);
+                if (targetController.Model?.IsDead == false)
+                {
+                    await targetController.TakeDamage(damage);
+                }
             }
         }
 
@@ -166,6 +178,11 @@ namespace DungeonCrawler.Systems.Battle
                     continue;
                 }
 
+                if (controller.Model?.IsDead == true)
+                {
+                    continue;
+                }
+
                 controller.SetAsTarget(true);
                 _highlightedControllers.Add(controller);
             }
@@ -175,7 +192,10 @@ namespace DungeonCrawler.Systems.Battle
         {
             foreach (var controller in _highlightedControllers)
             {
-                controller?.SetAsTarget(false);
+                if (controller?.Model?.IsDead == false)
+                {
+                    controller.SetAsTarget(false);
+                }
             }
 
             _highlightedControllers.Clear();
