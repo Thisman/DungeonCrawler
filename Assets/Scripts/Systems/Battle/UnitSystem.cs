@@ -7,6 +7,7 @@ using DungeonCrawler.Gameplay.Unit;
 using UnityEngine;
 using DungeonCrawler.Core.EventBus;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace DungeonCrawler.Systems.Battle
 {
@@ -21,6 +22,7 @@ namespace DungeonCrawler.Systems.Battle
         private readonly Dictionary<SquadModel, SquadController> _squadControllers = new();
         private readonly Dictionary<UnitModel, SquadController> _unitControllers = new();
         private readonly List<SquadController> _highlightedControllers = new();
+        private readonly List<SquadModel> _trackedSquads = new();
 
         public UnitSystem(
             GameEventBus sceneEventBus,
@@ -76,10 +78,13 @@ namespace DungeonCrawler.Systems.Battle
                 if (_gridController == null)
                 {
                     squadInstance.transform.localPosition = Vector3.zero;
+                    squadInstance.Initalize(squad);
                 }
 
                 _squadControllers[squad] = squadInstance;
                 _unitControllers[squad.Unit] = squadInstance;
+                squad.Changed += HandleSquadChanged;
+                _trackedSquads.Add(squad);
             }
         }
 
@@ -115,12 +120,12 @@ namespace DungeonCrawler.Systems.Battle
                 return;
             }
 
-            if (damage.Attacker != null && _unitControllers.TryGetValue(damage.Attacker, out var attackerController))
+            if (TryGetLiveController(damage.Attacker, out var attackerController))
             {
                 await attackerController.ResolveAttack(damage);
             }
 
-            if (damage.Target != null && _unitControllers.TryGetValue(damage.Target, out var targetController))
+            if (TryGetLiveController(damage.Target, out var targetController))
             {
                 await targetController.TakeDamage(damage);
             }
@@ -134,6 +139,13 @@ namespace DungeonCrawler.Systems.Battle
             }
 
             _subscriptions.Clear();
+
+            foreach (var squad in _trackedSquads.Where(s => s != null))
+            {
+                squad.Changed -= HandleSquadChanged;
+            }
+
+            _trackedSquads.Clear();
         }
 
         private void HandleStateChanged(BattleStateChanged evt)
@@ -148,7 +160,7 @@ namespace DungeonCrawler.Systems.Battle
         {
             ClearHighlights();
 
-            if (evt?.Action == null || _context?.ActiveUnit == null)
+            if (evt?.Action == null || _context?.ActiveUnit == null || _context.ActiveUnit.IsDead)
             {
                 return;
             }
@@ -161,13 +173,27 @@ namespace DungeonCrawler.Systems.Battle
 
             foreach (var target in validTargets)
             {
-                if (target == null || !_unitControllers.TryGetValue(target, out var controller))
+                if (target == null || !_unitControllers.TryGetValue(target, out var controller) || controller.Model?.IsDead == true)
                 {
                     continue;
                 }
 
                 controller.SetAsTarget(true);
                 _highlightedControllers.Add(controller);
+            }
+        }
+
+        private void HandleSquadChanged(SquadModel squad, int newCount, int oldCount)
+        {
+            if (squad == null || !_squadControllers.TryGetValue(squad, out var controller))
+            {
+                return;
+            }
+
+            if (squad.IsDead)
+            {
+                controller.SetAsTarget(false);
+                _highlightedControllers.Remove(controller);
             }
         }
 
@@ -179,6 +205,24 @@ namespace DungeonCrawler.Systems.Battle
             }
 
             _highlightedControllers.Clear();
+        }
+
+        private bool TryGetLiveController(UnitModel unit, out SquadController controller)
+        {
+            controller = null;
+
+            if (unit == null || !_unitControllers.TryGetValue(unit, out var foundController))
+            {
+                return false;
+            }
+
+            if (foundController.Model?.IsDead == true)
+            {
+                return false;
+            }
+
+            controller = foundController;
+            return true;
         }
     }
 }

@@ -74,6 +74,7 @@ namespace DungeonCrawler.Gameplay.Squad
         private void OnDisable()
         {
             StopAllAnimations();
+            ResetColor();
         }
 
         public void HighlightAsTarget()

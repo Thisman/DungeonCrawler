@@ -28,7 +28,7 @@ namespace DungeonCrawler.Gameplay.Battle
 
             foreach (var squad in context.Squads)
             {
-                if (squad.IsEmpty())
+                if (squad.IsEmpty() || squad.IsDead)
                 {
                     continue;
                 }

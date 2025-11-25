@@ -111,6 +111,7 @@ namespace DungeonCrawler.UI.Battle
             };
 
             entry.AddToClassList("battle-queue__entry");
+            entry.AddToClassList("battle-queue__separator");
             return entry;
         }
 
