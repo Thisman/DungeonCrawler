@@ -1,4 +1,5 @@
 // Executes battle actions and triggers related squad animations.
+using System.Collections.Generic;
 using DungeonCrawler.Core.EventBus;
 using DungeonCrawler.Gameplay.Squad;
 using DungeonCrawler.Gameplay.Unit;
@@ -12,11 +13,13 @@ namespace DungeonCrawler.Gameplay.Battle
     {
         private readonly GameEventBus _eventBus;
         private readonly UnitSystem _unitSystem;
+        private readonly BattleDamageSystem _battleDamageSystem;
 
-        public BattleActionExecutor(GameEventBus eventBus, UnitSystem unitSystem)
+        public BattleActionExecutor(GameEventBus eventBus, UnitSystem unitSystem, BattleDamageSystem battleDamageSystem)
         {
             _eventBus = eventBus;
             _unitSystem = unitSystem;
+            _battleDamageSystem = battleDamageSystem;
         }
 
         public async Task ExecuteAsync(PlannedUnitAction plan, BattleContext context)
@@ -61,11 +64,14 @@ namespace DungeonCrawler.Gameplay.Battle
             }
         }
 
-        private Task HandleAttackAsync(PlannedUnitAction plan, BattleContext context)
+        private async Task HandleAttackAsync(PlannedUnitAction plan, BattleContext context)
         {
-            // здесь только абстрактный каркас, без конкретного урона
-            // DamageSystem.ApplyAttack(action.Actor, action.Targets, context);
-            return Task.CompletedTask;
+            var damageInstances = await _battleDamageSystem?.ResolveDamageAsync(plan);
+
+            foreach (var damage in damageInstances)
+            {
+                await _unitSystem.ApplyDamage(damage);
+            }
         }
 
         private Task HandleAbilityAsync(PlannedUnitAction plan, BattleContext context)
