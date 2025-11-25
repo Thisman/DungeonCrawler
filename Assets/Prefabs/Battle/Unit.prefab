@@ -111,9 +111,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DungeonCrawler.Gameplay.Squad.SquadAnimationController
   _iconRenderer: {fileID: 1659224501506304108}
   _targetHighlightColor: {r: 0, g: 1, b: 0, a: 1}
-  _skipTurnColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-  _waitColor: {r: 0, g: 0.4521885, b: 1, a: 1}
+  _skipTurnColor: {r: 1, g: 0, b: 0.8605418, a: 1}
+  _waitColor: {r: 0.58770657, g: 0, b: 1, a: 1}
+  _attackColor: {r: 0.07062721, g: 0, b: 1, a: 1}
+  _damageColor: {r: 1, g: 0, b: 0, a: 1}
   _blinkDurationSeconds: 0.5
+  _blinkFrequency: 4
+  _attackMoveDistance: 0.35
+  _attackMoveDuration: 0.12
+  _shakeDuration: 0.2
+  _shakeStrength: 0.1
+  _shakeVibrato: 10
+  _dodgeFadeAlpha: 0.1
+  _dodgeFadeDuration: 0.12
 --- !u!1 &3550713591584299746
 GameObject:
   m_ObjectHideFlags: 0

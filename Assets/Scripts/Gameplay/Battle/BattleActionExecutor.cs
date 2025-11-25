@@ -1,5 +1,4 @@
 // Executes battle actions and triggers related squad animations.
-using System.Collections.Generic;
 using DungeonCrawler.Core.EventBus;
 using DungeonCrawler.Gameplay.Squad;
 using DungeonCrawler.Gameplay.Unit;
@@ -46,10 +45,10 @@ namespace DungeonCrawler.Gameplay.Battle
 
         private async Task HandleWaitAsync(PlannedUnitAction plan, BattleContext context)
         {
-            var animationController = GetAnimationController(plan.Actor, context);
-            if (animationController != null)
+            var squadController = GetSquadController(plan.Actor, context);
+            if (squadController != null)
             {
-                await animationController.PlayWaitAnimation();
+                await squadController.Wait();
             }
 
             context?.Queue?.MoveToCurrentRoundEnd(context.ActiveUnit);
@@ -57,10 +56,10 @@ namespace DungeonCrawler.Gameplay.Battle
 
         private async Task HandleSkipTurnAsync(PlannedUnitAction plan, BattleContext context)
         {
-            var animationController = GetAnimationController(plan.Actor, context);
-            if (animationController != null)
+            var squadController = GetSquadController(plan.Actor, context);
+            if (squadController != null)
             {
-                await animationController.PlaySkipTurnAnimation();
+                await squadController.SkipTurn();
             }
         }
 
@@ -80,7 +79,7 @@ namespace DungeonCrawler.Gameplay.Battle
             return Task.CompletedTask;
         }
 
-        private SquadAnimationController GetAnimationController(UnitModel actor, BattleContext context)
+        private SquadController GetSquadController(UnitModel actor, BattleContext context)
         {
             if (actor == null || context?.Squads == null || _unitSystem == null)
             {
@@ -88,8 +87,7 @@ namespace DungeonCrawler.Gameplay.Battle
             }
 
             var squad = context.Squads.FirstOrDefault(squadModel => squadModel.Unit == actor);
-            var controller = _unitSystem.GetController(squad);
-            return controller?.AnimationController;
+            return _unitSystem.GetController(squad);
         }
     }
 

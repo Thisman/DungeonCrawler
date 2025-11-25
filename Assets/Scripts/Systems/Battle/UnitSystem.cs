@@ -115,16 +115,14 @@ namespace DungeonCrawler.Systems.Battle
                 return;
             }
 
-            var attackerAnimation = TryGetAnimationController(damage.Attacker);
-            if (attackerAnimation != null)
+            if (damage.Attacker != null && _unitControllers.TryGetValue(damage.Attacker, out var attackerController))
             {
-                await attackerAnimation.PlayAttackAnimation();
+                await attackerController.ResolveAttack(damage);
             }
 
-            var targetAnimation = TryGetAnimationController(damage.Target);
-            if (targetAnimation != null)
+            if (damage.Target != null && _unitControllers.TryGetValue(damage.Target, out var targetController))
             {
-                await targetAnimation.PlayDamageAnimation();
+                await targetController.TakeDamage(damage);
             }
         }
 
@@ -168,7 +166,7 @@ namespace DungeonCrawler.Systems.Battle
                     continue;
                 }
 
-                controller.AnimationController?.HighlightAsTarget();
+                controller.SetAsTarget(true);
                 _highlightedControllers.Add(controller);
             }
         }
@@ -177,20 +175,10 @@ namespace DungeonCrawler.Systems.Battle
         {
             foreach (var controller in _highlightedControllers)
             {
-                controller?.AnimationController?.ResetColor();
+                controller?.SetAsTarget(false);
             }
 
             _highlightedControllers.Clear();
-        }
-
-        private SquadAnimationController TryGetAnimationController(UnitModel unit)
-        {
-            if (unit != null && _unitControllers.TryGetValue(unit, out var controller))
-            {
-                return controller.AnimationController;
-            }
-
-            return null;
         }
     }
 }
