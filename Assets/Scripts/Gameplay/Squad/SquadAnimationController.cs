@@ -59,6 +59,7 @@ namespace DungeonCrawler.Gameplay.Squad
         private readonly List<Tween> _runningTweens = new();
         private Color _originalColor;
         private Color _pendingResetColor;
+        private bool _isTargetHighlighted;
 
         private void Awake()
         {
@@ -82,7 +83,9 @@ namespace DungeonCrawler.Gameplay.Squad
                 return;
             }
 
-            StartBlinking(_targetHighlightColor, true);
+            _isTargetHighlighted = true;
+            StopBlink();
+            ApplyBaseColor();
         }
 
         public Task PlaySkipTurnAnimation() => PlayBlinkAsync(_skipTurnColor);
@@ -142,8 +145,9 @@ namespace DungeonCrawler.Gameplay.Squad
                 return;
             }
 
+            _isTargetHighlighted = false;
             StopBlink();
-            _iconRenderer.color = _originalColor;
+            ApplyBaseColor();
         }
 
         private Task PlayBlinkAsync(Color blinkColor)
@@ -155,7 +159,7 @@ namespace DungeonCrawler.Gameplay.Squad
 
             StopBlink();
 
-            _pendingResetColor = _iconRenderer.color;
+            _pendingResetColor = GetBaseColor();
             var completionSource = new TaskCompletionSource<bool>();
 
             var period = GetBlinkPeriod();
@@ -171,22 +175,13 @@ namespace DungeonCrawler.Gameplay.Squad
                 _blinkSequence = null;
                 completionSource.TrySetResult(true);
             });
-            _blinkSequence.OnKill(() => completionSource.TrySetResult(true));
+            _blinkSequence.OnKill(() =>
+            {
+                _iconRenderer.color = _pendingResetColor;
+                completionSource.TrySetResult(true);
+            });
 
             return completionSource.Task;
-        }
-
-        private void StartBlinking(Color blinkColor, bool continuous)
-        {
-            StopBlink();
-
-            _pendingResetColor = _originalColor;
-            var period = GetBlinkPeriod();
-
-            _blinkSequence = DOTween.Sequence();
-            _blinkSequence.Append(_iconRenderer.DOColor(blinkColor, period * 0.5f));
-            _blinkSequence.Append(_iconRenderer.DOColor(_pendingResetColor, period * 0.5f));
-            _blinkSequence.SetLoops(continuous ? -1 : 1);
         }
 
         private Task PlayLungeAsync(Vector3 direction)
@@ -226,10 +221,7 @@ namespace DungeonCrawler.Gameplay.Squad
 
             _runningTweens.Clear();
 
-            if (_iconRenderer != null)
-            {
-                _iconRenderer.color = _originalColor;
-            }
+            ApplyBaseColor();
         }
 
         private void RegisterTween(Tween tween)
@@ -241,6 +233,21 @@ namespace DungeonCrawler.Gameplay.Squad
 
             _runningTweens.Add(tween);
             tween.OnKill(() => _runningTweens.Remove(tween));
+        }
+
+        private Color GetBaseColor()
+        {
+            return _isTargetHighlighted ? _targetHighlightColor : _originalColor;
+        }
+
+        private void ApplyBaseColor()
+        {
+            if (_iconRenderer != null)
+            {
+                _iconRenderer.color = GetBaseColor();
+            }
+
+            _pendingResetColor = GetBaseColor();
         }
     }
 }
