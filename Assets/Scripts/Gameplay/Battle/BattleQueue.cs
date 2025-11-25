@@ -1,4 +1,4 @@
-// Builds and maintains an initiative-based turn queue for squads, supporting multi-round previews with separators.
+// Builds and maintains an initiative-based turn queue for living squads, supporting multi-round previews with separators.
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -39,8 +39,9 @@ namespace DungeonCrawler.Gameplay.Battle
             }
 
             _requestedUnitsCount = unitsCount;
+            RemoveDeadUnitsFromQueue();
             EnsureQueueFilled();
-            return _queue.ToList();
+            return _queue.Where(item => item == null || !item.IsDead).ToList();
         }
 
         public SquadModel GetNext()
@@ -55,7 +56,17 @@ namespace DungeonCrawler.Gameplay.Battle
                 return null;
             }
 
-            var next = _queue.Dequeue();
+            SquadModel next = null;
+
+            while (_queue.Count > 0 && next == null)
+            {
+                var candidate = _queue.Dequeue();
+
+                if (candidate == null || !candidate.IsDead)
+                {
+                    next = candidate;
+                }
+            }
 
             if (_requestedUnitsCount > 0)
             {
@@ -70,6 +81,11 @@ namespace DungeonCrawler.Gameplay.Battle
             if (squad == null)
             {
                 throw new ArgumentNullException(nameof(squad));
+            }
+
+            if (squad.IsDead)
+            {
+                throw new ArgumentException("Squad must be alive to enter the queue.", nameof(squad));
             }
 
             var items = new List<SquadModel>(1 + _queue.Count) { squad };
@@ -92,6 +108,11 @@ namespace DungeonCrawler.Gameplay.Battle
                 throw new ArgumentNullException(nameof(squad));
             }
 
+            if (squad.IsDead)
+            {
+                throw new ArgumentException("Squad must be alive to enter the queue.", nameof(squad));
+            }
+
             _queue.Enqueue(squad);
             EnsureQueueFilled();
         }
@@ -103,6 +124,11 @@ namespace DungeonCrawler.Gameplay.Battle
                 throw new ArgumentNullException(nameof(squad));
             }
 
+            if (squad.IsDead)
+            {
+                throw new ArgumentException("Squad must be alive to enter the queue.", nameof(squad));
+            }
+
             var queueItems = _queue.ToList();
             queueItems.RemoveAll(item => item == squad);
 
@@ -111,12 +137,12 @@ namespace DungeonCrawler.Gameplay.Battle
                 ? queueItems.GetRange(0, roundBoundaryIndex)
                 : queueItems;
 
-            // Перемещаем юнита в конец текущего раунда
-            currentRoundItems.RemoveAll(item => item == squad); // на всякий случай, если он был только в хвосте
+            // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
+            currentRoundItems.RemoveAll(item => item == squad); // пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
             currentRoundItems.Add(squad);
 
-            // Собираем очередь только из текущего раунда,
-            // хвост и разделители даст EnsureQueueFilled
+            // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ,
+            // пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ EnsureQueueFilled
             var rebuiltQueue = new List<SquadModel>(currentRoundItems);
 
             _queue.Clear();
@@ -126,7 +152,7 @@ namespace DungeonCrawler.Gameplay.Battle
             }
 
             _roundPosition = 0;
-            EnsureQueueFilled(); // он сам добавит один null между раундами, если нужно
+            EnsureQueueFilled(); // пїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ null пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
         }
 
 
@@ -141,11 +167,16 @@ namespace DungeonCrawler.Gameplay.Battle
         private void CalculateRoundOrder()
         {
             _roundOrder.Clear();
-            _roundOrder.AddRange(_squads.OrderByDescending(s => s.Unit.Stats.Initiative));
+            _roundOrder.AddRange(_squads
+                .Where(squad => squad != null && !squad.IsDead)
+                .OrderByDescending(s => s.Unit.Stats.Initiative));
         }
 
         private void EnsureQueueFilled()
         {
+            RemoveDeadUnitsFromQueue();
+            RemoveDeadFromRoundOrder();
+
             if (_roundOrder.Count == 0 || _requestedUnitsCount == 0)
             {
                 return;
@@ -162,9 +193,14 @@ namespace DungeonCrawler.Gameplay.Battle
 
                 while (_roundPosition < _roundOrder.Count && unitsInQueue < _requestedUnitsCount)
                 {
-                    _queue.Enqueue(_roundOrder[_roundPosition]);
+                    var squad = _roundOrder[_roundPosition];
                     _roundPosition++;
-                    unitsInQueue++;
+
+                    if (squad != null && !squad.IsDead)
+                    {
+                        _queue.Enqueue(squad);
+                        unitsInQueue++;
+                    }
                 }
 
                 if (_roundPosition >= _roundOrder.Count)
@@ -180,13 +216,38 @@ namespace DungeonCrawler.Gameplay.Battle
 
             foreach (var item in items)
             {
-                if (item != null)
+                if (item != null && !item.IsDead)
                 {
                     count++;
                 }
             }
 
             return count;
+        }
+
+        private void RemoveDeadUnitsFromQueue()
+        {
+            if (_queue.Count == 0)
+            {
+                return;
+            }
+
+            var items = _queue.ToList();
+            _queue.Clear();
+
+            foreach (var item in items)
+            {
+                if (item == null || !item.IsDead)
+                {
+                    _queue.Enqueue(item);
+                }
+            }
+        }
+
+        private void RemoveDeadFromRoundOrder()
+        {
+            _roundOrder.RemoveAll(item => item == null || item.IsDead);
+            _roundPosition = Math.Min(_roundPosition, _roundOrder.Count);
         }
     }
 }
