@@ -109,7 +109,8 @@ namespace DungeonCrawler.Gameplay.Squad
         public Task PlayDamageShakeAsync()
         {
             var startPosition = transform.localPosition;
-            var tween = transform.DOShakePosition(_shakeDuration, _shakeStrength, _shakeVibrato)
+            var tween = DOVirtual.Float(0f, 1f, _shakeDuration, _ => ApplyShake(transform, startPosition))
+                .SetEase(Ease.Linear)
                 .OnKill(() => transform.localPosition = startPosition)
                 .OnComplete(() => transform.localPosition = startPosition);
 
@@ -233,6 +234,23 @@ namespace DungeonCrawler.Gameplay.Squad
 
             _runningTweens.Add(tween);
             tween.OnKill(() => _runningTweens.Remove(tween));
+        }
+
+        private void ApplyShake(Transform target, Vector3 basePosition)
+        {
+            if (target == null)
+            {
+                return;
+            }
+
+            float amplitude = Mathf.Max(0f, _shakeStrength);
+            if (amplitude <= 0f)
+            {
+                return;
+            }
+
+            Vector2 offset = Random.insideUnitCircle * amplitude;
+            target.localPosition = basePosition + new Vector3(offset.x, offset.y, 0f);
         }
 
         private Color GetBaseColor()
