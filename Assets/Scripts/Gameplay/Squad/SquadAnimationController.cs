@@ -1,6 +1,8 @@
-// Drives squad icon highlight and blink animations for battle feedback.
-using System.Collections;
+// Drives squad icon highlight and movement animations for battle feedback.
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using DG.Tweening;
 using UnityEngine;
 
 namespace DungeonCrawler.Gameplay.Squad
@@ -29,7 +31,32 @@ namespace DungeonCrawler.Gameplay.Squad
         [SerializeField]
         private float _blinkDurationSeconds = 0.5f;
 
-        private Coroutine _currentAnimation;
+        [SerializeField]
+        private float _blinkFrequency = 4f;
+
+        [SerializeField]
+        private float _attackMoveDistance = 0.35f;
+
+        [SerializeField]
+        private float _attackMoveDuration = 0.12f;
+
+        [SerializeField]
+        private float _shakeDuration = 0.2f;
+
+        [SerializeField]
+        private float _shakeStrength = 0.1f;
+
+        [SerializeField]
+        private int _shakeVibrato = 10;
+
+        [SerializeField, Range(0.1f, 1f)]
+        private float _dodgeFadeAlpha = 0.35f;
+
+        [SerializeField]
+        private float _dodgeFadeDuration = 0.12f;
+
+        private Sequence _blinkSequence;
+        private readonly List<Tween> _runningTweens = new();
         private Color _originalColor;
         private Color _pendingResetColor;
 
@@ -45,7 +72,7 @@ namespace DungeonCrawler.Gameplay.Squad
 
         private void OnDisable()
         {
-            ResetColor();
+            StopAllAnimations();
         }
 
         public void HighlightAsTarget()
@@ -55,28 +82,57 @@ namespace DungeonCrawler.Gameplay.Squad
                 return;
             }
 
-            StopCurrentAnimation();
-            _iconRenderer.color = _targetHighlightColor;
+            StartBlinking(_targetHighlightColor, true);
         }
 
-        public Task PlaySkipTurnAnimation()
+        public Task PlaySkipTurnAnimation() => PlayBlinkAsync(_skipTurnColor);
+
+        public Task PlayWaitAnimation() => PlayBlinkAsync(_waitColor);
+
+        public Task PlayAttackAnimation() => PlayBlinkAsync(_attackColor);
+
+        public Task PlayDamageAnimation() => PlayBlinkAsync(_damageColor);
+
+        public Task PlayAttackMovementAsync(Vector3 direction)
         {
-            return PlayBlinkAsync(_skipTurnColor);
+            if (direction == Vector3.zero)
+            {
+                direction = transform.right;
+            }
+
+            return PlayLungeAsync(direction.normalized);
         }
 
-        public Task PlayWaitAnimation()
+        public Task PlayDamageShakeAsync()
         {
-            return PlayBlinkAsync(_waitColor);
+            var startPosition = transform.localPosition;
+            var tween = transform.DOShakePosition(_shakeDuration, _shakeStrength, _shakeVibrato)
+                .OnKill(() => transform.localPosition = startPosition)
+                .OnComplete(() => transform.localPosition = startPosition);
+
+            RegisterTween(tween);
+            return tween.AsyncWaitForCompletion();
         }
 
-        public Task PlayAttackAnimation()
+        public Task PlayDodgeAsync(Vector3 direction)
         {
-            return PlayBlinkAsync(_attackColor);
-        }
+            if (direction == Vector3.zero)
+            {
+                direction = transform.right;
+            }
 
-        public Task PlayDamageAnimation()
-        {
-            return PlayBlinkAsync(_damageColor);
+            var movement = PlayLungeAsync(-direction.normalized);
+
+            if (_iconRenderer == null)
+            {
+                return movement;
+            }
+
+            var fadeTween = _iconRenderer.DOFade(_dodgeFadeAlpha, _dodgeFadeDuration)
+                .SetLoops(2, LoopType.Yoyo);
+            RegisterTween(fadeTween);
+
+            return Task.WhenAll(movement, fadeTween.AsyncWaitForCompletion());
         }
 
         public void ResetColor()
@@ -86,7 +142,7 @@ namespace DungeonCrawler.Gameplay.Squad
                 return;
             }
 
-            StopCurrentAnimation();
+            StopBlink();
             _iconRenderer.color = _originalColor;
         }
 
@@ -97,33 +153,94 @@ namespace DungeonCrawler.Gameplay.Squad
                 return Task.CompletedTask;
             }
 
-            StopCurrentAnimation();
-            _pendingResetColor = _iconRenderer.color;
+            StopBlink();
 
+            _pendingResetColor = _iconRenderer.color;
             var completionSource = new TaskCompletionSource<bool>();
-            _currentAnimation = StartCoroutine(BlinkRoutine(blinkColor, completionSource));
+
+            var period = GetBlinkPeriod();
+            var loops = Mathf.Max(1, Mathf.RoundToInt(_blinkDurationSeconds / period));
+
+            _blinkSequence = DOTween.Sequence();
+            _blinkSequence.Append(_iconRenderer.DOColor(blinkColor, period * 0.5f));
+            _blinkSequence.Append(_iconRenderer.DOColor(_pendingResetColor, period * 0.5f));
+            _blinkSequence.SetLoops(loops);
+            _blinkSequence.OnComplete(() =>
+            {
+                _iconRenderer.color = _pendingResetColor;
+                _blinkSequence = null;
+                completionSource.TrySetResult(true);
+            });
+            _blinkSequence.OnKill(() => completionSource.TrySetResult(true));
+
             return completionSource.Task;
         }
 
-        private IEnumerator BlinkRoutine(Color blinkColor, TaskCompletionSource<bool> completionSource)
+        private void StartBlinking(Color blinkColor, bool continuous)
         {
-            _iconRenderer.color = blinkColor;
+            StopBlink();
 
-            yield return new WaitForSeconds(_blinkDurationSeconds);
+            _pendingResetColor = _originalColor;
+            var period = GetBlinkPeriod();
 
-            _iconRenderer.color = _pendingResetColor;
-            _currentAnimation = null;
-            completionSource.TrySetResult(true);
+            _blinkSequence = DOTween.Sequence();
+            _blinkSequence.Append(_iconRenderer.DOColor(blinkColor, period * 0.5f));
+            _blinkSequence.Append(_iconRenderer.DOColor(_pendingResetColor, period * 0.5f));
+            _blinkSequence.SetLoops(continuous ? -1 : 1);
         }
 
-        private void StopCurrentAnimation()
+        private Task PlayLungeAsync(Vector3 direction)
         {
-            if (_currentAnimation != null)
+            var startPosition = transform.localPosition;
+            var lungeTarget = startPosition + direction * _attackMoveDistance;
+
+            var sequence = DOTween.Sequence();
+            sequence.Append(transform.DOLocalMove(lungeTarget, _attackMoveDuration).SetEase(Ease.OutQuad));
+            sequence.Append(transform.DOLocalMove(startPosition, _attackMoveDuration).SetEase(Ease.InQuad));
+            sequence.OnKill(() => transform.localPosition = startPosition);
+            sequence.OnComplete(() => transform.localPosition = startPosition);
+
+            RegisterTween(sequence);
+            return sequence.AsyncWaitForCompletion();
+        }
+
+        private float GetBlinkPeriod()
+        {
+            return 1f / Mathf.Max(0.01f, _blinkFrequency);
+        }
+
+        private void StopBlink()
+        {
+            _blinkSequence?.Kill();
+            _blinkSequence = null;
+        }
+
+        private void StopAllAnimations()
+        {
+            StopBlink();
+
+            foreach (var tween in _runningTweens.ToArray())
             {
-                StopCoroutine(_currentAnimation);
-                _iconRenderer.color = _pendingResetColor;
-                _currentAnimation = null;
+                tween?.Kill();
             }
+
+            _runningTweens.Clear();
+
+            if (_iconRenderer != null)
+            {
+                _iconRenderer.color = _originalColor;
+            }
+        }
+
+        private void RegisterTween(Tween tween)
+        {
+            if (tween == null)
+            {
+                return;
+            }
+
+            _runningTweens.Add(tween);
+            tween.OnKill(() => _runningTweens.Remove(tween));
         }
     }
 }
