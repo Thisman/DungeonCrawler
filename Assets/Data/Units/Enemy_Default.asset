@@ -21,8 +21,8 @@ MonoBehaviour:
   BasePhysicalDefense: 0
   BaseMagicDefense: 0
   BaseAbsoluteDefense: 0
-  MinDamage: 10
-  MaxDamage: 20
+  MinDamage: 50
+  MaxDamage: 55
   Initiative: 2
   BaseCritChance: 1
   BaseCritMultiplier: 1.1

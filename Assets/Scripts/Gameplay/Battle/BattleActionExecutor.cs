@@ -1,7 +1,6 @@
 // Executes battle actions and triggers related squad animations.
 using DungeonCrawler.Core.EventBus;
 using DungeonCrawler.Gameplay.Squad;
-using DungeonCrawler.Gameplay.Unit;
 using DungeonCrawler.Systems.Battle;
 using System.Linq;
 using System.Threading.Tasks;
@@ -79,15 +78,14 @@ namespace DungeonCrawler.Gameplay.Battle
             return Task.CompletedTask;
         }
 
-        private SquadController GetSquadController(UnitModel actor, BattleContext context)
+        private SquadController GetSquadController(SquadModel actor, BattleContext context)
         {
             if (actor == null || context?.Squads == null || _unitSystem == null)
             {
                 return null;
             }
 
-            var squad = context.Squads.FirstOrDefault(squadModel => squadModel.Unit == actor);
-            return _unitSystem.GetController(squad);
+            return _unitSystem.GetController(actor);
         }
     }
 

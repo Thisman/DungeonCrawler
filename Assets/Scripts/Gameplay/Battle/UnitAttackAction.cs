@@ -1,25 +1,26 @@
-﻿// Provides targeting logic for the basic attack action, selecting only opposing units.
-using DungeonCrawler.Gameplay.Unit;
+// Provides targeting logic for the basic attack action, selecting only opposing squads.
 using System.Collections.Generic;
+using DungeonCrawler.Gameplay.Squad;
 
 namespace DungeonCrawler.Gameplay.Battle
 {
     public class UnitAttackAction : UnitAction
     {
-        public UnitAttackAction() {
+        public UnitAttackAction()
+        {
             Name = "Attack";
             Id = "Attack";
             Type = ActionType.Attack;
         }
 
-        public override bool CanExecute(UnitModel actor, BattleContext context)
+        public override bool CanExecute(SquadModel actor, BattleContext context)
         {
             return true;
         }
 
-        public override IReadOnlyList<UnitModel> GetValidTargets(UnitModel actor, BattleContext context)
+        public override IReadOnlyList<SquadModel> GetValidTargets(SquadModel actor, BattleContext context)
         {
-            var validTargets = new List<UnitModel>();
+            var validTargets = new List<SquadModel>();
 
             if (actor == null || context == null)
             {
@@ -35,13 +36,13 @@ namespace DungeonCrawler.Gameplay.Battle
 
                 var targetDefinition = squad.Unit.Definition;
 
-                if (actor.Definition.IsFriendly() && targetDefinition.IsEnemy())
+                if (actor.Unit.Definition.IsFriendly() && targetDefinition.IsEnemy())
                 {
-                    validTargets.Add(squad.Unit);
+                    validTargets.Add(squad);
                 }
-                else if (actor.Definition.IsEnemy() && targetDefinition.IsFriendly())
+                else if (actor.Unit.Definition.IsEnemy() && targetDefinition.IsFriendly())
                 {
-                    validTargets.Add(squad.Unit);
+                    validTargets.Add(squad);
                 }
             }
 

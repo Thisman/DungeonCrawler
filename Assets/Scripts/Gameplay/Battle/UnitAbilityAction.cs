@@ -1,7 +1,6 @@
-﻿using DungeonCrawler.Gameplay.Unit;
-using System.Collections;
+// Represents a special ability action placeholder for future mechanics.
 using System.Collections.Generic;
-using UnityEngine;
+using DungeonCrawler.Gameplay.Squad;
 
 namespace DungeonCrawler.Gameplay.Battle
 {
@@ -14,14 +13,14 @@ namespace DungeonCrawler.Gameplay.Battle
             Type = ActionType.Ability;
         }
 
-        public override bool CanExecute(UnitModel actor, BattleContext context)
+        public override bool CanExecute(SquadModel actor, BattleContext context)
         {
             return true;
         }
 
-        public override IReadOnlyList<UnitModel> GetValidTargets(UnitModel actor, BattleContext context)
+        public override IReadOnlyList<SquadModel> GetValidTargets(SquadModel actor, BattleContext context)
         {
-            return new List<UnitModel>();
+            return new List<SquadModel>();
         }
     }
 }

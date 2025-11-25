@@ -251,7 +251,7 @@ namespace DungeonCrawler.Gameplay.Battle
                 if (_isStopped)
                     cts.Cancel();
 
-                var planned = await controller.DecideActionAsync(actor.Unit, _context, cts.Token);
+                var planned = await controller.DecideActionAsync(actor, _context, cts.Token);
                 _context.PlannedActiion = planned;
                 _sceneEventBus.Publish<UnitPlanSelected>(new UnitPlanSelected(planned));
 

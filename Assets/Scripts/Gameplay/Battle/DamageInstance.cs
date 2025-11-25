@@ -1,11 +1,11 @@
 // Describes a resolved damage event including participants, value, type, and hit status.
-using DungeonCrawler.Gameplay.Unit;
+using DungeonCrawler.Gameplay.Squad;
 
 namespace DungeonCrawler.Gameplay.Battle
 {
     public class DamageInstance
     {
-        public DamageInstance(UnitModel attacker, UnitModel target, float amount, DamageType damageType, bool isHit)
+        public DamageInstance(SquadModel attacker, SquadModel target, float amount, DamageType damageType, bool isHit)
         {
             Attacker = attacker;
             Target = target;
@@ -14,9 +14,9 @@ namespace DungeonCrawler.Gameplay.Battle
             IsHit = isHit;
         }
 
-        public UnitModel Attacker { get; }
+        public SquadModel Attacker { get; }
 
-        public UnitModel Target { get; }
+        public SquadModel Target { get; }
 
         public float Amount { get; }
 

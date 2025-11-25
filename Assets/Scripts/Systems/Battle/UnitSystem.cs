@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using DungeonCrawler.Gameplay.Battle;
 using DungeonCrawler.Gameplay.Squad;
-using DungeonCrawler.Gameplay.Unit;
 using UnityEngine;
 using DungeonCrawler.Core.EventBus;
 using System.Threading.Tasks;
@@ -20,7 +19,6 @@ namespace DungeonCrawler.Systems.Battle
         private readonly BattleContext _context;
         private readonly List<IDisposable> _subscriptions = new();
         private readonly Dictionary<SquadModel, SquadController> _squadControllers = new();
-        private readonly Dictionary<UnitModel, SquadController> _unitControllers = new();
         private readonly List<SquadController> _highlightedControllers = new();
         private readonly List<SquadModel> _trackedSquads = new();
 
@@ -82,7 +80,6 @@ namespace DungeonCrawler.Systems.Battle
                 }
 
                 _squadControllers[squad] = squadInstance;
-                _unitControllers[squad.Unit] = squadInstance;
                 squad.Changed += HandleSquadChanged;
                 _trackedSquads.Add(squad);
             }
@@ -165,7 +162,7 @@ namespace DungeonCrawler.Systems.Battle
                 return;
             }
 
-            var validTargets = evt.Action.GetValidTargets(_context.ActiveUnit.Unit, _context);
+            var validTargets = evt.Action.GetValidTargets(_context.ActiveUnit, _context);
             if (validTargets == null)
             {
                 return;
@@ -173,7 +170,7 @@ namespace DungeonCrawler.Systems.Battle
 
             foreach (var target in validTargets)
             {
-                if (target == null || !_unitControllers.TryGetValue(target, out var controller) || controller.Model?.IsDead == true)
+                if (target == null || !_squadControllers.TryGetValue(target, out var controller) || controller.Model?.IsDead == true)
                 {
                     continue;
                 }
@@ -207,11 +204,11 @@ namespace DungeonCrawler.Systems.Battle
             _highlightedControllers.Clear();
         }
 
-        private bool TryGetLiveController(UnitModel unit, out SquadController controller)
+        private bool TryGetLiveController(SquadModel squad, out SquadController controller)
         {
             controller = null;
 
-            if (unit == null || !_unitControllers.TryGetValue(unit, out var foundController))
+            if (squad == null || !_squadControllers.TryGetValue(squad, out var foundController))
             {
                 return false;
             }

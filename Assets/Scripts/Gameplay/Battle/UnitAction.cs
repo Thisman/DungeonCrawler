@@ -1,7 +1,6 @@
-﻿using DungeonCrawler.Gameplay.Unit;
-using System.Collections;
+// Defines a unit action contract for squads including execution and targeting rules.
 using System.Collections.Generic;
-using UnityEngine;
+using DungeonCrawler.Gameplay.Squad;
 
 namespace DungeonCrawler.Gameplay.Battle
 {
@@ -13,8 +12,8 @@ namespace DungeonCrawler.Gameplay.Battle
 
         public ActionType Type;
 
-        public abstract bool CanExecute(UnitModel actor, BattleContext context);
+        public abstract bool CanExecute(SquadModel actor, BattleContext context);
 
-        public abstract IReadOnlyList<UnitModel> GetValidTargets(UnitModel actor, BattleContext context);
+        public abstract IReadOnlyList<SquadModel> GetValidTargets(SquadModel actor, BattleContext context);
     }
 }

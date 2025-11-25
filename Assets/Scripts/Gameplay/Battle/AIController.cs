@@ -1,10 +1,12 @@
-﻿using DungeonCrawler.Core.EventBus;
-using DungeonCrawler.Gameplay.Unit;
+// Provides simple AI decision making for selecting squad actions during battle.
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using DungeonCrawler.Core.EventBus;
+using DungeonCrawler.Gameplay.Squad;
+using DungeonCrawler.Gameplay.Unit;
 
 namespace DungeonCrawler.Gameplay.Battle
 {
@@ -20,11 +22,11 @@ namespace DungeonCrawler.Gameplay.Battle
         }
 
         public async Task<PlannedUnitAction> DecideActionAsync(
-            UnitModel actor,
+            SquadModel actor,
             BattleContext context,
             CancellationToken cancellationToken)
         {
-            await Task.Delay(TimeSpan.FromSeconds(2));
+            await Task.Delay(TimeSpan.FromSeconds(2), cancellationToken);
             var action = ChooseActionDefinition(actor, context);
             var validTargets = action.GetValidTargets(actor, context);
             var chosenTargets = ChooseTargets(action, validTargets, actor, context);
@@ -33,42 +35,40 @@ namespace DungeonCrawler.Gameplay.Battle
             return planned;
         }
 
-        private UnitAction ChooseActionDefinition(UnitModel actor, BattleContext context) {
+        private UnitAction ChooseActionDefinition(SquadModel actor, BattleContext context)
+        {
             return _availableActions.First(a => a.Type == ActionType.SkipTurn);
         }
 
-        private IReadOnlyList<UnitModel> ChooseTargets(
+        private IReadOnlyList<SquadModel> ChooseTargets(
             UnitAction action,
-            IReadOnlyList<UnitModel> validTargets,
-            UnitModel actor,
+            IReadOnlyList<SquadModel> validTargets,
+            SquadModel actor,
             BattleContext context)
         {
-
             switch (action.Type)
             {
                 case ActionType.Attack:
-                    {
-                        // цель с минимальным здоровьем
-                        var best = validTargets.OrderBy(t => t.Stats.CurrentHealth).First();
-                        return new List<UnitModel>() { best };
-                    }
+                {
+                    var best = validTargets.OrderBy(t => t.Unit.Stats.CurrentHealth).First();
+                    return new List<SquadModel>() { best };
+                }
                 case ActionType.SkipTurn:
-                    {
-                        return new List<UnitModel>();
-                    }
+                {
+                    return new List<SquadModel>();
+                }
                 case ActionType.Wait:
-                    {
-                        return new List<UnitModel>();
-                    }
+                {
+                    return new List<SquadModel>();
+                }
                 case ActionType.Ability:
-                    {
-                        // для MVP просто выбираем первую цель
-                        var target = validTargets.First();
-                        return new List<UnitModel>() { target };
-                    }
+                {
+                    var target = validTargets.First();
+                    return new List<SquadModel>() { target };
+                }
             }
 
-            return new List<UnitModel>();
+            return new List<SquadModel>();
         }
     }
 }

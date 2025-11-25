@@ -1,26 +1,26 @@
-﻿using DungeonCrawler.Gameplay.Unit;
-using System.Collections;
+// Represents a skip turn action that immediately ends the squad's current turn.
 using System.Collections.Generic;
-using UnityEngine;
+using DungeonCrawler.Gameplay.Squad;
 
 namespace DungeonCrawler.Gameplay.Battle
 {
     public class UnitSkipTurnAction : UnitAction
     {
-        public UnitSkipTurnAction() {
+        public UnitSkipTurnAction()
+        {
             Name = "SkipTurn";
             Id = "SkipTurn";
             Type = ActionType.SkipTurn;
         }
 
-        public override bool CanExecute(UnitModel actor, BattleContext context)
+        public override bool CanExecute(SquadModel actor, BattleContext context)
         {
             return true;
         }
 
-        public override IReadOnlyList<UnitModel> GetValidTargets(UnitModel actor, BattleContext context)
+        public override IReadOnlyList<SquadModel> GetValidTargets(SquadModel actor, BattleContext context)
         {
-            return new List<UnitModel>();
+            return new List<SquadModel>();
         }
     }
 }
