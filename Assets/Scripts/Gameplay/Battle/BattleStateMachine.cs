@@ -201,6 +201,7 @@ namespace DungeonCrawler.Gameplay.Battle
 
         private void EnterRoundInit() {
             _context.CurrentRoundNumber++;
+            _logger.LogRoundCount(_context.CurrentRoundNumber);
             Fire(Trigger.NextState);
         }
 

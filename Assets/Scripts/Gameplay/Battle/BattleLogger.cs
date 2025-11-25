@@ -1,5 +1,6 @@
 // Provides battle flow logging for BattleStateMachine transitions and status changes.
 using System;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 namespace DungeonCrawler.Gameplay.Battle
@@ -36,6 +37,11 @@ namespace DungeonCrawler.Gameplay.Battle
         public void LogUnhandledTrigger(BattleState state, string trigger)
         {
             _log?.Invoke($"[Battle] Unhandled trigger '{trigger}' in state {state}");
+        }
+
+        public void LogRoundCount(int roundCount)
+        {
+            _log?.Invoke($"[Battle] Started round N: {roundCount}");
         }
     }
 }

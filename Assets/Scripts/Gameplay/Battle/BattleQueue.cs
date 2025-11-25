@@ -41,39 +41,55 @@ namespace DungeonCrawler.Gameplay.Battle
             _requestedUnitsCount = unitsCount;
             RemoveDeadUnitsFromQueue();
             EnsureQueueFilled();
-            return _queue.Where(item => item == null || !item.IsDead).ToList();
+
+            // Для превью: показываем живые юниты и разделители раундов (null)
+            return _queue
+                .Where(item => item == null || !item.IsDead)
+                .ToList();
         }
 
         public SquadModel GetNext()
         {
-            if (_queue.Count == 0)
+            while (true)
             {
-                EnsureQueueFilled();
-            }
+                if (_queue.Count == 0)
+                {
+                    EnsureQueueFilled();
+                }
 
-            if (_queue.Count == 0)
-            {
-                return null;
-            }
+                if (_queue.Count == 0)
+                {
+                    // Совсем никого нет в очереди — бой закончился
+                    return null;
+                }
 
-            SquadModel next = null;
-
-            while (_queue.Count > 0 && next == null)
-            {
                 var candidate = _queue.Dequeue();
 
-                if (candidate == null || !candidate.IsDead)
+                if (candidate == null)
                 {
-                    next = candidate;
+                    // Дошли до разделителя раунда → сигнал "конец раунда"
+                    if (_requestedUnitsCount > 0)
+                    {
+                        // Поддерживаем инвариант превью, но это уже пойдёт в следующий раунд
+                        EnsureQueueFilled();
+                    }
+
+                    return null;
                 }
-            }
 
-            if (_requestedUnitsCount > 0)
-            {
-                EnsureQueueFilled();
-            }
+                if (!candidate.IsDead)
+                {
+                    // Живой юнит — его ход
+                    if (_requestedUnitsCount > 0)
+                    {
+                        EnsureQueueFilled();
+                    }
 
-            return next;
+                    return candidate;
+                }
+
+                // Мёртвый юнит — просто пропускаем и продолжаем цикл
+            }
         }
 
         public void AddFirst(SquadModel squad)
@@ -137,12 +153,12 @@ namespace DungeonCrawler.Gameplay.Battle
                 ? queueItems.GetRange(0, roundBoundaryIndex)
                 : queueItems;
 
-            // ���������� ����� � ����� �������� ������
-            currentRoundItems.RemoveAll(item => item == squad); // �� ������ ������, ���� �� ��� ������ � ������
+            // Переносим отряд в конец списка текущего раунда
+            currentRoundItems.RemoveAll(item => item == squad);
             currentRoundItems.Add(squad);
 
-            // �������� ������� ������ �� �������� ������,
-            // ����� � ����������� ���� EnsureQueueFilled
+            // Перестраиваем очередь только из текущего раунда;
+            // дальнейшие раунды и разделители будут восстановлены EnsureQueueFilled
             var rebuiltQueue = new List<SquadModel>(currentRoundItems);
 
             _queue.Clear();
@@ -152,9 +168,8 @@ namespace DungeonCrawler.Gameplay.Battle
             }
 
             _roundPosition = 0;
-            EnsureQueueFilled(); // �� ��� ������� ���� null ����� ��������, ���� �����
+            EnsureQueueFilled(); // добьём очередь до нужного количества с учётом разделителей
         }
-
 
         public void Calculate()
         {
@@ -186,6 +201,7 @@ namespace DungeonCrawler.Gameplay.Battle
 
             while (unitsInQueue < _requestedUnitsCount)
             {
+                // В начале нового раунда — вставляем null как разделитель
                 if (_roundPosition == 0 && _queue.Count > 0)
                 {
                     _queue.Enqueue(null);
