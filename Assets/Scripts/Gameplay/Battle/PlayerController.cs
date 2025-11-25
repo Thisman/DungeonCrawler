@@ -1,11 +1,12 @@
-﻿using DungeonCrawler.Core.EventBus;
-using DungeonCrawler.Gameplay.Unit;
+// Handles player decision making for selecting squad actions during battle.
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Unity.VisualScripting;
+using DungeonCrawler.Core.EventBus;
+using DungeonCrawler.Gameplay.Squad;
+using DungeonCrawler.Gameplay.Unit;
 
 namespace DungeonCrawler.Gameplay.Battle
 {
@@ -19,17 +20,15 @@ namespace DungeonCrawler.Gameplay.Battle
         }
 
         public Task<PlannedUnitAction> DecideActionAsync(
-            UnitModel actor,
+            SquadModel actor,
             BattleContext context,
             CancellationToken cancellationToken)
         {
             var tcs = new TaskCompletionSource<PlannedUnitAction>();
 
-            // 1. Экшен по умолчанию — атака
             UnitAction currentAction = new UnitAttackAction();
-            IReadOnlyList<UnitModel> currentValidTargets = currentAction.GetValidTargets(actor, context);
+            IReadOnlyList<SquadModel> currentValidTargets = currentAction.GetValidTargets(actor, context);
 
-            // Дать знать UI, что сейчас выбрана атака
             _sceneEventBus.Publish(new RequestSelectAction(currentAction));
 
             IDisposable clickSubscription = null;
@@ -43,24 +42,22 @@ namespace DungeonCrawler.Gameplay.Battle
                 waitActionSubscription?.Dispose();
             }
 
-            // 2. Клик по юниту -> проверяем, что он валидный, и завершаем планирование
             clickSubscription = _sceneEventBus.Subscribe<RequestSelectTarget>(evt =>
             {
                 if (tcs.Task.IsCompleted)
                     return;
 
                 var target = evt.Target;
-                if (!currentValidTargets.Contains(target.Unit))
-                    return; // кликнули по невалидной цели — игнорируем
+                if (!currentValidTargets.Contains(target))
+                    return;
 
-                var chosenTargets = new List<UnitModel> { target.Unit };
+                var chosenTargets = new List<SquadModel> { target };
                 var planned = new PlannedUnitAction(currentAction, actor, chosenTargets);
 
                 Cleanup();
                 tcs.TrySetResult(planned);
             });
 
-            // 3. Нажатие "Пропустить ход"
             skipActionSubscription = _sceneEventBus.Subscribe<RequestSkipTurnAction>(evt =>
             {
                 if (tcs.Task.IsCompleted)
@@ -76,7 +73,6 @@ namespace DungeonCrawler.Gameplay.Battle
                 tcs.TrySetResult(planned);
             });
 
-            // 4. Нажатие "Подождать"
             waitActionSubscription = _sceneEventBus.Subscribe<RequestWaitAction>(evt =>
             {
                 if (tcs.Task.IsCompleted)
@@ -92,7 +88,6 @@ namespace DungeonCrawler.Gameplay.Battle
                 tcs.TrySetResult(planned);
             });
 
-            // 5. Отмена (например, стейт-машина завершила бой)
             cancellationToken.Register(() =>
             {
                 Cleanup();
@@ -102,38 +97,35 @@ namespace DungeonCrawler.Gameplay.Battle
             return tcs.Task;
         }
 
-        private IReadOnlyList<UnitModel> ChooseTargets(
+        private IReadOnlyList<SquadModel> ChooseTargets(
             UnitAction action,
-            IReadOnlyList<UnitModel> validTargets,
-            UnitModel actor,
+            IReadOnlyList<SquadModel> validTargets,
+            SquadModel actor,
             BattleContext context)
         {
-
             switch (action.Type)
             {
                 case ActionType.Attack:
-                    {
-                        // цель с минимальным здоровьем
-                        var best = validTargets.OrderBy(t => t.Stats.CurrentHealth).First();
-                        return new List<UnitModel>() { best };
-                    }
+                {
+                    var best = validTargets.OrderBy(t => t.Unit.Stats.CurrentHealth).First();
+                    return new List<SquadModel>() { best };
+                }
                 case ActionType.SkipTurn:
-                    {
-                        return new List<UnitModel>();
-                    }
+                {
+                    return new List<SquadModel>();
+                }
                 case ActionType.Wait:
-                    {
-                        return new List<UnitModel>();
-                    }
+                {
+                    return new List<SquadModel>();
+                }
                 case ActionType.Ability:
-                    {
-                        // для MVP просто выбираем первую цель
-                        var target = validTargets.First();
-                        return new List<UnitModel>() { target };
-                    }
+                {
+                    var target = validTargets.First();
+                    return new List<SquadModel>() { target };
+                }
             }
 
-            return new List<UnitModel>();
+            return new List<SquadModel>();
         }
     }
 }

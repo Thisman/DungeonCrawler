@@ -1,17 +1,14 @@
-﻿using DungeonCrawler.Gameplay.Battle;
-using DungeonCrawler.Gameplay.Unit;
-using System;
-using System.Collections;
+// Describes a controller that selects actions for a squad during battle.
 using System.Threading;
 using System.Threading.Tasks;
-using UnityEngine;
+using DungeonCrawler.Gameplay.Squad;
 
 namespace DungeonCrawler.Gameplay.Battle
 {
     public interface IBattleController
     {
         Task<PlannedUnitAction> DecideActionAsync(
-            UnitModel actor,
+            SquadModel actor,
             BattleContext context,
             CancellationToken cancellationToken);
     }

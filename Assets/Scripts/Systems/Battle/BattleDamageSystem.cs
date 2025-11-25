@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using DungeonCrawler.Gameplay.Battle;
+using DungeonCrawler.Gameplay.Squad;
 using DungeonCrawler.Gameplay.Unit;
 using UnityEngine;
 
@@ -12,8 +13,8 @@ namespace DungeonCrawler.Systems.Battle
     {
         private readonly DefenseSettings _defenseSettings;
         private readonly AntiStreakSettings _antiStreakSettings;
-        private readonly Dictionary<UnitModel, CritState> _critStates = new();
-        private readonly Dictionary<UnitModel, DodgeState> _dodgeStates = new();
+        private readonly Dictionary<SquadModel, CritState> _critStates = new();
+        private readonly Dictionary<SquadModel, DodgeState> _dodgeStates = new();
 
         public BattleDamageSystem(): this(DefenseSettings.Default, AntiStreakSettings.Default)
         {
@@ -27,17 +28,17 @@ namespace DungeonCrawler.Systems.Battle
 
         public Task<IReadOnlyList<DamageInstance>> ResolveDamageAsync(PlannedUnitAction plan)
         {
-            if (plan?.Actor?.Stats == null || plan.Targets == null)
+            if (plan?.Actor?.Unit?.Stats == null || plan.Targets == null)
             {
                 return Task.FromResult<IReadOnlyList<DamageInstance>>(new List<DamageInstance>());
             }
 
             var results = new List<DamageInstance>();
 
-            foreach (var target in plan.Targets.Where(target => target != null))
+            foreach (var target in plan.Targets.Where(target => target?.Unit != null))
             {
-                var attackerStats = plan.Actor.Stats;
-                var targetStats = target.Stats;
+                var attackerStats = plan.Actor.Unit.Stats;
+                var targetStats = target.Unit.Stats;
 
                 var attackType = attackerStats.DamageType;
                 var isMagicAttack = attackType == DamageType.Magical;
@@ -72,6 +73,9 @@ namespace DungeonCrawler.Systems.Battle
 
                 var finalDamage = CalculateFinalDamage(attackType, critDamage, targetStats);
                 finalDamage = Mathf.Max(_defenseSettings.MinimumHitDamage, finalDamage);
+
+                var attackerCount = Mathf.Max(0, plan.Actor.UnitCount);
+                finalDamage *= attackerCount;
 
                 results.Add(new DamageInstance(plan.Actor, target, finalDamage, attackerStats.DamageType, true));
             }
@@ -164,7 +168,7 @@ namespace DungeonCrawler.Systems.Battle
             dodgeState.SuccessStreak = 0;
         }
 
-        private CritState GetCritState(UnitModel attacker)
+        private CritState GetCritState(SquadModel attacker)
         {
             if (_critStates.TryGetValue(attacker, out var state))
             {
@@ -176,7 +180,7 @@ namespace DungeonCrawler.Systems.Battle
             return state;
         }
 
-        private DodgeState GetDodgeState(UnitModel target)
+        private DodgeState GetDodgeState(SquadModel target)
         {
             if (_dodgeStates.TryGetValue(target, out var state))
             {

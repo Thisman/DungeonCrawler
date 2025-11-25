@@ -1,8 +1,7 @@
-﻿using DungeonCrawler.Gameplay.Unit;
+// Represents an action chosen by a squad including its actor and targets.
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
+using DungeonCrawler.Gameplay.Squad;
 
 namespace DungeonCrawler.Gameplay.Battle
 {
@@ -10,14 +9,15 @@ namespace DungeonCrawler.Gameplay.Battle
     {
         public UnitAction Action { get; }
 
-        public UnitModel Actor { get; }
+        public SquadModel Actor { get; }
 
-        public IReadOnlyList<UnitModel> Targets { get; }
+        public IReadOnlyList<SquadModel> Targets { get; }
 
-        public PlannedUnitAction(UnitAction action, UnitModel actor, IReadOnlyList<UnitModel> targets) {
+        public PlannedUnitAction(UnitAction action, SquadModel actor, IReadOnlyList<SquadModel> targets)
+        {
             Action = action ?? throw new ArgumentNullException(nameof(action));
             Actor = actor ?? throw new ArgumentNullException(nameof(actor));
-            Targets = targets ?? Array.Empty<UnitModel>();
+            Targets = targets ?? Array.Empty<SquadModel>();
         }
     }
 }
