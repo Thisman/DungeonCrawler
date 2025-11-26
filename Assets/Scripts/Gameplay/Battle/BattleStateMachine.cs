@@ -215,6 +215,11 @@ namespace DungeonCrawler.Gameplay.Battle
 
         private void EnterTurnInit()
         {
+            if (TryResolveBattle())
+            {
+                return;
+            }
+
             _context.ActiveUnit = _context.Queue?.GetNext();
 
             if (_context.ActiveUnit == null)
@@ -260,11 +265,16 @@ namespace DungeonCrawler.Gameplay.Battle
                     cts.Cancel();
 
                 await _battleActionExecutor.ExecuteAsync(planned, _context);
+                if (TryResolveBattle())
+                {
+                    return;
+                }
+
                 Fire(Trigger.NextState);
             }
             catch (OperationCanceledException)
             {
-                //      
+                //
             }
         }
 
@@ -300,6 +310,22 @@ namespace DungeonCrawler.Gameplay.Battle
             _logger.LogStatusChange(status);
         }
 
+        private bool TryResolveBattle(bool playerRequestedFlee = false)
+        {
+            if (_context?.Result == null)
+            {
+                return false;
+            }
+
+            if (_context.Result.TryEvaluate(playerRequestedFlee))
+            {
+                TryFire(Trigger.Result);
+                return true;
+            }
+
+            return false;
+        }
+
         private void Fire(Trigger trigger)
         {
             if (_isStopped)
@@ -326,7 +352,7 @@ namespace DungeonCrawler.Gameplay.Battle
         private void SubscribeToSceneEvents()
         {
             _subscribtions.Add(_sceneEventBus.Subscribe<RequestBattlePreparationFinish>((RequestBattlePreparationFinish _) => TryFire(Trigger.NextState)));
-            _subscribtions.Add(_sceneEventBus.Subscribe<RequestFleeFromBattle>((RequestFleeFromBattle _) => TryFire(Trigger.Result)));
+            _subscribtions.Add(_sceneEventBus.Subscribe<RequestFleeFromBattle>(HandleFleeFromBattle));
             _subscribtions.Add(_sceneEventBus.Subscribe<RequestFinishBattle>((RequestFinishBattle _) => TryFire(Trigger.Finish)));
         }
 
@@ -334,6 +360,16 @@ namespace DungeonCrawler.Gameplay.Battle
         {
             _subscribtions.ForEach(subscribtion => subscribtion.Dispose());
             _subscribtions.Clear();
+        }
+
+        private void HandleFleeFromBattle(RequestFleeFromBattle _)
+        {
+            if (TryResolveBattle(playerRequestedFlee: true))
+            {
+                return;
+            }
+
+            TryFire(Trigger.Result);
         }
 
         private enum Trigger

@@ -1,4 +1,4 @@
-// Holds battle participants, queue, and lifecycle state.
+// Holds battle participants, queue, lifecycle state, and captured result data.
 using System.Collections.Generic;
 using DungeonCrawler.Gameplay.Squad;
 
@@ -11,6 +11,7 @@ namespace DungeonCrawler.Gameplay.Battle
             Squads = squads != null ? new List<SquadModel>(squads) : new List<SquadModel>();
             Status = status;
             CurrentRoundNumber = 0;
+            Result = new BattleResult(Squads);
         }
 
         public List<SquadModel> Squads { get; }
@@ -26,5 +27,7 @@ namespace DungeonCrawler.Gameplay.Battle
         public PlannedUnitAction PlannedActiion { get; set; }
 
         public int CurrentRoundNumber { get; set; }
+
+        public BattleResult Result { get; }
     }
 }

@@ -2,6 +2,10 @@
     <ui:Style src="../Global.uss" />
     <ui:Style src="BattleResultPanel.uss" />
     <ui:VisualElement class="panel battle-result">
+        <ui:VisualElement class="battle-result__rows">
+            <ui:VisualElement name="player-result-container" class="battle-result__row battle-result__row--player" />
+            <ui:VisualElement name="enemy-result-container" class="battle-result__row battle-result__row--enemy" />
+        </ui:VisualElement>
         <ui:Button name="finish-battle-button" text="Завершить" class="battle-result__button" />
     </ui:VisualElement>
 </ui:UXML>
