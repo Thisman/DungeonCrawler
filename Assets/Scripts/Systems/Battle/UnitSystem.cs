@@ -37,6 +37,7 @@ namespace DungeonCrawler.Systems.Battle
 
             _subscriptions.Add(_sceneEventBus.Subscribe<RequestSelectAction>(HandleRequestSelectAction));
             _subscriptions.Add(_sceneEventBus.Subscribe<BattleStateChanged>(HandleStateChanged));
+            _subscriptions.Add(_sceneEventBus.Subscribe<UnitPlanSelected>(HandlePlanSelected));
         }
 
         public void InitializeSquads(IReadOnlyList<SquadModel> squads)
@@ -153,6 +154,11 @@ namespace DungeonCrawler.Systems.Battle
             {
                 ClearHighlights();
             }
+        }
+
+        private void HandlePlanSelected(UnitPlanSelected evt)
+        {
+            ClearHighlights();
         }
 
         private void HandleRequestSelectAction(RequestSelectAction evt)
