@@ -24,7 +24,7 @@ namespace DungeonCrawler.Gameplay.Battle
         private readonly List<BattleGridSlot> _enemySlotData = new();
         private readonly List<BattleGridSlot> _allGridSlots = new();
 
-        public IReadOnlyList<BattleGridSlot> GridSlots = new List<BattleGridSlot>();
+        public IReadOnlyList<BattleGridSlot> GridSlots => _allGridSlots;
 
         private void Awake()
         {

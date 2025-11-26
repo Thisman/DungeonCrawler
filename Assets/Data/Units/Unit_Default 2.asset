@@ -15,7 +15,7 @@ MonoBehaviour:
   Icon: {fileID: 7598845908082315433, guid: 8a944d486a57f4f409dadb0989e78db0, type: 3}
   Name: Unit_Default 2
   Kind: 1
-  AttackType: 0
+  AttackType: 1
   DamageType: 0
   BaseHealth: 100
   BasePhysicalDefense: 0
