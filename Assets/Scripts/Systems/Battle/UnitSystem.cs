@@ -83,6 +83,8 @@ namespace DungeonCrawler.Systems.Battle
                 squad.Changed += HandleSquadChanged;
                 _trackedSquads.Add(squad);
             }
+
+            UpdateSquadPlacements();
         }
 
         public SquadController GetController(SquadModel squad)
@@ -143,6 +145,32 @@ namespace DungeonCrawler.Systems.Battle
             }
 
             _trackedSquads.Clear();
+        }
+
+        private void UpdateSquadPlacements()
+        {
+            if (_context == null || _gridController == null)
+            {
+                return;
+            }
+
+            RegisterRowPlacements(_gridController.GetFrontRow(false), isEnemySide: false, BattleRow.Front);
+            RegisterRowPlacements(_gridController.GetBackRow(false), isEnemySide: false, BattleRow.Back);
+            RegisterRowPlacements(_gridController.GetFrontRow(true), isEnemySide: true, BattleRow.Front);
+            RegisterRowPlacements(_gridController.GetBackRow(true), isEnemySide: true, BattleRow.Back);
+        }
+
+        private void RegisterRowPlacements(IEnumerable<SquadModel> squads, bool isEnemySide, BattleRow row)
+        {
+            if (squads == null)
+            {
+                return;
+            }
+
+            foreach (var squad in squads)
+            {
+                _context.SetSquadPlacement(squad, isEnemySide, row);
+            }
         }
 
         private void HandleStateChanged(BattleStateChanged evt)

@@ -1,4 +1,4 @@
-// Provides targeting logic for the basic attack action, selecting only opposing squads.
+// Provides targeting logic for the basic attack action, selecting valid opposing squads with frontline restrictions.
 using System.Collections.Generic;
 using DungeonCrawler.Gameplay.Squad;
 
@@ -27,6 +27,10 @@ namespace DungeonCrawler.Gameplay.Battle
                 return validTargets;
             }
 
+            var actorDefinition = actor.Unit?.Definition;
+            var actorIsFriendly = actorDefinition != null && actorDefinition.IsFriendly();
+            var actorIsEnemy = actorDefinition != null && actorDefinition.IsEnemy();
+
             foreach (var squad in context.Squads)
             {
                 if (squad.IsEmpty() || squad.IsDead)
@@ -36,17 +40,33 @@ namespace DungeonCrawler.Gameplay.Battle
 
                 var targetDefinition = squad.Unit.Definition;
 
-                if (actor.Unit.Definition.IsFriendly() && targetDefinition.IsEnemy())
+                if (actorIsFriendly && targetDefinition.IsEnemy())
                 {
                     validTargets.Add(squad);
                 }
-                else if (actor.Unit.Definition.IsEnemy() && targetDefinition.IsFriendly())
+                else if (actorIsEnemy && targetDefinition.IsFriendly())
                 {
                     validTargets.Add(squad);
                 }
             }
 
+            if (actorDefinition?.AttackType == AttackType.Melee)
+            {
+                var targetIsEnemySide = actorIsFriendly;
+                var targetFrontlineSquads = context.GetAliveSquadsInRow(targetIsEnemySide, BattleRow.Front);
+
+                if (targetFrontlineSquads.Count > 0)
+                {
+                    validTargets.RemoveAll(target => !IsFrontRowTarget(context, target));
+                }
+            }
+
             return validTargets;
+        }
+
+        private static bool IsFrontRowTarget(BattleContext context, SquadModel target)
+        {
+            return context.TryGetPlacement(target, out var placement) && placement.Row == BattleRow.Front;
         }
     }
 }
