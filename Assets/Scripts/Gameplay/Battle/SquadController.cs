@@ -6,8 +6,9 @@ using TMPro;
 using UnityEngine;
 using DungeonCrawler.Gameplay.Unit;
 using DungeonCrawler.Gameplay.Battle;
+using DungeonCrawler.Gameplay.Squad;
 
-namespace DungeonCrawler.Gameplay.Squad
+namespace Assets.Scripts.Gameplay.Battle
 {
     [DisallowMultipleComponent]
     public class SquadController : MonoBehaviour

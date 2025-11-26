@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using DG.Tweening;
 using UnityEngine;
 
-namespace DungeonCrawler.Gameplay.Squad
+namespace Assets.Scripts.Gameplay.Battle
 {
     [DisallowMultipleComponent]
     public class SquadAnimationController : MonoBehaviour

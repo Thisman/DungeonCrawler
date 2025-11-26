@@ -1,6 +1,7 @@
 // Manages battle grid slots for friendly and enemy squads, providing helpers to place and query occupants.
 using System;
 using System.Collections.Generic;
+using Assets.Scripts.Gameplay.Battle;
 using DungeonCrawler.Gameplay.Squad;
 using UnityEngine;
 

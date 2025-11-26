@@ -1,4 +1,5 @@
 // Executes battle actions and triggers related squad animations.
+using Assets.Scripts.Gameplay.Battle;
 using DungeonCrawler.Core.EventBus;
 using DungeonCrawler.Gameplay.Squad;
 using DungeonCrawler.Systems.Battle;

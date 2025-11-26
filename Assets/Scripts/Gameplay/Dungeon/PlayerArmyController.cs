@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using DungeonCrawler.Gameplay.Squad;
 using UnityEngine;
 
-namespace DungeonCrawler.Gameplay.Player
+namespace DungeonCrawler.Gameplay.Dungeon
 {
     [DisallowMultipleComponent]
     public class PlayerArmyController : MonoBehaviour

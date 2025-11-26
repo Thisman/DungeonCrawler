@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace DungeonCrawler.Gameplay.Player
+namespace DungeonCrawler.Gameplay.Dungeon
 {
     [DisallowMultipleComponent]
     [RequireComponent(typeof(Rigidbody2D))]
