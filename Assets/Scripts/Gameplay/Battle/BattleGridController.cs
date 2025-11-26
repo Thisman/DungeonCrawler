@@ -20,13 +20,18 @@ namespace DungeonCrawler.Gameplay.Battle
         [SerializeField]
         private Transform _defaultParent;
 
-        private readonly List<BattleSlot> _friendlySlotData = new();
-        private readonly List<BattleSlot> _enemySlotData = new();
+        private readonly List<BattleGridSlot> _friendlySlotData = new();
+        private readonly List<BattleGridSlot> _enemySlotData = new();
+        private readonly List<BattleGridSlot> _allGridSlots = new();
+
+        public IReadOnlyList<BattleGridSlot> GridSlots = new List<BattleGridSlot>();
 
         private void Awake()
         {
-            InitializeSlots(_friendlySlots, _friendlySlotData);
-            InitializeSlots(_enemySlots, _enemySlotData);
+            InitializeSlots(_friendlySlots, _friendlySlotData, BattleGridSlotSide.Ally);
+            InitializeSlots(_enemySlots, _enemySlotData, BattleGridSlotSide.Enemy);
+            _allGridSlots.AddRange(_friendlySlotData);
+            _allGridSlots.AddRange(_enemySlotData);
         }
 
         public SquadController AddToSlot(int slotIndex, bool isEnemySide, SquadModel squadModel, SquadController prefab)
@@ -46,6 +51,7 @@ namespace DungeonCrawler.Gameplay.Battle
 
             RemoveFromSlot(slotIndex, isEnemySide);
 
+            // TODO: перенести инициализацию в UnitSystem
             var parent = slot.Root != null ? slot.Root : _defaultParent;
             var instance = Instantiate(prefab, parent);
             instance.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
@@ -78,7 +84,7 @@ namespace DungeonCrawler.Gameplay.Battle
         public bool IsSlotEmpty(int slotIndex, bool isEnemySide)
         {
             var slot = GetSlot(slotIndex, isEnemySide);
-            return slot == null || slot.Squad == null;
+            return slot == null || slot.IsEmpty;
         }
 
         public SquadModel GetSquad(int slotIndex, bool isEnemySide)
@@ -96,7 +102,7 @@ namespace DungeonCrawler.Gameplay.Battle
             return GetRow(isEnemySide, isFrontRow: false);
         }
 
-        private void InitializeSlots(IReadOnlyList<Transform> slotTransforms, List<BattleSlot> slots)
+        private void InitializeSlots(IReadOnlyList<Transform> slotTransforms, List<BattleGridSlot> slots, BattleGridSlotSide side)
         {
             slots.Clear();
 
@@ -105,13 +111,20 @@ namespace DungeonCrawler.Gameplay.Battle
                 return;
             }
 
-            foreach (var slotTransform in slotTransforms)
+            for (int i = 0; i < slotTransforms.Count; i++)
             {
-                slots.Add(new BattleSlot(slotTransform));
+                var slot = new BattleGridSlot(slotTransforms[i])
+                {
+                    Index = i,
+                    Side = side,
+                    Type = i < 3 ? BattleGridSlotType.Back : BattleGridSlotType.Front,
+                };
+
+                slots.Add(slot);
             }
         }
 
-        private BattleSlot GetSlot(int slotIndex, bool isEnemySide)
+        private BattleGridSlot GetSlot(int slotIndex, bool isEnemySide)
         {
             var slots = isEnemySide ? _enemySlotData : _friendlySlotData;
             if (slotIndex < 0 || slotIndex >= slots.Count)
@@ -157,18 +170,26 @@ namespace DungeonCrawler.Gameplay.Battle
             return rowSquads;
         }
 
-        private class BattleSlot
+        public class BattleGridSlot
         {
-            public BattleSlot(Transform root)
+            public BattleGridSlot(Transform root)
             {
                 Root = root;
             }
+
+            public int Index { get; set; }
+
+            public bool IsEmpty => Squad == null;
 
             public Transform Root { get; }
 
             public SquadModel Squad { get; set; }
 
             public SquadController Controller { get; set; }
+
+            public BattleGridSlotSide Side { get; set; }
+
+            public BattleGridSlotType Type { get; set; }
 
             public float LocalX => Root != null ? Root.localPosition.x : 0f;
         }

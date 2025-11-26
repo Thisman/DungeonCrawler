@@ -83,6 +83,8 @@ namespace DungeonCrawler.Systems.Battle
                 squad.Changed += HandleSquadChanged;
                 _trackedSquads.Add(squad);
             }
+
+            _context.GridSlots = _gridController.GridSlots;
         }
 
         public SquadController GetController(SquadModel squad)

@@ -15,6 +15,8 @@ namespace DungeonCrawler.Gameplay.Battle
 
         public List<SquadModel> Squads { get; }
 
+        public IReadOnlyList<BattleGridController.BattleGridSlot> GridSlots { get; set; }
+
         public BattleQueue Queue { get; set; }
 
         public SquadModel ActiveUnit { get; set; }

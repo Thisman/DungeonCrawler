@@ -194,12 +194,36 @@ MonoBehaviour:
     Id: Unit Default 2
     UnitCount: 10
     Level: 0
+  - Definition: {fileID: 11400000, guid: da2b3cf924410754e81f9496d0492bd6, type: 2}
+    Id: Unit Default 3
+    UnitCount: 5
+    Level: 0
+  - Definition: {fileID: 11400000, guid: 3f1b8eec4a6e99d418360ea65980925e, type: 2}
+    Id: Unit Default 4
+    UnitCount: 1
+    Level: 0
+  - Definition: {fileID: 11400000, guid: 96dccc52fdca82b4ab876c2edcacf4a6, type: 2}
+    Id: Unit Default 5
+    UnitCount: 10
+    Level: 0
   - Definition: {fileID: 11400000, guid: 57eda35d38d716f4ea7e6666a99afb86, type: 2}
     Id: Enemy Default
     UnitCount: 10
     Level: 0
   - Definition: {fileID: 11400000, guid: 9636c7b22b301a742a8db8aaeec41ba9, type: 2}
+    Id: Enemy Default 1
+    UnitCount: 10
+    Level: 0
+  - Definition: {fileID: 11400000, guid: 6684fd6448477d440829172f7fe7ccdb, type: 2}
     Id: Enemy Default 2
+    UnitCount: 10
+    Level: 0
+  - Definition: {fileID: 11400000, guid: 6947b88225ef45f4a8731c7c2bfe1950, type: 2}
+    Id: Enemy Default 3
+    UnitCount: 10
+    Level: 0
+  - Definition: {fileID: 11400000, guid: 94ccff3648000174c82f6317a8bc12c5, type: 2}
+    Id: Enemy Default 4
     UnitCount: 10
     Level: 0
   _initialState: 0
