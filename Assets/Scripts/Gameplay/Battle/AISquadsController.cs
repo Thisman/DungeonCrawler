@@ -10,12 +10,12 @@ using DungeonCrawler.Gameplay.Unit;
 
 namespace DungeonCrawler.Gameplay.Battle
 {
-    public class AIController : IBattleController
+    public class AISquadsController : IBattleController
     {
         private readonly IReadOnlyList<UnitAction> _availableActions;
         private readonly GameEventBus _sceneEventBus;
 
-        public AIController(IReadOnlyList<UnitAction> availableActions, GameEventBus sceneEventBus)
+        public AISquadsController(IReadOnlyList<UnitAction> availableActions, GameEventBus sceneEventBus)
         {
             _availableActions = availableActions;
             _sceneEventBus = sceneEventBus;

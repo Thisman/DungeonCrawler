@@ -1,7 +1,7 @@
 // Rotates the player sprite to match movement direction and applies the army's lead icon.
 using UnityEngine;
 
-namespace DungeonCrawler.Gameplay.Player
+namespace DungeonCrawler.Gameplay.Dungeon
 {
     [DisallowMultipleComponent]
     public class PlayerAnimationController : MonoBehaviour

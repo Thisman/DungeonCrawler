@@ -1,6 +1,7 @@
 // Boots the battle scene by building squads from inspector data, laying out squads, and running the battle state machine.
 using System;
 using System.Collections.Generic;
+using Assets.Scripts.Gameplay.Battle;
 using DungeonCrawler.Core.EventBus;
 using DungeonCrawler.Gameplay.Squad;
 using DungeonCrawler.Gameplay.Unit;

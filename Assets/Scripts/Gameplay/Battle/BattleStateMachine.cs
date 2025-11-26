@@ -34,7 +34,7 @@ namespace DungeonCrawler.Gameplay.Battle
             _stateMachine = new StateMachine<BattleState, Trigger>(() => _currentState, state => _currentState = state);
             _battleActionExecutor = new BattleActionExecutor(_sceneEventBus, unitSystem, battleDamageSystem);
 
-            _unitControllers.Add("Player", new PlayerController(_sceneEventBus));
+            _unitControllers.Add("Player", new PlayerSquadsController(_sceneEventBus));
             var availableActionForEnemies = new List<UnitAction>()
             {
                 new UnitAttackAction(),
@@ -42,7 +42,7 @@ namespace DungeonCrawler.Gameplay.Battle
                 new UnitAbilityAction(),
                 new UnitSkipTurnAction(),
             };
-            _unitControllers.Add("Enemy", new AIController(availableActionForEnemies, _sceneEventBus));
+            _unitControllers.Add("Enemy", new AISquadsController(availableActionForEnemies, _sceneEventBus));
 
             ConfigureTransitions();
             _stateMachine.OnTransitioned(transition => {

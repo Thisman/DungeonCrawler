@@ -1,6 +1,6 @@
 // Picks battle targets on pointer input and publishes selection events through the game event bus.
+using Assets.Scripts.Gameplay.Battle;
 using DungeonCrawler.Core.EventBus;
-using DungeonCrawler.Gameplay.Squad;
 using DungeonCrawler.Systems.Input;
 using UnityEngine;
 

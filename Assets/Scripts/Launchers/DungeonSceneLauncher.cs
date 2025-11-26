@@ -1,7 +1,7 @@
 // Boots a dungeon scene by spawning the player prefab and seeding their army squads from inspector data.
 using System;
 using System.Collections.Generic;
-using DungeonCrawler.Gameplay.Player;
+using DungeonCrawler.Gameplay.Dungeon;
 using DungeonCrawler.Gameplay.Squad;
 using DungeonCrawler.Gameplay.Unit;
 using UnityEngine;

@@ -10,11 +10,11 @@ using DungeonCrawler.Gameplay.Unit;
 
 namespace DungeonCrawler.Gameplay.Battle
 {
-    public class PlayerController : IBattleController
+    public class PlayerSquadsController : IBattleController
     {
         private readonly GameEventBus _sceneEventBus;
 
-        public PlayerController(GameEventBus sceneEventBus)
+        public PlayerSquadsController(GameEventBus sceneEventBus)
         {
             _sceneEventBus = sceneEventBus;
         }

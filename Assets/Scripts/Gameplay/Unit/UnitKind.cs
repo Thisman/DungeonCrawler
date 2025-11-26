@@ -1,5 +1,5 @@
 // Enumerates possible allegiances for units.
-namespace DungeonCrawler.Gameplay.Battle
+namespace DungeonCrawler.Gameplay.Unit
 {
     public enum UnitKind
     {
