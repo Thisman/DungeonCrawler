@@ -7,6 +7,11 @@
     background-color: rgba(0, 0, 0, 0.99);
 }
 
+.finish-battle__title {
+    color: #fff;
+    font-size: 50px;
+}
+
 .battle-result__rows {
     display: flex;
     flex-direction: column;

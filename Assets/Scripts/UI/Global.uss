@@ -5,3 +5,15 @@
 .panel.panel--active {
     display: flex;
 }
+
+.top {
+    height: 150px;
+    align-items: center;
+    justify-content: center;
+}
+
+.bottom {
+    height: 150px;
+    align-items: center;
+    justify-content: center;
+}

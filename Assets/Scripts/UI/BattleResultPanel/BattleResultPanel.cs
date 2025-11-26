@@ -14,6 +14,7 @@ namespace DungeonCrawler.UI.Battle
         private VisualElement _playerContainerUI;
         private VisualElement _enemyContainerUI;
         private Button _finishBattleButtonUI;
+        private Label _finishBattleTitleUI;
         private IDisposable _battleStateChangedSubscription;
 
         protected override void RegisterUIElements()
@@ -22,6 +23,7 @@ namespace DungeonCrawler.UI.Battle
             _playerContainerUI = _uiDocument.rootVisualElement.Q<VisualElement>("player-result-container");
             _enemyContainerUI = _uiDocument.rootVisualElement.Q<VisualElement>("enemy-result-container");
             _finishBattleButtonUI = _uiDocument.rootVisualElement.Q<Button>("finish-battle-button");
+            _finishBattleTitleUI = _uiDocument.rootVisualElement.Q<Label>("finish-battle-title");
 
             Hide();
         }
@@ -60,12 +62,6 @@ namespace DungeonCrawler.UI.Battle
                 UpdateResults(stateChanged.Context);
                 Show();
             }
-
-            if (stateChanged.FromState == BattleState.Result)
-            {
-                ClearResults();
-                Hide();
-            }
         }
 
         private void HandleFinishClicked()
@@ -81,6 +77,7 @@ namespace DungeonCrawler.UI.Battle
             }
 
             ClearResults();
+            UpdateFinishTitle(context.Result);
             PopulateSquads(_playerContainerUI, context.Result.GetPlayerSquads());
             PopulateSquads(_enemyContainerUI, context.Result.GetEnemySquads());
         }
@@ -152,6 +149,26 @@ namespace DungeonCrawler.UI.Battle
         {
             _playerContainerUI?.Clear();
             _enemyContainerUI?.Clear();
+            _finishBattleTitleUI.text = "";
+        }
+
+        private void UpdateFinishTitle(BattleResult result)
+        {
+            switch(result.Outcome)
+            {
+                case BattleOutcome.Defeat:
+                    _finishBattleTitleUI.text = "Разгромное поражение!";
+                     break;
+                case BattleOutcome.Victory:
+                    _finishBattleTitleUI.text = "Достойная победа!";
+                    break;
+                case BattleOutcome.Flee:
+                    _finishBattleTitleUI.text = "Трусливый побег";
+                    break;
+                case BattleOutcome.None:
+                    _finishBattleTitleUI.text = "";
+                    break;
+            }
         }
 
         private void Show()
