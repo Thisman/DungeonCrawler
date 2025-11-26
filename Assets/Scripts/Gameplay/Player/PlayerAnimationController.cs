@@ -41,11 +41,11 @@ namespace DungeonCrawler.Gameplay.Player
             if (Mathf.Abs(direction.x) > Mathf.Epsilon)
             {
                 _isFacingLeft = direction.x < 0f;
-                _spriteRenderer.flipX = _isFacingLeft;
+                _spriteRenderer.flipX = !_isFacingLeft;
             }
             else if (direction.y != 0f)
             {
-                _spriteRenderer.flipX = _isFacingLeft;
+                _spriteRenderer.flipX = !_isFacingLeft;
             }
         }
     }

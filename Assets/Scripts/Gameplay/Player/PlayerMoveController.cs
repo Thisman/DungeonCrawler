@@ -32,7 +32,7 @@ namespace DungeonCrawler.Gameplay.Player
         {
             _moveAction?.action.Disable();
             MovementDirection = Vector2.zero;
-            _rigidbody2D.velocity = Vector2.zero;
+            _rigidbody2D.linearVelocity = Vector2.zero;
         }
 
         private void Update()
@@ -43,7 +43,7 @@ namespace DungeonCrawler.Gameplay.Player
         private void FixedUpdate()
         {
             var clampedInput = Vector2.ClampMagnitude(MovementDirection, 1f);
-            _rigidbody2D.velocity = clampedInput * _moveSpeed;
+            _rigidbody2D.linearVelocity = clampedInput * _moveSpeed;
         }
     }
 }
