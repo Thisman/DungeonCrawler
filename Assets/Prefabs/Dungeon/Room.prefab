@@ -3947,6 +3947,7 @@ GameObject:
   - component: {fileID: 969961164874220913}
   - component: {fileID: 6419703493620365527}
   - component: {fileID: 1484461519230610375}
+  - component: {fileID: -590670185364902843}
   m_Layer: 0
   m_Name: Room
   m_TagString: Untagged
@@ -4055,6 +4056,19 @@ MonoBehaviour:
   _westExit: {fileID: 6106015747130787239}
   _eastExit: {fileID: 7143783476789598166}
   _collider: {fileID: 6419703493620365527}
+--- !u!114 &-590670185364902843
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6667031921774038225}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 98f068bfe56c2d34496830a5701e158a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DungeonCrawler.Gameplay.Dungeon.RoomCameraController
+  _trigger: {fileID: 6419703493620365527}
 --- !u!1 &6963139150551589603
 GameObject:
   m_ObjectHideFlags: 0
