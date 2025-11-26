@@ -1,4 +1,4 @@
-// Rotates the player sprite to face the current horizontal movement direction.
+// Rotates the player sprite to match movement direction and applies the army's lead icon.
 using UnityEngine;
 
 namespace DungeonCrawler.Gameplay.Player
@@ -8,6 +8,9 @@ namespace DungeonCrawler.Gameplay.Player
     {
         [SerializeField]
         private PlayerMoveController _moveController;
+
+        [SerializeField]
+        private PlayerArmyController _playerArmyController;
 
         [SerializeField]
         private SpriteRenderer _spriteRenderer;
@@ -21,12 +24,27 @@ namespace DungeonCrawler.Gameplay.Player
                 _moveController = GetComponent<PlayerMoveController>();
             }
 
+            if (_playerArmyController == null)
+            {
+                _playerArmyController = GetComponent<PlayerArmyController>();
+            }
+
             if (_spriteRenderer == null)
             {
                 _spriteRenderer = GetComponentInChildren<SpriteRenderer>();
             }
 
             _isFacingLeft = _spriteRenderer != null && _spriteRenderer.flipX;
+        }
+
+        private void Start()
+        {
+            if (_playerArmyController == null)
+            {
+                _playerArmyController = GetComponent<PlayerArmyController>();
+            }
+
+            TryApplySquadIcon();
         }
 
         private void LateUpdate()
@@ -46,6 +64,22 @@ namespace DungeonCrawler.Gameplay.Player
             else if (direction.y != 0f)
             {
                 _spriteRenderer.flipX = !_isFacingLeft;
+            }
+        }
+
+        private void TryApplySquadIcon()
+        {
+            if (_spriteRenderer == null || _playerArmyController?.Squads == null || _playerArmyController.Squads.Count == 0)
+            {
+                return;
+            }
+
+            var leadSquad = _playerArmyController.Squads[0];
+            var icon = leadSquad?.Unit?.Definition?.Icon;
+
+            if (icon != null)
+            {
+                _spriteRenderer.sprite = icon;
             }
         }
     }
