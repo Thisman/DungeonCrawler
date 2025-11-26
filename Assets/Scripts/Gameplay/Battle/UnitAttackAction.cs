@@ -69,17 +69,37 @@ namespace DungeonCrawler.Gameplay.Battle
             var targetSlot = gridSlots.FirstOrDefault(slot => slot?.Squad == targetSquad);
             if (targetSlot == null)
             {
+                // ÷ель вне сетки Ч считаем достижимой
                 return true;
             }
 
+            // ≈сли цель стоит во фронтальном р€ду Ч всегда достижима
             if (targetSlot.Type == BattleGridSlotType.Front)
             {
                 return true;
             }
 
-            var slotBehindTargetSlot = gridSlots.First(slot => slot.Index == targetSlot.Index + 3);
+            // ---- Ћогика дл€ заднего р€да ----
 
-            return slotBehindTargetSlot.IsEmpty;
+            // »ндекс фронтального слота, который блокирует позицию цели
+            int frontIndex = targetSlot.Index + 3;
+
+            // »щем этот фронтальный слот
+            var blockingSlot = gridSlots.FirstOrDefault(slot =>
+                slot != null &&
+                slot.Index == frontIndex &&
+                slot.Type == BattleGridSlotType.Front &&
+                slot.Side == targetSlot.Side
+            );
+
+            // ≈сли соответствующего слота нет Ч подр€д вступление невозможно, считаем недостижимым
+            if (blockingSlot == null)
+            {
+                return false;
+            }
+
+            // ≈сли фронтальный слот пустой Ч цель достижима
+            return blockingSlot.IsEmpty;
         }
     }
 }

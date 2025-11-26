@@ -179,7 +179,7 @@ namespace DungeonCrawler.Gameplay.Battle
 
             public int Index { get; set; }
 
-            public bool IsEmpty => Squad == null;
+            public bool IsEmpty => Squad == null || Squad.IsDead;
 
             public Transform Root { get; }
 
