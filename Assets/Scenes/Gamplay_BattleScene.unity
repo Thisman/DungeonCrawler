@@ -3878,7 +3878,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DungeonCrawler.Launchers.BattleSceneScope
   parentReference:
-    TypeName: 
+    TypeName: DungeonCrawler.Launchers.RootSceneScope
   autoRun: 1
   autoInjectGameObjects:
   - {fileID: 67183015}
