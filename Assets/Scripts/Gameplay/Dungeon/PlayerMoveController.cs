@@ -1,6 +1,8 @@
 // Moves the player character based on directional input from the new Input System.
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Windows;
+using VContainer;
 
 namespace DungeonCrawler.Gameplay.Dungeon
 {
@@ -8,19 +10,26 @@ namespace DungeonCrawler.Gameplay.Dungeon
     [RequireComponent(typeof(Rigidbody2D))]
     public class PlayerMoveController : MonoBehaviour
     {
-        [SerializeField]
-        private InputActionReference _moveAction;
 
         [SerializeField]
         private float _moveSpeed = 5f;
 
+        [Inject]
+        private readonly InputActionAsset _actions;
+
         private Rigidbody2D _rigidbody2D;
+        private InputAction _moveAction;
 
         public Vector2 MovementDirection { get; private set; }
 
         private void Awake()
         {
             _rigidbody2D = GetComponent<Rigidbody2D>();
+        }
+
+        private void Start()
+        {
+            _moveAction = _actions.FindAction("Player/Move", true);
         }
 
         private void OnDisable()
@@ -31,7 +40,7 @@ namespace DungeonCrawler.Gameplay.Dungeon
 
         private void Update()
         {
-            MovementDirection = _moveAction != null ? _moveAction.action.ReadValue<Vector2>() : Vector2.zero;
+            MovementDirection = _moveAction != null ? _moveAction.ReadValue<Vector2>() : Vector2.zero;
         }
 
         private void FixedUpdate()

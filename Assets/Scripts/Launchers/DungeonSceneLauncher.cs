@@ -11,6 +11,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
 using VContainer;
+using VContainer.Unity;
 
 namespace DungeonCrawler.Gameplay.Battle
 {
@@ -32,6 +33,9 @@ namespace DungeonCrawler.Gameplay.Battle
         [Inject]
         private readonly GameEventBus _sceneEventBus;
 
+        [Inject]
+        private readonly IObjectResolver _resolver;
+
         private IDisposable _enterBattleSubscription;
 
         private GameObject _player;
@@ -44,9 +48,9 @@ namespace DungeonCrawler.Gameplay.Battle
 
         private void OnEnable()
         {
-            InitializeInputSystem();
             SetPlayerSquads();
             SubscribeToBattleRequests();
+            InitializeInputSystem();
         }
 
         private void OnDisable()
@@ -59,7 +63,7 @@ namespace DungeonCrawler.Gameplay.Battle
         {
             Debug.Assert(_playerPrefab != null, "Player prefab didn't set!");
 
-            _player = Instantiate(_playerPrefab, transform.position, Quaternion.identity, transform.parent);
+            _player = _resolver.Instantiate(_playerPrefab, transform.position, Quaternion.identity, transform.parent);
         }
 
         private void SetPlayerSquads()
@@ -78,9 +82,6 @@ namespace DungeonCrawler.Gameplay.Battle
 
         private void InitializeInputSystem()
         {
-            // OnEnable runs only on the initial activation of this component; when the battle scene is loaded
-            // additively the launcher stays enabled, so we need to explicitly switch the input map back to
-            // the dungeon here after the battle scene is unloaded.
             _gameInputSystem.EnterDungeon();
         }
 
@@ -131,7 +132,6 @@ namespace DungeonCrawler.Gameplay.Battle
             }
 
             _gameSessionSystem.SetEnemySquads(Array.Empty<SquadModel>());
-            _gameInputSystem.EnterDungeon();
             _sceneEventBus.Publish(new BattleEnded(battleResult));
         }
     }

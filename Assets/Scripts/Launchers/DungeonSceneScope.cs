@@ -11,19 +11,13 @@ namespace DungeonCrawler.Launchers
 {
     public class DungeonSceneScope : LifetimeScope
     {
-        [SerializeField]
-        private InputActionAsset _actions;
-
         protected override void Configure(IContainerBuilder builder)
         {
-            builder.RegisterInstance<InputActionAsset>(_actions).AsSelf();
-            builder.Register<GameInputSystem>(Lifetime.Singleton);
             builder.Register<GameEventBus>(Lifetime.Singleton);
-
             builder.RegisterBuildCallback(resolver =>
             {
-                var controllers = FindObjectsByType<ScenarioController>(FindObjectsSortMode.None);
-                foreach (var c in controllers)
+                var sceneControllers = FindObjectsByType<ScenarioController>(FindObjectsSortMode.None);
+                foreach (var c in sceneControllers)
                 {
                     resolver.Inject(c);
                 }

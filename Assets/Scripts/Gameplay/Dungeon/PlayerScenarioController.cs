@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using VContainer;
 
 namespace DungeonCrawler.Gameplay.Dungeon
 {
@@ -9,21 +10,29 @@ namespace DungeonCrawler.Gameplay.Dungeon
     public class PlayerScenarioController : MonoBehaviour
     {
         [SerializeField]
-        private InputActionReference _interactAction;
-
-        [SerializeField]
         private float _interactionRadius = 2f;
 
+        [Inject]
+        private readonly InputActionAsset _actions;
+
         private bool _isRunningScenario;
+        private InputAction _interactAction;
+
+        private void Start()
+        {
+            _interactAction = _actions.FindAction("Player/Interact", true);
+            _interactAction.performed += OnInteractPerformed;
+        }
 
         private void OnEnable()
         {
-            _interactAction.action.performed += OnInteractPerformed;
+            if(_interactAction != null)
+                _interactAction.performed += OnInteractPerformed;
         }
 
         private void OnDisable()
         {
-            _interactAction.action.performed -= OnInteractPerformed;
+            _interactAction.performed -= OnInteractPerformed;
         }
 
         private void OnInteractPerformed(InputAction.CallbackContext context)
