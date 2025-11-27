@@ -5,7 +5,9 @@ using DungeonCrawler.Gameplay.Squad;
 using DungeonCrawler.Systems.Battle;
 using DungeonCrawler.Systems.Input;
 using DungeonCrawler.Systems.Session;
+using DungeonCrawler.Systems.SceneManagement;
 using DungeonCrawler.UI.Common;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using VContainer;
@@ -39,6 +41,11 @@ namespace DungeonCrawler.Gameplay.Battle
         [Inject]
         private readonly GameSessionSystem _gameSessionSystem;
 
+        [Inject]
+        private readonly SceneLoaderSystem _sceneLoaderSystem;
+
+        private IDisposable _finishBattleSubscription;
+
         private void Start()
         {
             InitializeUIPanels();
@@ -54,6 +61,17 @@ namespace DungeonCrawler.Gameplay.Battle
 
             _unitSystem.Initalize(buildedSquads, _squadPrefab);
             _stateMachine.Start();
+        }
+
+        private void OnEnable()
+        {
+            _finishBattleSubscription ??= _sceneEventBus.Subscribe<RequestFinishBattle>(HandleRequestFinishBattle);
+        }
+
+        private void OnDisable()
+        {
+            _finishBattleSubscription?.Dispose();
+            _finishBattleSubscription = null;
         }
 
         private void OnDestroy()
@@ -73,6 +91,12 @@ namespace DungeonCrawler.Gameplay.Battle
         private void InitalizeInputSystem()
         {
             _gameInputSystem.EnterBattle();
+        }
+
+        private void HandleRequestFinishBattle(RequestFinishBattle request)
+        {
+            var result = request?.Result ?? _context?.Result;
+            _ = _sceneLoaderSystem.UnloadAdditiveScene(gameObject.scene.name, result);
         }
     }
 }

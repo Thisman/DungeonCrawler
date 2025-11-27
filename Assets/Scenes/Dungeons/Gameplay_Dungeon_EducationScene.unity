@@ -272,31 +272,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c65b541da7134c24fb94d882c4e0e63b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DungeonCrawler.Gameplay.Battle.DungeonSceneLauncher
-  _squads:
-  - Definition: {fileID: 11400000, guid: 703d8e3756d4db44a8c3f9d4a19583bf, type: 2}
-    Id: Hero Default
-    UnitCount: 1
-    Level: 0
-  - Definition: {fileID: 11400000, guid: 2d51902cf15ac3b4fb3639f08468879a, type: 2}
-    Id: Unit Default
-    UnitCount: 10
-    Level: 0
-  - Definition: {fileID: 11400000, guid: 733081a3d0c46484f8b35adaba75b9b4, type: 2}
-    Id: Unit Default 2
-    UnitCount: 10
-    Level: 0
-  - Definition: {fileID: 11400000, guid: da2b3cf924410754e81f9496d0492bd6, type: 2}
-    Id: Unit Default 3
-    UnitCount: 10
-    Level: 0
-  - Definition: {fileID: 11400000, guid: 3f1b8eec4a6e99d418360ea65980925e, type: 2}
-    Id: Unit Default 4
-    UnitCount: 10
-    Level: 0
-  - Definition: {fileID: 11400000, guid: 96dccc52fdca82b4ab876c2edcacf4a6, type: 2}
-    Id: Unit Default 5
-    UnitCount: 10
-    Level: 0
   _playerPrefab: {fileID: 5846416121986788414, guid: 10eb0e70bfc621c48b190557011bc38b, type: 3}
 --- !u!4 &886533059
 Transform:
@@ -1350,12 +1325,16 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -2407443971471641488, guid: d899daa5019227544a7a2f98905d8dd6, type: 3}
       propertyPath: _actions.Array.size
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: -2407443971471641488, guid: d899daa5019227544a7a2f98905d8dd6, type: 3}
       propertyPath: '_actions.Array.data[0]'
       value: 
       objectReference: {fileID: 11400000, guid: 6f06df68ab78fc5479c078be6a8c114d, type: 2}
+    - target: {fileID: -2407443971471641488, guid: d899daa5019227544a7a2f98905d8dd6, type: 3}
+      propertyPath: '_actions.Array.data[1]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 2055de3c6b8a8dc46b74738a27a3a6de, type: 2}
     - target: {fileID: 1541032812004127217, guid: d899daa5019227544a7a2f98905d8dd6, type: 3}
       propertyPath: m_LocalPosition.x
       value: 8
