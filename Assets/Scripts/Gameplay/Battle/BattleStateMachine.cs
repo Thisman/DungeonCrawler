@@ -363,7 +363,7 @@ namespace DungeonCrawler.Gameplay.Battle
         {
             _subscribtions.Add(_sceneEventBus.Subscribe<RequestBattlePreparationFinish>((RequestBattlePreparationFinish _) => TryFire(Trigger.NextState)));
             _subscribtions.Add(_sceneEventBus.Subscribe<RequestFleeFromBattle>(HandleFleeFromBattle));
-            _subscribtions.Add(_sceneEventBus.Subscribe<RequestFinishBattle>((RequestFinishBattle _) => TryFire(Trigger.Finish)));
+            _subscribtions.Add(_sceneEventBus.Subscribe<RequestFinishBattle>(_ => TryFire(Trigger.Finish)));
         }
 
         private void UnsubscribeFromSceneEvents()

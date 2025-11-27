@@ -16,6 +16,7 @@ namespace DungeonCrawler.UI.Battle
         private Button _finishBattleButtonUI;
         private Label _finishBattleTitleUI;
         private IDisposable _battleStateChangedSubscription;
+        private BattleContext _context;
 
         protected override void RegisterUIElements()
         {
@@ -59,6 +60,7 @@ namespace DungeonCrawler.UI.Battle
         {
             if (stateChanged.ToState == BattleState.Result)
             {
+                _context = stateChanged.Context;
                 UpdateResults(stateChanged.Context);
                 Show();
             }
@@ -66,7 +68,7 @@ namespace DungeonCrawler.UI.Battle
 
         private void HandleFinishClicked()
         {
-            _sceneEventBusService?.Publish(new RequestFinishBattle());
+            _sceneEventBusService?.Publish(new RequestFinishBattle(_context?.Result));
         }
 
         private void UpdateResults(BattleContext context)
@@ -157,13 +159,13 @@ namespace DungeonCrawler.UI.Battle
             switch(result.Outcome)
             {
                 case BattleOutcome.Defeat:
-                    _finishBattleTitleUI.text = "Разгромное поражение!";
+                    _finishBattleTitleUI.text = "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ!";
                      break;
                 case BattleOutcome.Victory:
-                    _finishBattleTitleUI.text = "Достойная победа!";
+                    _finishBattleTitleUI.text = "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ!";
                     break;
                 case BattleOutcome.Flee:
-                    _finishBattleTitleUI.text = "Трусливый побег";
+                    _finishBattleTitleUI.text = "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ";
                     break;
                 case BattleOutcome.None:
                     _finishBattleTitleUI.text = "";
