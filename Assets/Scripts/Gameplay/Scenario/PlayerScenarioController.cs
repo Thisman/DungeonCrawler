@@ -20,8 +20,8 @@ namespace DungeonCrawler.Gameplay.Scenario
         {
             if (_interactAction != null)
             {
-                _interactAction.action.performed += OnInteractPerformed;
                 _interactAction.action.Enable();
+                _interactAction.action.performed += OnInteractPerformed;
             }
         }
 

@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using DungeonCrawler.Gameplay.Dungeon;
 using DungeonCrawler.Gameplay.Squad;
 using DungeonCrawler.Gameplay.Unit;
+using DungeonCrawler.Systems;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace DungeonCrawler.Gameplay.Battle
 {
@@ -15,34 +17,35 @@ namespace DungeonCrawler.Gameplay.Battle
         private List<BattleSceneLauncher.SquadConfig> _squads = new();
 
         [SerializeField]
+        private InputActionAsset _actions;
+
+        [SerializeField]
         private GameObject _playerPrefab;
 
         private PlayerArmyController _playerArmyController;
+        private GameInputSystem _gameInputSystem;
+
+        private void Awake()
+        {
+            _gameInputSystem = new GameInputSystem(_actions);
+        }
 
         private void Start()
         {
+            _gameInputSystem.EnterDungeon();
             var squads = BuildSquads();
             InitializePlayer();
-
-            _playerArmyController?.Initialize(squads);
+            _playerArmyController.Initialize(squads);
         }
 
         private void InitializePlayer()
         {
-            if (_playerPrefab == null)
-            {
-                Debug.LogError("Player prefab is not assigned in DungeonLauncher.");
-                return;
-            }
+            Debug.Assert(_playerPrefab != null, "Player prefab didn't set!");
 
             var playerInstance = Instantiate(_playerPrefab, transform.position, Quaternion.identity);
-            _playerArmyController = playerInstance.GetComponent<PlayerArmyController>()
-                ?? playerInstance.GetComponentInChildren<PlayerArmyController>();
+            _playerArmyController = playerInstance.GetComponent<PlayerArmyController>();
 
-            if (_playerArmyController == null)
-            {
-                Debug.LogError("Spawned player prefab is missing a PlayerArmyController component.");
-            }
+            Debug.Assert(_playerArmyController != null, "PlayerArmyController not found!");
         }
 
         private List<SquadModel> BuildSquads()

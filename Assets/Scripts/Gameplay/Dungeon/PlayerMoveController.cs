@@ -25,12 +25,12 @@ namespace DungeonCrawler.Gameplay.Dungeon
 
         private void OnEnable()
         {
-            _moveAction?.action.Enable();
+            _moveAction.action.Enable();
         }
 
         private void OnDisable()
         {
-            _moveAction?.action.Disable();
+            _moveAction.action.Disable();
             MovementDirection = Vector2.zero;
             _rigidbody2D.linearVelocity = Vector2.zero;
         }
