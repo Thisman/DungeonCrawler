@@ -78,6 +78,9 @@ namespace DungeonCrawler.Gameplay.Battle
 
         private void InitializeInputSystem()
         {
+            // OnEnable runs only on the initial activation of this component; when the battle scene is loaded
+            // additively the launcher stays enabled, so we need to explicitly switch the input map back to
+            // the dungeon here after the battle scene is unloaded.
             _gameInputSystem.EnterDungeon();
         }
 
@@ -128,6 +131,7 @@ namespace DungeonCrawler.Gameplay.Battle
             }
 
             _gameSessionSystem.SetEnemySquads(Array.Empty<SquadModel>());
+            _gameInputSystem.EnterDungeon();
             _sceneEventBus.Publish(new BattleEnded(battleResult));
         }
     }
