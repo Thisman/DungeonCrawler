@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace DungeonCrawler.Gameplay.Scenario
+namespace DungeonCrawler.Gameplay.Dungeon
 {
     [DisallowMultipleComponent]
     public class PlayerScenarioController : MonoBehaviour

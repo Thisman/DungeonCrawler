@@ -4,9 +4,10 @@ using System.Collections.Generic;
 using DungeonCrawler.Gameplay.Dungeon;
 using DungeonCrawler.Gameplay.Squad;
 using DungeonCrawler.Gameplay.Unit;
-using DungeonCrawler.Systems;
+using DungeonCrawler.Systems.Input;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using VContainer;
 
 namespace DungeonCrawler.Gameplay.Battle
 {
@@ -14,28 +15,18 @@ namespace DungeonCrawler.Gameplay.Battle
     public class DungeonSceneLauncher : MonoBehaviour
     {
         [SerializeField]
-        private List<BattleSceneLauncher.SquadConfig> _squads = new();
-
-        [SerializeField]
-        private InputActionAsset _actions;
+        private List<SquadConfig> _squads = new();
 
         [SerializeField]
         private GameObject _playerPrefab;
 
-        private PlayerArmyController _playerArmyController;
-        private GameInputSystem _gameInputSystem;
-
-        private void Awake()
-        {
-            _gameInputSystem = new GameInputSystem(_actions);
-        }
+        [Inject]
+        private readonly GameInputSystem _gameInputSystem;
 
         private void Start()
         {
-            _gameInputSystem.EnterDungeon();
-            var squads = BuildSquads();
+            InitializeInputSystem();
             InitializePlayer();
-            _playerArmyController.Initialize(squads);
         }
 
         private void InitializePlayer()
@@ -43,9 +34,17 @@ namespace DungeonCrawler.Gameplay.Battle
             Debug.Assert(_playerPrefab != null, "Player prefab didn't set!");
 
             var playerInstance = Instantiate(_playerPrefab, transform.position, Quaternion.identity);
-            _playerArmyController = playerInstance.GetComponent<PlayerArmyController>();
+            var playerArmyController = playerInstance.GetComponent<PlayerArmyController>();
 
-            Debug.Assert(_playerArmyController != null, "PlayerArmyController not found!");
+            Debug.Assert(playerArmyController != null, "PlayerArmyController not found!");
+
+            var squads = BuildSquads();
+            playerArmyController.Initialize(squads);
+        }
+
+        private void InitializeInputSystem()
+        {
+            _gameInputSystem.EnterDungeon();
         }
 
         private List<SquadModel> BuildSquads()

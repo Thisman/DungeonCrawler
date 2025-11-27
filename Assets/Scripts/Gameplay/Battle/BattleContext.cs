@@ -6,15 +6,12 @@ namespace DungeonCrawler.Gameplay.Battle
 {
     public class BattleContext
     {
-        public BattleContext(IEnumerable<SquadModel> squads = null, BattleStatus status = BattleStatus.Preparation)
+        public BattleContext()
         {
-            Squads = squads != null ? new List<SquadModel>(squads) : new List<SquadModel>();
-            Status = status;
             CurrentRoundNumber = 0;
-            Result = new BattleResult(Squads);
         }
 
-        public List<SquadModel> Squads { get; }
+        public List<SquadModel> Squads { get; set; }
 
         public IReadOnlyList<BattleGridController.BattleGridSlot> GridSlots { get; set; }
 
@@ -28,6 +25,6 @@ namespace DungeonCrawler.Gameplay.Battle
 
         public int CurrentRoundNumber { get; set; }
 
-        public BattleResult Result { get; }
+        public BattleResult Result { get; set; }
     }
 }

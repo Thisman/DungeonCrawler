@@ -1,72 +1,66 @@
-using System;
-using UnityEngine;
-using UnityEngine.InputSystem;
+п»їusing System;
+using System.Collections.Generic;
+using System.Text;
 
 namespace DungeonCrawler.Systems.Input
 {
-    public class GameInputSystem : MonoBehaviour
+    using UnityEngine.InputSystem;
+
+    public enum GameMode
     {
-        public static GameInputSystem Instance { get; private set; }
+        Dungeon,
+        Dialog,
+        Battle,
+        Menu,
+    }
 
-        public event Action<Vector2> BattleClick;
+    public class GameInputSystem
+    {
+        private readonly InputActionAsset _actions;
 
-        [Header("Input System")]
-        [SerializeField] private InputActionAsset _inputActions; // сюда кидаешь GameInputActions.asset в инспекторе
+        public InputActionAsset Actions => _actions;
 
-        private InputAction _battlePointAction;
-        private InputAction _battleClickAction;
-
-        private void Awake()
+        public GameInputSystem(InputActionAsset actions)
         {
-            if (Instance != null && Instance != this)
+            _actions = actions;
+        }
+
+        public void EnableOnly(params string[] maps)
+        {
+            foreach (var m in _actions.actionMaps) m.Disable();
+            foreach (var name in maps)
+                _actions.FindActionMap(name, throwIfNotFound: true).Enable();
+        }
+
+        public void ClearBindingMask() => _actions.bindingMask = null;
+
+        public void EnterBattle() => SetMode(GameMode.Battle);
+
+        public void EnterDungeon() => SetMode(GameMode.Dungeon);
+
+        public void EnterMenu() => SetMode(GameMode.Menu);
+
+        public void EnterDialog() => SetMode(GameMode.Dialog);
+
+        private void SetMode(GameMode mode)
+        {
+            ClearBindingMask();
+
+            switch (mode)
             {
-                Destroy(gameObject);
-                return;
+                case GameMode.Dungeon:
+                    EnableOnly("Player");
+                    break;
+                case GameMode.Battle:
+                    EnableOnly("Battle");
+                    break;
+                case GameMode.Menu:
+                    EnableOnly("Menu");
+                    break;
+                case GameMode.Dialog:
+                    EnableOnly("Dialog");
+                    break;
             }
-
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-
-            // Ищем action map и actions
-            var battleMap = _inputActions.FindActionMap("Battle", throwIfNotFound: true);
-            _battlePointAction = battleMap.FindAction("Point", throwIfNotFound: true);
-            _battleClickAction = battleMap.FindAction("Click", throwIfNotFound: true);
-        }
-
-        private void OnEnable()
-        {
-            _battlePointAction.Enable();
-            _battleClickAction.Enable();
-
-            _battleClickAction.performed += OnBattleClickPerformed;
-        }
-
-        private void OnDisable()
-        {
-            _battleClickAction.performed -= OnBattleClickPerformed;
-
-            _battlePointAction.Disable();
-            _battleClickAction.Disable();
-        }
-
-        private void OnBattleClickPerformed(InputAction.CallbackContext ctx)
-        {
-            // Берём текущую позицию указателя
-            var screenPos = _battlePointAction.ReadValue<Vector2>();
-            BattleClick?.Invoke(screenPos);
-        }
-
-        // Опционально: включение/отключение карты "Battle" по состоянию боя
-        public void EnableBattleControls()
-        {
-            _battlePointAction.Enable();
-            _battleClickAction.Enable();
-        }
-
-        public void DisableBattleControls()
-        {
-            _battlePointAction.Disable();
-            _battleClickAction.Disable();
         }
     }
 }

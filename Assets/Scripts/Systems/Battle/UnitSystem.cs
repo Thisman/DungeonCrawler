@@ -8,85 +8,33 @@ using DungeonCrawler.Core.EventBus;
 using System.Threading.Tasks;
 using System.Linq;
 using Assets.Scripts.Gameplay.Battle;
+using VContainer;
 
 namespace DungeonCrawler.Systems.Battle
 {
     public class UnitSystem : IDisposable
     {
-        private readonly GameEventBus _sceneEventBus;
-        private readonly SquadController _squadPrefab;
-        private readonly Transform _defaultParent;
-        private readonly BattleGridController _gridController;
+        [Inject]
         private readonly BattleContext _context;
-        private readonly List<IDisposable> _subscriptions = new();
-        private readonly Dictionary<SquadModel, SquadController> _squadControllers = new();
-        private readonly List<SquadController> _highlightedControllers = new();
+
+        [Inject]
+        private readonly GameEventBus _sceneEventBus;
+
+        [Inject]
+        private readonly BattleGridController _battleGridController;
+
         private readonly List<SquadModel> _trackedSquads = new();
+        private readonly List<IDisposable> _subscriptions = new();
+        private readonly List<SquadController> _highlightedControllers = new();
+        private readonly Dictionary<SquadModel, SquadController> _squadControllers = new();
 
-        public UnitSystem(
-            GameEventBus sceneEventBus,
-            SquadController squadPrefab,
-            Transform defaultParent,
-            BattleGridController gridController,
-            BattleContext context)
+        public void Initalize(IReadOnlyList<SquadModel> squads, SquadController squadPrefab)
         {
-            _sceneEventBus = sceneEventBus;
-            _squadPrefab = squadPrefab;
-            _defaultParent = defaultParent;
-            _gridController = gridController;
-            _context = context;
-
             _subscriptions.Add(_sceneEventBus.Subscribe<RequestSelectAction>(HandleRequestSelectAction));
             _subscriptions.Add(_sceneEventBus.Subscribe<BattleStateChanged>(HandleStateChanged));
             _subscriptions.Add(_sceneEventBus.Subscribe<UnitPlanSelected>(HandlePlanSelected));
-        }
 
-        public void InitializeSquads(IReadOnlyList<SquadModel> squads)
-        {
-            if (_squadPrefab == null)
-            {
-                Debug.LogWarning("Squad prefab is not assigned; squad layout will be skipped.");
-                return;
-            }
-
-            if (squads == null)
-            {
-                return;
-            }
-
-            var friendlyIndex = 0;
-            var enemyIndex = 0;
-
-            foreach (var squad in squads)
-            {
-                if (squad == null)
-                {
-                    continue;
-                }
-
-                var isEnemy = squad.Unit.Definition.IsEnemy();
-                var slotIndex = isEnemy ? enemyIndex++ : friendlyIndex++;
-                var squadInstance = _gridController != null
-                    ? _gridController.AddToSlot(slotIndex, isEnemy, squad, _squadPrefab)
-                    : UnityEngine.Object.Instantiate(_squadPrefab, _defaultParent);
-
-                if (squadInstance == null)
-                {
-                    continue;
-                }
-
-                if (_gridController == null)
-                {
-                    squadInstance.transform.localPosition = Vector3.zero;
-                    squadInstance.Initalize(squad);
-                }
-
-                _squadControllers[squad] = squadInstance;
-                squad.Changed += HandleSquadChanged;
-                _trackedSquads.Add(squad);
-            }
-
-            _context.GridSlots = _gridController.GridSlots;
+            InitializeSquads(squads, squadPrefab);
         }
 
         public SquadController GetController(SquadModel squad)
@@ -147,6 +95,52 @@ namespace DungeonCrawler.Systems.Battle
             }
 
             _trackedSquads.Clear();
+        }
+
+        private void InitializeSquads(IReadOnlyList<SquadModel> squads, SquadController squadPrefab)
+        {
+            if (squadPrefab == null)
+            {
+                Debug.LogWarning("Squad prefab is not assigned; squad layout will be skipped.");
+                return;
+            }
+
+            if (squads == null)
+            {
+                return;
+            }
+
+            var friendlyIndex = 0;
+            var enemyIndex = 0;
+
+            foreach (var squad in squads)
+            {
+                if (squad == null)
+                {
+                    continue;
+                }
+
+                var isEnemy = squad.Unit.Definition.IsEnemy();
+                var slotIndex = isEnemy ? enemyIndex++ : friendlyIndex++;
+                var squadInstance = _battleGridController.AddToSlot(slotIndex, isEnemy, squad, squadPrefab);
+
+                if (squadInstance == null)
+                {
+                    continue;
+                }
+
+                if (_battleGridController == null)
+                {
+                    squadInstance.transform.localPosition = Vector3.zero;
+                    squadInstance.Initalize(squad);
+                }
+
+                _squadControllers[squad] = squadInstance;
+                squad.Changed += HandleSquadChanged;
+                _trackedSquads.Add(squad);
+            }
+
+            _context.GridSlots = _battleGridController.GridSlots;
         }
 
         private void HandleStateChanged(BattleStateChanged evt)

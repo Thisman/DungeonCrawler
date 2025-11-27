@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace DungeonCrawler.Gameplay.Scenario
+namespace DungeonCrawler.Gameplay.Dungeon
 {
     public class ScenarioController : MonoBehaviour
     {

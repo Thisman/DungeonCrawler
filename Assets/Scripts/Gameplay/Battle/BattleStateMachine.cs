@@ -6,33 +6,39 @@ using Stateless;
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using VContainer;
 
 namespace DungeonCrawler.Gameplay.Battle
 {
     public class BattleStateMachine
     {
+        [Inject]
+        private readonly UnitSystem _unitSystem;
+
+        [Inject]
+        private readonly BattleContext _context;
+
+        [Inject]
+        private readonly GameEventBus _sceneEventBus;
+
+        [Inject]
+        private readonly BattleDamageSystem _battleDamageSystem;
+
         private bool _isStopped;
         private BattleState _currentState;
-        private readonly BattleLogger _logger;
-        private readonly BattleContext _context;
-        private readonly GameEventBus _sceneEventBus;
+        private BattleLogger _logger;
+        private BattleActionExecutor _battleActionExecutor;
+        private StateMachine<BattleState, Trigger> _stateMachine;
+
         private readonly List<IDisposable> _subscribtions = new();
-        private readonly BattleActionExecutor _battleActionExecutor;
-        private readonly StateMachine<BattleState, Trigger> _stateMachine;
         private readonly Dictionary<string, IBattleController> _unitControllers = new();
 
-        public BattleState CurrentState => _currentState;
-
-        public BattleContext Context => _context;
-
-        public BattleStateMachine(BattleContext context, GameEventBus sceneEventBus, UnitSystem unitSystem, BattleDamageSystem battleDamageSystem)
+        public void Start()
         {
-            _context = context;
             _logger = new BattleLogger();
-            _sceneEventBus = sceneEventBus;
             _currentState = BattleState.None;
             _stateMachine = new StateMachine<BattleState, Trigger>(() => _currentState, state => _currentState = state);
-            _battleActionExecutor = new BattleActionExecutor(_sceneEventBus, unitSystem, battleDamageSystem);
+            _battleActionExecutor = new BattleActionExecutor(_sceneEventBus, _unitSystem, _battleDamageSystem);
 
             _unitControllers.Add("Player", new PlayerSquadsController(_sceneEventBus));
             var availableActionForEnemies = new List<UnitAction>()
@@ -52,16 +58,21 @@ namespace DungeonCrawler.Gameplay.Battle
             _stateMachine.OnUnhandledTrigger((state, trigger) => {
                 _logger.LogUnhandledTrigger(state, trigger.ToString());
             });
-        }
 
-        public void Start()
-        {
+            SubscribeToSceneEvents();
+
             Fire(Trigger.NextState);
         }
 
         public void Stop()
         {
             _isStopped = true;
+            _stateMachine = null;
+            _battleActionExecutor = null;
+            _currentState = BattleState.None;
+
+            _subscribtions.Clear();
+            _unitControllers.Clear();
             UnsubscribeFromSceneEvents();
         }
 
@@ -190,7 +201,6 @@ namespace DungeonCrawler.Gameplay.Battle
         private void EnterPreparation()
         {
             SetStatus(BattleStatus.Preparation);
-            SubscribeToSceneEvents();
         }
 
         private void ExitPreparation()

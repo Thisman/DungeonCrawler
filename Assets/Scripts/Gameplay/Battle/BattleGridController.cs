@@ -18,9 +18,6 @@ namespace DungeonCrawler.Gameplay.Battle
         [SerializeField]
         private Transform[] _enemySlots = Array.Empty<Transform>();
 
-        [SerializeField]
-        private Transform _defaultParent;
-
         private readonly List<BattleGridSlot> _friendlySlotData = new();
         private readonly List<BattleGridSlot> _enemySlotData = new();
         private readonly List<BattleGridSlot> _allGridSlots = new();
@@ -53,7 +50,7 @@ namespace DungeonCrawler.Gameplay.Battle
             RemoveFromSlot(slotIndex, isEnemySide);
 
             // TODO: перенести инициализацию в UnitSystem
-            var parent = slot.Root != null ? slot.Root : _defaultParent;
+            var parent = slot.Root;
             var instance = Instantiate(prefab, parent);
             instance.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
             instance.transform.localScale = Vector3.one;

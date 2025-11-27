@@ -160,8 +160,6 @@ GameObject:
   m_Component:
   - component: {fileID: 67183017}
   - component: {fileID: 67183016}
-  - component: {fileID: 67183018}
-  - component: {fileID: 67183019}
   m_Layer: 0
   m_Name: SceneLauncher
   m_TagString: Untagged
@@ -226,15 +224,12 @@ MonoBehaviour:
     Id: Enemy Default 4
     UnitCount: 10
     Level: 0
-  _initialState: 0
   _uiPanels:
   - {fileID: 2055049124}
   - {fileID: 1925583477}
   - {fileID: 1334742676}
   - {fileID: 1234006799}
   _squadPrefab: {fileID: -3801268468514071021, guid: 98f35b6f4d06a1f4fb35f0fe9648450b, type: 3}
-  _battleGridController: {fileID: 2039933355}
-  _battleTargetPicker: {fileID: 67183018}
 --- !u!4 &67183017
 Transform:
   m_ObjectHideFlags: 0
@@ -250,34 +245,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &67183018
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 67183015}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d3d800d60e2e99347a088527ec26d7e4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DungeonCrawler.Gameplay.Battle.BattleTargetPicker
-  unitLayerMask:
-    serializedVersion: 2
-    m_Bits: 64
---- !u!114 &67183019
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 67183015}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2e3470988e60b5e44a98b8354fed40a7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DungeonCrawler.Systems.Input.GameInputSystem
-  _inputActions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
 --- !u!1 &326415138
 GameObject:
   m_ObjectHideFlags: 0
@@ -989,6 +956,66 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1149120152}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1541974998
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1541975001}
+  - component: {fileID: 1541975000}
+  - component: {fileID: 1541974999}
+  m_Layer: 0
+  m_Name: SceneClickSystem
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1541974999
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1541974998}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2e3470988e60b5e44a98b8354fed40a7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DungeonCrawler.Systems.Input.BattleClickSystem
+--- !u!114 &1541975000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1541974998}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d3d800d60e2e99347a088527ec26d7e4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DungeonCrawler.Gameplay.Battle.BattleTargetPicker
+  unitLayerMask:
+    serializedVersion: 2
+    m_Bits: 64
+--- !u!4 &1541975001
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1541974998}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 6.34374, y: 0.60958, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1590491581
 GameObject:
@@ -3765,7 +3792,6 @@ MonoBehaviour:
   - {fileID: 326415139}
   - {fileID: 766315769}
   - {fileID: 1493665435}
-  _defaultParent: {fileID: 2039933354}
 --- !u!1 &2055049121
 GameObject:
   m_ObjectHideFlags: 0
@@ -3835,12 +3861,69 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DungeonCrawler.UI.Battle.BattlePreparationPanel
   _uiDocument: {fileID: 2055049122}
+--- !u!1 &2100259960
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2100259962}
+  - component: {fileID: 2100259961}
+  m_Layer: 0
+  m_Name: SceneScope
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &2100259961
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2100259960}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 632cda244d80c17419b2c6add825f808, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DungeonCrawler.Launchers.BattleSceneScope
+  parentReference:
+    TypeName: 
+  autoRun: 1
+  autoInjectGameObjects:
+  - {fileID: 67183015}
+  - {fileID: 1541974998}
+  - {fileID: 2039933352}
+  _actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
+  _battleGridController: {fileID: 2039933355}
+  _battleTargetPicker: {fileID: 1541975000}
+  _battleClickSystem: {fileID: 1541974999}
+--- !u!4 &2100259962
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2100259960}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 6.34374, y: 0.60958, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 519420032}
   - {fileID: 619394802}
+  - {fileID: 2100259962}
+  - {fileID: 1541975001}
   - {fileID: 67183017}
   - {fileID: 2055049123}
   - {fileID: 1925583476}

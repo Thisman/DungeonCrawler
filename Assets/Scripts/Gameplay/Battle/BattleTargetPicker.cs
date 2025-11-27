@@ -3,6 +3,7 @@ using Assets.Scripts.Gameplay.Battle;
 using DungeonCrawler.Core.EventBus;
 using DungeonCrawler.Systems.Input;
 using UnityEngine;
+using VContainer;
 
 namespace DungeonCrawler.Gameplay.Battle
 {
@@ -10,24 +11,25 @@ namespace DungeonCrawler.Gameplay.Battle
     {
         [SerializeField] private LayerMask unitLayerMask;
 
-        private GameEventBus _eventBus;
-        private GameInputSystem _inputSystem;
+        [Inject]
+        private readonly GameEventBus _eventBus;
 
-        public void Initialize(GameEventBus eventBus)
+        [Inject]
+        private readonly BattleClickSystem _battleClickSystem;
+
+        private void Start()
         {
-            _eventBus = eventBus;
-            _inputSystem = GameInputSystem.Instance;
-            if (_inputSystem != null)
+            if (_battleClickSystem != null)
             {
-                _inputSystem.BattleClick += OnBattleClick;
+                _battleClickSystem.OnClick += OnBattleClick;
             }
         }
 
         private void OnDisable()
         {
-            if (_inputSystem != null)
+            if (_battleClickSystem != null)
             {
-                _inputSystem.BattleClick -= OnBattleClick;
+                _battleClickSystem.OnClick -= OnBattleClick;
             }
         }
 

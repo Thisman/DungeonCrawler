@@ -12,7 +12,7 @@ namespace DungeonCrawler.Gameplay.Dungeon
     public class EnemyArmyController : MonoBehaviour
     {
         [SerializeField]
-        private List<BattleSceneLauncher.SquadConfig> _configs = new();
+        private List<SquadConfig> _configs = new();
 
         public List<SquadModel> Squads { get; private set; } = new();
 

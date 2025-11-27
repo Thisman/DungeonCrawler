@@ -11,20 +11,10 @@ namespace DungeonCrawler.Systems.Battle
 {
     public class BattleDamageSystem
     {
-        private readonly DefenseSettings _defenseSettings;
-        private readonly AntiStreakSettings _antiStreakSettings;
+        private readonly DefenseSettings _defenseSettings = DefenseSettings.Default;
+        private readonly AntiStreakSettings _antiStreakSettings = AntiStreakSettings.Default;
         private readonly Dictionary<SquadModel, CritState> _critStates = new();
         private readonly Dictionary<SquadModel, DodgeState> _dodgeStates = new();
-
-        public BattleDamageSystem(): this(DefenseSettings.Default, AntiStreakSettings.Default)
-        {
-        }
-
-        public BattleDamageSystem(DefenseSettings defenseSettings, AntiStreakSettings antiStreakSettings)
-        {
-            _defenseSettings = defenseSettings;
-            _antiStreakSettings = antiStreakSettings;
-        }
 
         public Task<IReadOnlyList<DamageInstance>> ResolveDamageAsync(PlannedUnitAction plan)
         {

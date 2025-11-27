@@ -6,9 +6,9 @@ using DungeonCrawler.Core.EventBus;
 using DungeonCrawler.Gameplay.Squad;
 using DungeonCrawler.Gameplay.Unit;
 using DungeonCrawler.Systems.Battle;
-using DungeonCrawler.UI.Battle;
 using DungeonCrawler.UI.Common;
 using UnityEngine;
+using VContainer;
 
 namespace DungeonCrawler.Gameplay.Battle
 {
@@ -16,50 +16,36 @@ namespace DungeonCrawler.Gameplay.Battle
     public class BattleSceneLauncher : MonoBehaviour
     {
         [SerializeField]
-        private List<SquadConfig> _squads = new();
-
-        [SerializeField]
-        private BattleState _initialState = BattleState.Preparation;
-
-        [SerializeField]
         private BaseUIController[] _uiPanels;
 
         [SerializeField]
         private SquadController _squadPrefab;
 
         [SerializeField]
-        private BattleGridController _battleGridController;
+        private List<SquadConfig> _squads = new();
 
-        [SerializeField]
-        private BattleTargetPicker _battleTargetPicker;
+        [Inject]
+        private readonly UnitSystem _unitSystem;
 
-        private UnitSystem _unitSystem;
-        private BattleDamageSystem _battleDamageSystem;
-        private GameEventBus _sceneEventBus;
-        private BattleStateMachine _stateMachine;
-        private List<SquadModel> _buildedSquads;
+        [Inject]
+        private readonly BattleContext _context;
 
-        public GameEventBus SceneEventBus => _sceneEventBus;
+        [Inject]
+        private readonly GameEventBus _sceneEventBus;
 
-        public BattleState CurrentBattleState => _stateMachine?.CurrentState ?? _initialState;
-
-        private void Awake()
-        {
-            _buildedSquads = BuildSquads();
-            _sceneEventBus = new GameEventBus();
-
-            var context = new BattleContext(_buildedSquads);
-            _unitSystem = new UnitSystem(_sceneEventBus, _squadPrefab, transform, _battleGridController, context);
-            _battleDamageSystem = new BattleDamageSystem();
-            _stateMachine = new BattleStateMachine(context, _sceneEventBus, _unitSystem, _battleDamageSystem);
-
-            InitializeUIPanels();
-        }
+        [Inject]
+        private readonly BattleStateMachine _stateMachine;
 
         private void Start()
         {
-            _battleTargetPicker.Initialize(_sceneEventBus);
-            _unitSystem.InitializeSquads(_buildedSquads);
+            InitializeUIPanels();
+
+            var buildedSquads = BuildSquads();
+            _context.Status = BattleStatus.Preparation;
+            _context.Squads = buildedSquads;
+            _context.Result = new BattleResult(buildedSquads);
+
+            _unitSystem.Initalize(buildedSquads, _squadPrefab);
             _stateMachine.Start();
         }
 
@@ -103,24 +89,6 @@ namespace DungeonCrawler.Gameplay.Battle
         private static string GenerateUnitId(UnitDefinition definition)
         {
             return $"{definition.Name}_{Guid.NewGuid():N}";
-        }
-
-        [Serializable]
-        public class SquadConfig
-        {
-            [Tooltip("Definition of the unit this squad represents.")]
-            public UnitDefinition Definition;
-
-            [Tooltip("Custom identifier for the unit model. If empty, a generated id will be used.")]
-            public string Id;
-
-            [Min(1)]
-            [Tooltip("Number of units in the squad.")]
-            public int UnitCount = 1;
-
-            [Min(1)]
-            [Tooltip("Starting level for the unit stats.")]
-            public int Level = 1;
         }
     }
 }

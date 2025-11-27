@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace DungeonCrawler.Gameplay.Scenario
+namespace DungeonCrawler.Gameplay.Dungeon
 {
     [CreateAssetMenu(fileName = "DebugAction", menuName = "Scenario/Debug Action")]
     public class DebugAction : ScenarioAction
