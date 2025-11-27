@@ -20,9 +20,6 @@ namespace DungeonCrawler.Launchers
         [SerializeField]
         private BattleTargetPicker _battleTargetPicker;
 
-        [SerializeField]
-        private BattleClickSystem _battleClickSystem;
-
         protected override void Configure(IContainerBuilder builder)
         {
             builder.Register<UnitSystem>(Lifetime.Singleton);
@@ -33,7 +30,6 @@ namespace DungeonCrawler.Launchers
             builder.Register<BattleStateMachine>(Lifetime.Singleton);
 
             builder.RegisterInstance<InputActionAsset>(_actions).AsSelf();
-            builder.RegisterInstance<BattleClickSystem>(_battleClickSystem).AsSelf();
             builder.RegisterInstance<BattleTargetPicker>(_battleTargetPicker).AsSelf();
             builder.RegisterInstance<BattleGridController>(_battleGridController).AsSelf();
         }

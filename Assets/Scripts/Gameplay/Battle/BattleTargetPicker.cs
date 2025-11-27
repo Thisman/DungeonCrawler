@@ -3,6 +3,7 @@ using Assets.Scripts.Gameplay.Battle;
 using DungeonCrawler.Core.EventBus;
 using DungeonCrawler.Systems.Input;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using VContainer;
 
 namespace DungeonCrawler.Gameplay.Battle
@@ -15,37 +16,28 @@ namespace DungeonCrawler.Gameplay.Battle
         private readonly GameEventBus _eventBus;
 
         [Inject]
-        private readonly BattleClickSystem _battleClickSystem;
+        private readonly InputActionAsset _inputActions;
+
+        private InputAction _PointAction;
+        private InputAction _ClickAction;
 
         private void Start()
         {
-            if (_battleClickSystem != null)
-            {
-                _battleClickSystem.OnClick += OnBattleClick;
-            }
+            var battleMap = _inputActions.FindActionMap("Battle", throwIfNotFound: true);
+            _PointAction = battleMap.FindAction("Point", throwIfNotFound: true);
+            _ClickAction = battleMap.FindAction("Click", throwIfNotFound: true);
+            _ClickAction.performed += HandleClick;
         }
 
         private void OnDisable()
         {
-            if (_battleClickSystem != null)
-            {
-                _battleClickSystem.OnClick -= OnBattleClick;
-            }
+            _ClickAction.performed -= HandleClick;
         }
 
-        private void OnBattleClick(Vector2 screenPosition)
+        private void HandleClick(InputAction.CallbackContext ctx)
         {
-            if (_eventBus == null)
-            {
-                return;
-            }
-
             var camera = Camera.main;
-            if (camera == null)
-            {
-                return;
-            }
-
+            var screenPosition = _PointAction.ReadValue<Vector2>();
             var worldPoint = camera.ScreenToWorldPoint(screenPosition);
             worldPoint.z = 0f;
 
@@ -57,11 +49,6 @@ namespace DungeonCrawler.Gameplay.Battle
 
             var squadController = hit.collider.GetComponentInParent<SquadController>();
             var targetModel = squadController.Model;
-            if (targetModel == null)
-            {
-                return;
-            }
-
             _eventBus.Publish(new RequestSelectTarget(targetModel));
         }
     }

@@ -6,6 +6,7 @@ using DungeonCrawler.Core.EventBus;
 using DungeonCrawler.Gameplay.Squad;
 using DungeonCrawler.Gameplay.Unit;
 using DungeonCrawler.Systems.Battle;
+using DungeonCrawler.Systems.Input;
 using DungeonCrawler.UI.Common;
 using UnityEngine;
 using VContainer;
@@ -36,9 +37,13 @@ namespace DungeonCrawler.Gameplay.Battle
         [Inject]
         private readonly BattleStateMachine _stateMachine;
 
+        [Inject]
+        private readonly GameInputSystem _gameInputSystem;
+
         private void Start()
         {
             InitializeUIPanels();
+            InitalizeInputSystem();
 
             var buildedSquads = BuildSquads();
             _context.Status = BattleStatus.Preparation;
@@ -61,6 +66,11 @@ namespace DungeonCrawler.Gameplay.Battle
             {
                 uiPanel.Initialize(_sceneEventBus);
             }
+        }
+
+        private void InitalizeInputSystem()
+        {
+            _gameInputSystem.EnterBattle();
         }
 
         private List<SquadModel> BuildSquads()
