@@ -230,12 +230,12 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2091152296}
-  - {fileID: 1436171009}
-  - {fileID: 886533059}
   - {fileID: 608951320}
   - {fileID: 1916732281}
   - {fileID: 272134659}
   - {fileID: 676032665423515094}
+  - {fileID: 1436171009}
+  - {fileID: 886533059}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &608951320 stripped
@@ -337,7 +337,6 @@ MonoBehaviour:
   autoRun: 1
   autoInjectGameObjects:
   - {fileID: 886533057}
-  _actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
 --- !u!1001 &1916732280
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.InputSystem;
+using VContainer;
 
 namespace DungeonCrawler.Systems.Input
 {
@@ -14,14 +15,10 @@ namespace DungeonCrawler.Systems.Input
 
     public class GameInputSystem
     {
+        [Inject]
         private readonly InputActionAsset _actions;
 
         public InputActionAsset Actions => _actions;
-
-        public GameInputSystem(InputActionAsset actions)
-        {
-            _actions = actions;
-        }
 
         public void EnableOnly(params string[] maps)
         {
@@ -45,6 +42,7 @@ namespace DungeonCrawler.Systems.Input
             ClearBindingMask();
 
             Debug.Log($"[GameInputSystem] Set Mode {mode}");
+            Debug.Log(_actions.GetInstanceID());
 
             switch (mode)
             {

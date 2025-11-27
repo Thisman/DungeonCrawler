@@ -131,6 +131,7 @@ namespace DungeonCrawler.Gameplay.Battle
                 _gameSessionSystem.SetPlayerSquads(battleResult.GetPlayerSquads().Select(result => result.Squad));
             }
 
+            InitializeInputSystem();
             _gameSessionSystem.SetEnemySquads(Array.Empty<SquadModel>());
             _sceneEventBus.Publish(new BattleEnded(battleResult));
         }

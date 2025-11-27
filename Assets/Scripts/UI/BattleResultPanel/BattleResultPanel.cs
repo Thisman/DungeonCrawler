@@ -159,13 +159,13 @@ namespace DungeonCrawler.UI.Battle
             switch(result.Outcome)
             {
                 case BattleOutcome.Defeat:
-                    _finishBattleTitleUI.text = "���������� ���������!";
+                    _finishBattleTitleUI.text = "Разгромное поражение!";
                      break;
                 case BattleOutcome.Victory:
-                    _finishBattleTitleUI.text = "��������� ������!";
+                    _finishBattleTitleUI.text = "Блестящая победа!";
                     break;
                 case BattleOutcome.Flee:
-                    _finishBattleTitleUI.text = "��������� �����";
+                    _finishBattleTitleUI.text = "Жалкий побег!";
                     break;
                 case BattleOutcome.None:
                     _finishBattleTitleUI.text = "";
