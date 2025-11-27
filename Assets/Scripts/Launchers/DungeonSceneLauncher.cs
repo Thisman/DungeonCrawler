@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using VContainer;
 using static UnityEditor.Experimental.GraphView.GraphView;
 
@@ -112,7 +111,7 @@ namespace DungeonCrawler.Gameplay.Battle
             }
 
             _gameSessionSystem.SetEnemySquads(enemies);
-            var currentSceneName = SceneManager.GetActiveScene().name;
+            var currentSceneName = gameObject.scene.name;
             var battleHandle = _sceneLoaderSystem.LoadAdditiveScene("Gamplay_BattleScene", currentSceneName);
 
             SceneUnloadResult unloadResult;
