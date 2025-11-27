@@ -18,20 +18,12 @@ namespace DungeonCrawler.Gameplay.Dungeon
 
         private void OnEnable()
         {
-            if (_interactAction != null)
-            {
-                _interactAction.action.Enable();
-                _interactAction.action.performed += OnInteractPerformed;
-            }
+            _interactAction.action.performed += OnInteractPerformed;
         }
 
         private void OnDisable()
         {
-            if (_interactAction != null)
-            {
-                _interactAction.action.performed -= OnInteractPerformed;
-                _interactAction.action.Disable();
-            }
+            _interactAction.action.performed -= OnInteractPerformed;
         }
 
         private void OnInteractPerformed(InputAction.CallbackContext context)

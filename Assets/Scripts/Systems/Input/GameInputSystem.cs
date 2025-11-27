@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace DungeonCrawler.Systems.Input
 {
-    using UnityEngine.InputSystem;
 
     public enum GameMode
     {
@@ -45,6 +43,8 @@ namespace DungeonCrawler.Systems.Input
         private void SetMode(GameMode mode)
         {
             ClearBindingMask();
+
+            Debug.Log($"[GameInputSystem] Set Mode {mode}");
 
             switch (mode)
             {

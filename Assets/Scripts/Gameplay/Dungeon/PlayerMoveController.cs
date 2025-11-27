@@ -23,14 +23,8 @@ namespace DungeonCrawler.Gameplay.Dungeon
             _rigidbody2D = GetComponent<Rigidbody2D>();
         }
 
-        private void OnEnable()
-        {
-            _moveAction.action.Enable();
-        }
-
         private void OnDisable()
         {
-            _moveAction.action.Disable();
             MovementDirection = Vector2.zero;
             _rigidbody2D.linearVelocity = Vector2.zero;
         }

@@ -11,7 +11,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
 using VContainer;
-using static UnityEditor.Experimental.GraphView.GraphView;
 
 namespace DungeonCrawler.Gameplay.Battle
 {
@@ -60,7 +59,7 @@ namespace DungeonCrawler.Gameplay.Battle
         {
             Debug.Assert(_playerPrefab != null, "Player prefab didn't set!");
 
-            _player = Instantiate(_playerPrefab, transform.position, Quaternion.identity);
+            _player = Instantiate(_playerPrefab, transform.position, Quaternion.identity, transform.parent);
         }
 
         private void SetPlayerSquads()
@@ -87,11 +86,6 @@ namespace DungeonCrawler.Gameplay.Battle
             _enterBattleSubscription ??= _sceneEventBus.SubscribeAsync<RequestEnterBattle>(HandleEnterBattleAsync);
         }
 
-        private void SetPlayerActiveStatus(bool isActive)
-        {
-            _player.SetActive(isActive);
-        }
-
         private async Task HandleEnterBattleAsync(RequestEnterBattle request)
         {
             if (request == null)
@@ -99,7 +93,6 @@ namespace DungeonCrawler.Gameplay.Battle
                 return;
             }
 
-            SetPlayerActiveStatus(false);
             await RunBattleAsync(request.Enemies).ConfigureAwait(false);
         }
 
@@ -136,7 +129,6 @@ namespace DungeonCrawler.Gameplay.Battle
 
             _gameSessionSystem.SetEnemySquads(Array.Empty<SquadModel>());
             _sceneEventBus.Publish(new BattleEnded(battleResult));
-            SetPlayerActiveStatus(true);
         }
     }
 }
