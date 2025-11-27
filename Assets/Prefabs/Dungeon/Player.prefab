@@ -188,6 +188,7 @@ GameObject:
   - component: {fileID: 4034738300571815986}
   - component: {fileID: 3730717176120825985}
   - component: {fileID: 2817338335481769418}
+  - component: {fileID: 1065817025291765178}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -326,3 +327,17 @@ MonoBehaviour:
   _moveController: {fileID: 4034738300571815986}
   _playerArmyController: {fileID: 3730717176120825985}
   _spriteRenderer: {fileID: 8732195785430470932}
+--- !u!114 &1065817025291765178
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5846416121986788414}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 962c433df5bace649863b0d94d0bf860, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DungeonCrawler.Gameplay.Scenario.PlayerScenarioController
+  _interactAction: {fileID: 1781555164194001046, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
+  _interactionRadius: 2
