@@ -21,7 +21,7 @@ namespace DungeonCrawler.Gameplay.Dungeon
                     continue;
                 }
 
-                await action.Execute();
+                await action.Execute(this);
             }
         }
     }

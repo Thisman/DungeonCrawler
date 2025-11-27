@@ -6,6 +6,6 @@ namespace DungeonCrawler.Gameplay.Dungeon
 {
     public abstract class ScenarioAction : ScriptableObject
     {
-        public abstract Task Execute();
+        public abstract Task Execute(ScenarioController controller);
     }
 }
