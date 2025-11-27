@@ -29,7 +29,7 @@ namespace DungeonCrawler.Gameplay.Dungeon
 
         private void Start()
         {
-            _moveAction = _actions.FindAction("Player/Move", true);
+            _moveAction = _actions.FindAction("Dungeon/Move", true);
         }
 
         private void OnDisable()

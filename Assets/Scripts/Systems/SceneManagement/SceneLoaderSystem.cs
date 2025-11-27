@@ -96,18 +96,13 @@ namespace DungeonCrawler.Systems.SceneManagement
         public Task<SceneUnloadResult> UnloadAdditiveScene(string sceneName, object unloadData = null)
         {
             var unloadCompletion = GetOrCreateUnloadCompletion(sceneName);
-            if (_returnSceneName != null)
-            {
-                var returnScene = SceneManager.GetSceneByName(_returnSceneName);
-                ToggleSceneRoot(returnScene, true);
-                _returnSceneName = null;
-            }
-
             if (!_loadedScenes.Remove(sceneName))
             {
                 Debug.LogWarning($"Attempted to unload additive scene '{sceneName}' that is not tracked.");
             }
 
+            var unloadedSceneName = SceneManager.GetSceneByName(sceneName);
+            ToggleSceneRoot(unloadedSceneName, false);
             var unloadOperation = SceneManager.UnloadSceneAsync(sceneName);
 
             if (unloadOperation == null)
@@ -158,6 +153,13 @@ namespace DungeonCrawler.Systems.SceneManagement
 
         private void CompleteUnload(string sceneName, TaskCompletionSource<SceneUnloadResult> completion, object unloadData)
         {
+            if (_returnSceneName != null)
+            {
+                var returnScene = SceneManager.GetSceneByName(_returnSceneName);
+                ToggleSceneRoot(returnScene, true);
+                _returnSceneName = null;
+            }
+
             completion.TrySetResult(new SceneUnloadResult(sceneName, unloadData));
             _unloadCompletions.Remove(sceneName);
         }

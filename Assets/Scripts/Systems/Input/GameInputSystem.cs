@@ -49,7 +49,7 @@ namespace DungeonCrawler.Systems.Input
             switch (mode)
             {
                 case GameMode.Dungeon:
-                    EnableOnly("Player");
+                    EnableOnly("Dungeon");
                     break;
                 case GameMode.Battle:
                     EnableOnly("Battle");

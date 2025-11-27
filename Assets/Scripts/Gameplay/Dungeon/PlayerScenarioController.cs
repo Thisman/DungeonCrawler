@@ -20,7 +20,7 @@ namespace DungeonCrawler.Gameplay.Dungeon
 
         private void Start()
         {
-            _interactAction = _actions.FindAction("Player/Interact", true);
+            _interactAction = _actions.FindAction("Dungeon/Interact", true);
             _interactAction.performed += OnInteractPerformed;
         }
 
