@@ -10,7 +10,7 @@ namespace DungeonCrawler.Gameplay.Dungeon
     {
         public List<SquadModel> Squads { get; private set; } = new();
 
-        public void Initialize(List<SquadModel> squads)
+        public void SetSquads(List<SquadModel> squads)
         {
             Squads = squads ?? new List<SquadModel>();
         }
