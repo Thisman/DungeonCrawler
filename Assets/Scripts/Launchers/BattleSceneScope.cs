@@ -12,10 +12,13 @@ namespace DungeonCrawler.Launchers
     public class BattleSceneScope : LifetimeScope
     {
         [SerializeField]
+        private BattleTargetPicker _battleTargetPicker;
+
+        [SerializeField]
         private BattleGridController _battleGridController;
 
         [SerializeField]
-        private BattleTargetPicker _battleTargetPicker;
+        private BattleGridDragAndDropController _dragAndDropController;
 
         protected override void Configure(IContainerBuilder builder)
         {
@@ -27,6 +30,7 @@ namespace DungeonCrawler.Launchers
 
             builder.RegisterInstance<BattleTargetPicker>(_battleTargetPicker).AsSelf();
             builder.RegisterInstance<BattleGridController>(_battleGridController).AsSelf();
+            builder.RegisterInstance<BattleGridDragAndDropController>(_dragAndDropController).AsSelf();
         }
     }
 }

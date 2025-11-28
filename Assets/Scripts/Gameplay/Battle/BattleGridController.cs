@@ -1,4 +1,4 @@
-// Manages battle grid slots for friendly and enemy squads, providing helpers to place and query occupants.
+// Manages battle grid slots for friendly and enemy squads, providing helpers to place, query, and reassign occupants.
 using System;
 using System.Collections.Generic;
 using Assets.Scripts.Gameplay.Battle;
@@ -49,7 +49,7 @@ namespace DungeonCrawler.Gameplay.Battle
 
             RemoveFromSlot(slotIndex, isEnemySide);
 
-            // TODO: ïåðåíåñòè èíèöèàëèçàöèþ â UnitSystem
+            // TODO: Ð¿ÐµÑ€ÐµÐ½ÐµÑÑ‚Ð¸ Ð¸Ð½Ð¸Ñ†Ð¸Ð°Ð»Ð¸Ð·Ð°Ñ†Ð¸ÑŽ Ð² UnitSystem
             var parent = slot.Root;
             var instance = Instantiate(prefab, parent);
             instance.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
@@ -190,6 +190,123 @@ namespace DungeonCrawler.Gameplay.Battle
             public BattleGridSlotType Type { get; set; }
 
             public float LocalX => Root != null ? Root.localPosition.x : 0f;
+        }
+
+        public bool TryResolveSlot(Transform transform, out Transform slotRoot)
+        {
+            var slot = FindSlotByTransform(transform);
+            slotRoot = slot?.Root;
+            return slotRoot != null;
+        }
+
+        public bool TryGetSlotSide(Transform slotRoot, out BattleGridSlotSide side)
+        {
+            var slot = FindSlotByTransform(slotRoot);
+            side = slot?.Side ?? default;
+            return slot != null;
+        }
+
+        public bool IsSlotEmpty(Transform slotRoot)
+        {
+            var slot = FindSlotByTransform(slotRoot);
+            return slot == null || slot.IsEmpty;
+        }
+
+        public bool TryGetSlotOccupant(Transform slotRoot, out Transform occupant)
+        {
+            var slot = FindSlotByTransform(slotRoot);
+            occupant = slot?.Controller != null ? slot.Controller.transform : null;
+            return occupant != null;
+        }
+
+        public bool TryAttachToSlot(Transform slotRoot, Transform occupant)
+        {
+            var slot = FindSlotByTransform(slotRoot);
+            if (slot == null || occupant == null)
+            {
+                return false;
+            }
+
+            var controller = occupant.GetComponent<SquadController>();
+            if (controller == null || controller.Model == null)
+            {
+                return false;
+            }
+
+            slot.Controller = controller;
+            slot.Squad = controller.Model;
+
+            occupant.SetParent(slot.Root, false);
+            occupant.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
+            occupant.localScale = Vector3.one;
+
+            return true;
+        }
+
+        public bool TryRemoveOccupant(Transform occupant, out Transform slotRoot)
+        {
+            slotRoot = null;
+
+            if (occupant == null)
+            {
+                return false;
+            }
+
+            var controller = occupant.GetComponentInParent<SquadController>();
+            if (controller == null)
+            {
+                return false;
+            }
+
+            var slot = FindSlotByController(controller);
+            if (slot == null)
+            {
+                return false;
+            }
+
+            slotRoot = slot.Root;
+            slot.Controller = null;
+            slot.Squad = null;
+            return true;
+        }
+
+        private BattleGridSlot FindSlotByTransform(Transform transform)
+        {
+            if (transform == null)
+            {
+                return null;
+            }
+
+            foreach (var slot in _allGridSlots)
+            {
+                for (var current = transform; current != null; current = current.parent)
+                {
+                    if (slot.Root == current)
+                    {
+                        return slot;
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        private BattleGridSlot FindSlotByController(SquadController controller)
+        {
+            if (controller == null)
+            {
+                return null;
+            }
+
+            foreach (var slot in _allGridSlots)
+            {
+                if (slot.Controller == controller)
+                {
+                    return slot;
+                }
+            }
+
+            return null;
         }
     }
 }
