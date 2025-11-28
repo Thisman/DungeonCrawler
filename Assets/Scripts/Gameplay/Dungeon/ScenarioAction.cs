@@ -4,8 +4,14 @@ using UnityEngine;
 
 namespace DungeonCrawler.Gameplay.Dungeon
 {
+    public enum ActionResult
+    {
+        Continue,
+        Break
+    }
+
     public abstract class ScenarioAction : ScriptableObject
     {
-        public abstract Task Execute(ScenarioController controller);
+        public abstract Task<ActionResult> Execute(ScenarioController controller);
     }
 }

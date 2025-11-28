@@ -11,10 +11,10 @@ namespace DungeonCrawler.Gameplay.Dungeon
         [SerializeField]
         private string _message = "Scenario debug action executed.";
 
-        public override Task Execute(ScenarioController controller)
+        public override Task<ActionResult> Execute(ScenarioController controller)
         {
             Debug.Log(_message);
-            return Task.CompletedTask;
+            return Task.FromResult(ActionResult.Continue);
         }
     }
 }
