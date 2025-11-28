@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4585855325842959297}
   - component: {fileID: 3787821195317729992}
+  - component: {fileID: 6947293383846980914}
   m_Layer: 0
   m_Name: Light
   m_TagString: Untagged
@@ -84,6 +85,25 @@ MonoBehaviour:
   - {x: 0.5, y: -0.5, z: 0}
   - {x: 0.5, y: 0.5, z: 0}
   - {x: -0.5, y: 0.5, z: 0}
+--- !u!114 &6947293383846980914
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3054787726337997470}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c4435653bb132d4cb1a4bbc95243ebf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DungeonCrawler.Gameplay.Dungeon.BonfireLightController
+  _light: {fileID: 3787821195317729992}
+  _baseIntensity: 1.2
+  _intensityJitter: 0.3
+  _baseOuterRadius: 2.5
+  _radiusJitter: 0.35
+  _changeInterval: 0.2
+  _smoothFactor: 6
 --- !u!1 &8017853743878816436
 GameObject:
   m_ObjectHideFlags: 0
