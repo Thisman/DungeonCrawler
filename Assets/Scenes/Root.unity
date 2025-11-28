@@ -161,18 +161,6 @@ MonoBehaviour:
     Id: Unit Default 2
     UnitCount: 10
     Level: 0
-  - Definition: {fileID: 11400000, guid: da2b3cf924410754e81f9496d0492bd6, type: 2}
-    Id: Unit Default 3
-    UnitCount: 5
-    Level: 0
-  - Definition: {fileID: 11400000, guid: 3f1b8eec4a6e99d418360ea65980925e, type: 2}
-    Id: Unit Default 4
-    UnitCount: 1
-    Level: 0
-  - Definition: {fileID: 11400000, guid: 96dccc52fdca82b4ab876c2edcacf4a6, type: 2}
-    Id: Unit Default 5
-    UnitCount: 10
-    Level: 0
   _additiveScenes:
   - Gameplay_Dungeon_EducationScene
 --- !u!4 &1519717169
