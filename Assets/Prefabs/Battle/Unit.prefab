@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 6727850948456637333}
   m_Layer: 6
   m_Name: Unit
-  m_TagString: Untagged
+  m_TagString: Unit
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -121,7 +121,6 @@ MonoBehaviour:
   _attackMoveDuration: 0.12
   _shakeDuration: 0.2
   _shakeStrength: 0.1
-  _shakeVibrato: 10
   _dodgeFadeAlpha: 0.1
   _dodgeFadeDuration: 0.12
 --- !u!1 &3550713591584299746
@@ -201,7 +200,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 309284413
-  m_SortingLayer: 1
+  m_SortingLayer: 4
   m_SortingOrder: 0
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
