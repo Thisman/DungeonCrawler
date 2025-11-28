@@ -11,8 +11,9 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using VContainer;
+using DungeonCrawler.Gameplay.Battle;
 
-namespace DungeonCrawler.Gameplay.Battle
+namespace DungeonCrawler.Launchers
 {
     [DisallowMultipleComponent]
     public class BattleSceneLauncher : MonoBehaviour

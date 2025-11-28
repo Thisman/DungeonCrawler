@@ -1,5 +1,6 @@
 // Boots a dungeon scene by spawning the player prefab and seeding their army squads from inspector data.
 using DungeonCrawler.Core.EventBus;
+using DungeonCrawler.Gameplay.Battle;
 using DungeonCrawler.Gameplay.Dungeon;
 using DungeonCrawler.Gameplay.Squad;
 using DungeonCrawler.Systems.Input;
@@ -13,7 +14,7 @@ using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 
-namespace DungeonCrawler.Gameplay.Battle
+namespace DungeonCrawler.Launchers
 {
     [DisallowMultipleComponent]
     public class DungeonSceneLauncher : MonoBehaviour
@@ -127,12 +128,6 @@ namespace DungeonCrawler.Gameplay.Battle
                         .GetPlayerSquads()
                         .Select(result => result.Squad));
             }
-
-            // На этом этапе:
-            // - Сцена битвы выгружена
-            // - Dungeon Root снова активен (через SceneLoaderSystem)
-            // Здесь можно безопасно переинициализировать инпут под данж.
-            InitializeInputSystem();
 
             _gameSessionSystem.SetEnemySquads(Array.Empty<SquadModel>());
             _sceneEventBus.Publish(new BattleEnded(battleResult));
