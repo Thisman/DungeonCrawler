@@ -1,4 +1,4 @@
-// Handles dragging squad controllers between battle grid slots while enforcing team boundaries.
+// Handles dragging squad controllers between battle grid slots while enforcing team boundaries and slot highlighting.
 using System.Collections.Generic;
 using Assets.Scripts.Gameplay.Battle;
 using UnityEngine;
@@ -13,12 +13,19 @@ namespace DungeonCrawler.Gameplay.Battle
         [SerializeField]
         private string _draggableTag = "Unit";
 
+        [SerializeField]
+        private Color _validSlotColor = Color.green;
+
+        [SerializeField]
+        private Color _invalidSlotColor = Color.red;
+
         [Inject]
         private readonly BattleGridController _gridController;
 
         private Camera _camera;
         private Transform _originSlot;
         private Transform _hoveredSlot;
+        private Transform _highlightedSlot;
         private Transform _draggedObject;
         private Transform _originalParent;
         private Vector3 _originalPosition;
@@ -43,6 +50,7 @@ namespace DungeonCrawler.Gameplay.Battle
 
             if (_draggedObject == null)
             {
+                ResetHighlights();
                 return;
             }
 
@@ -112,6 +120,7 @@ namespace DungeonCrawler.Gameplay.Battle
         {
             UpdateDraggedObjectPosition();
             _hoveredSlot = FindSlotUnderPointer();
+            UpdateSlotHighlight();
         }
 
         private void FinishDrag()
@@ -142,9 +151,63 @@ namespace DungeonCrawler.Gameplay.Battle
 
             RestoreDragObjectColliders();
 
+            ResetHighlights();
+
             _draggedObject = null;
             _originSlot = null;
             _hoveredSlot = null;
+        }
+
+        private void UpdateSlotHighlight()
+        {
+            if (_draggedObject == null || _gridController == null)
+            {
+                return;
+            }
+
+            if (_hoveredSlot == null)
+            {
+                ClearHighlightedSlot();
+                return;
+            }
+
+            bool isValid = TryGetPlacementInfo(_hoveredSlot, out var resolvedSlot, out _);
+            var targetSlot = isValid ? resolvedSlot : _hoveredSlot;
+
+            if (_highlightedSlot != null && _highlightedSlot != targetSlot)
+            {
+                _gridController.ResetSlotHighlight(_highlightedSlot);
+            }
+
+            _highlightedSlot = targetSlot;
+
+            if (_highlightedSlot != null)
+            {
+                var color = isValid ? _validSlotColor : _invalidSlotColor;
+                _gridController.HighlightSlot(_highlightedSlot, color);
+            }
+        }
+
+        private void ResetHighlights()
+        {
+            if (_gridController == null)
+            {
+                return;
+            }
+
+            _gridController.ResetAllHighlights();
+            _highlightedSlot = null;
+        }
+
+        private void ClearHighlightedSlot()
+        {
+            if (_highlightedSlot == null || _gridController == null)
+            {
+                return;
+            }
+
+            _gridController.ResetSlotHighlight(_highlightedSlot);
+            _highlightedSlot = null;
         }
 
         private void DisableDragObjectColliders()

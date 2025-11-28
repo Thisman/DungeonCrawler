@@ -1,4 +1,4 @@
-// Manages battle grid slots for friendly and enemy squads, providing helpers to place, query, and reassign occupants.
+// Manages battle grid slots for friendly and enemy squads, providing helpers to place, query, highlight, and reassign occupants.
 using System;
 using System.Collections.Generic;
 using Assets.Scripts.Gameplay.Battle;
@@ -18,9 +18,14 @@ namespace DungeonCrawler.Gameplay.Battle
         [SerializeField]
         private Transform[] _enemySlots = Array.Empty<Transform>();
 
+        [SerializeField]
+        private Color _defaultHighlightColor = Color.white;
+
         private readonly List<BattleGridSlot> _friendlySlotData = new();
         private readonly List<BattleGridSlot> _enemySlotData = new();
         private readonly List<BattleGridSlot> _allGridSlots = new();
+        private readonly Dictionary<Transform, SpriteRenderer> _slotRenderers = new();
+        private readonly Dictionary<Transform, Color> _slotBaseColors = new();
 
         public IReadOnlyList<BattleGridSlot> GridSlots => _allGridSlots;
 
@@ -30,6 +35,8 @@ namespace DungeonCrawler.Gameplay.Battle
             InitializeSlots(_enemySlots, _enemySlotData, BattleGridSlotSide.Enemy);
             _allGridSlots.AddRange(_friendlySlotData);
             _allGridSlots.AddRange(_enemySlotData);
+
+            CacheSlotRenderers();
         }
 
         public SquadController AddToSlot(int slotIndex, bool isEnemySide, SquadModel squadModel, SquadController prefab)
@@ -243,6 +250,39 @@ namespace DungeonCrawler.Gameplay.Battle
             return true;
         }
 
+        public void HighlightSlot(Transform slotRoot, Color color)
+        {
+            var renderer = GetSlotRenderer(slotRoot);
+            if (renderer == null)
+            {
+                return;
+            }
+
+            renderer.color = color;
+        }
+
+        public void ResetSlotHighlight(Transform slotRoot)
+        {
+            var renderer = GetSlotRenderer(slotRoot);
+            if (renderer == null)
+            {
+                return;
+            }
+
+            var baseColor = _slotBaseColors.TryGetValue(slotRoot, out var color)
+                ? color
+                : _defaultHighlightColor;
+            renderer.color = baseColor;
+        }
+
+        public void ResetAllHighlights()
+        {
+            foreach (var slot in _allGridSlots)
+            {
+                ResetSlotHighlight(slot.Root);
+            }
+        }
+
         public bool TryRemoveOccupant(Transform occupant, out Transform slotRoot)
         {
             slotRoot = null;
@@ -307,6 +347,42 @@ namespace DungeonCrawler.Gameplay.Battle
             }
 
             return null;
+        }
+
+        private void CacheSlotRenderers()
+        {
+            foreach (var slot in _allGridSlots)
+            {
+                GetSlotRenderer(slot.Root);
+            }
+        }
+
+        private SpriteRenderer GetSlotRenderer(Transform slotRoot)
+        {
+            if (slotRoot == null)
+            {
+                return null;
+            }
+
+            if (_slotRenderers.TryGetValue(slotRoot, out var cachedRenderer) && cachedRenderer != null)
+            {
+                return cachedRenderer;
+            }
+
+            var renderer = slotRoot.GetComponentInChildren<SpriteRenderer>();
+            if (renderer == null)
+            {
+                return null;
+            }
+
+            _slotRenderers[slotRoot] = renderer;
+
+            if (!_slotBaseColors.ContainsKey(slotRoot))
+            {
+                _slotBaseColors.Add(slotRoot, renderer.color);
+            }
+
+            return renderer;
         }
     }
 }
