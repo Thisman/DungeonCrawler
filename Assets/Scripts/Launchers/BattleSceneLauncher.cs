@@ -23,33 +23,20 @@ namespace DungeonCrawler.Gameplay.Battle
         [SerializeField]
         private SquadController _squadPrefab;
 
-        [Inject]
-        private readonly UnitSystem _unitSystem;
-
-        [Inject]
-        private readonly BattleContext _context;
-
-        [Inject]
-        private readonly GameEventBus _sceneEventBus;
-
-        [Inject]
-        private readonly BattleStateMachine _stateMachine;
-
-        [Inject]
-        private readonly GameInputSystem _gameInputSystem;
-
-        [Inject]
-        private readonly GameSessionSystem _gameSessionSystem;
-
-        [Inject]
-        private readonly SceneLoaderSystem _sceneLoaderSystem;
+        [Inject] private readonly UnitSystem _unitSystem;
+        [Inject] private readonly BattleContext _context;
+        [Inject] private readonly GameEventBus _sceneEventBus;
+        [Inject] private readonly BattleStateMachine _stateMachine;
+        [Inject] private readonly GameInputSystem _gameInputSystem;
+        [Inject] private readonly GameSessionSystem _gameSessionSystem;
+        [Inject] private readonly SceneLoaderSystem _sceneLoaderSystem;
 
         private IDisposable _finishBattleSubscription;
 
         private void Start()
         {
             InitializeUIPanels();
-            InitalizeInputSystem();
+            InitializeInputSystem();
 
             var buildedSquads = new List<SquadModel>();
             buildedSquads.AddRange(_gameSessionSystem.PlayerSquads);
@@ -65,7 +52,8 @@ namespace DungeonCrawler.Gameplay.Battle
 
         private void OnEnable()
         {
-            _finishBattleSubscription ??= _sceneEventBus.Subscribe<RequestFinishBattle>(HandleRequestFinishBattle);
+            _finishBattleSubscription ??=
+                _sceneEventBus.Subscribe<RequestFinishBattle>(HandleRequestFinishBattle);
         }
 
         private void OnDisable()
@@ -84,12 +72,14 @@ namespace DungeonCrawler.Gameplay.Battle
         {
             foreach (var uiPanel in _uiPanels)
             {
-                uiPanel.Initialize(_sceneEventBus);
+                if (uiPanel != null)
+                    uiPanel.Initialize(_sceneEventBus);
             }
         }
 
-        private void InitalizeInputSystem()
+        private void InitializeInputSystem()
         {
+            // Переключаем инпут в боевой режим.
             _gameInputSystem.EnterBattle();
         }
 

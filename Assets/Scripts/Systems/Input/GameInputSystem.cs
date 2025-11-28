@@ -24,7 +24,13 @@ namespace DungeonCrawler.Systems.Input
         {
             foreach (var m in _actions.actionMaps) m.Disable();
             foreach (var name in maps)
-                _actions.FindActionMap(name, throwIfNotFound: true).Enable();
+            {
+                var map = _actions.FindActionMap(name, throwIfNotFound: true);
+                map.Enable();
+                Debug.Log($"[GameInputSystem] Enabled map: {map.name}");
+            }
+
+            Debug.Log(_actions);
         }
 
         public void ClearBindingMask() => _actions.bindingMask = null;
@@ -40,9 +46,7 @@ namespace DungeonCrawler.Systems.Input
         private void SetMode(GameMode mode)
         {
             ClearBindingMask();
-
             Debug.Log($"[GameInputSystem] Set Mode {mode}");
-            Debug.Log(_actions.GetInstanceID());
 
             switch (mode)
             {

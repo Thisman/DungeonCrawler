@@ -12,14 +12,14 @@ namespace DungeonCrawler.Launchers
     public class RootSceneScope : LifetimeScope
     {
         [SerializeField]
-        private InputActionAsset _actions;
+        private InputActionAsset _inputActions;
 
         protected override void Configure(IContainerBuilder builder)
         {
             builder.Register<GameSessionSystem>(Lifetime.Singleton);
             builder.Register<SceneLoaderSystem>(Lifetime.Singleton);
             builder.Register<GameInputSystem>(Lifetime.Singleton);
-            builder.RegisterInstance<InputActionAsset>(_actions).AsSelf();
+            builder.RegisterInstance(_inputActions).As<InputActionAsset>();
         }
     }
 }
