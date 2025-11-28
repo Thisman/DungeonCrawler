@@ -206,6 +206,28 @@ namespace DungeonCrawler.Gameplay.Battle
             return slotRoot != null;
         }
 
+        public bool TryResolveSlot(Vector3 worldPosition, out Transform slotRoot)
+        {
+            slotRoot = null;
+
+            foreach (var slot in _allGridSlots)
+            {
+                var renderer = GetSlotRenderer(slot.Root);
+                if (renderer == null)
+                {
+                    continue;
+                }
+
+                if (renderer.bounds.Contains(worldPosition))
+                {
+                    slotRoot = slot.Root;
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         public bool TryGetSlotSide(Transform slotRoot, out BattleGridSlotSide side)
         {
             var slot = FindSlotByTransform(slotRoot);

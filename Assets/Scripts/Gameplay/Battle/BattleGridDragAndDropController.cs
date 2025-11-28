@@ -14,6 +14,7 @@ namespace DungeonCrawler.Gameplay.Battle
         private string _draggableTag = "Unit";
 
         [SerializeField]
+        [Tooltip("Для подсветки и наведения на слоты добавьте SpriteRenderer на объекты слотов (или их потомков) и убедитесь, что у него корректный размер под слот в сцене.")]
         private Color _validSlotColor = Color.green;
 
         [SerializeField]
@@ -262,37 +263,23 @@ namespace DungeonCrawler.Gameplay.Battle
 
         private void UpdateDraggedObjectPosition()
         {
-            if (!TryGetPointerScreenPosition(out var pointerPosition))
+            if (!TryGetPointerWorldPosition(out var worldPosition))
             {
                 return;
             }
 
-            Vector3 mousePosition = pointerPosition;
-
-            if (_camera.orthographic)
-            {
-                mousePosition.z = _dragPlaneDistance;
-                Vector3 worldPosition = _camera.ScreenToWorldPoint(mousePosition);
-                worldPosition.z = _draggedObject.position.z;
-                _draggedObject.position = worldPosition;
-            }
-            else
-            {
-                var ray = _camera.ScreenPointToRay(mousePosition);
-                Vector3 worldPosition = ray.origin + ray.direction * _dragPlaneDistance;
-                _draggedObject.position = worldPosition;
-            }
+            _draggedObject.position = worldPosition;
         }
 
         private Transform FindSlotUnderPointer()
         {
-            var hit = RaycastForTransform();
-            if (hit == null)
+            if (TryGetPointerWorldPosition(out var pointerWorld) && _gridController.TryResolveSlot(pointerWorld, out var slot))
             {
-                return null;
+                return slot;
             }
 
-            return _gridController.TryResolveSlot(hit, out var slot) ? slot : null;
+            var hit = RaycastForTransform();
+            return hit != null && _gridController.TryResolveSlot(hit, out var hitSlot) ? hitSlot : null;
         }
 
         private Transform RaycastForDraggable()
@@ -385,6 +372,32 @@ namespace DungeonCrawler.Gameplay.Battle
             var definition = squadModel?.Unit?.Definition;
 
             return definition != null && definition.IsFriendly();
+        }
+
+        private bool TryGetPointerWorldPosition(out Vector3 worldPosition)
+        {
+            worldPosition = default;
+
+            if (_camera == null)
+            {
+                return false;
+            }
+
+            if (!TryGetPointerScreenPosition(out var pointerPosition))
+            {
+                return false;
+            }
+
+            if (_camera.orthographic)
+            {
+                pointerPosition.z = _dragPlaneDistance;
+                worldPosition = _camera.ScreenToWorldPoint(pointerPosition);
+                return true;
+            }
+
+            var ray = _camera.ScreenPointToRay(pointerPosition);
+            worldPosition = ray.origin + ray.direction * _dragPlaneDistance;
+            return true;
         }
 
         private bool TryGetPlacementInfo(Transform slot, out Transform resolvedSlot, out Transform occupantToSwap)

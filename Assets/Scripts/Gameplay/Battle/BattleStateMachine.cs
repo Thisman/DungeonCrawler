@@ -24,6 +24,9 @@ namespace DungeonCrawler.Gameplay.Battle
         [Inject]
         private readonly BattleDamageSystem _battleDamageSystem;
 
+        [Inject]
+        private readonly BattleGridDragAndDropController _gridDragAndDropController;
+
         private bool _isStopped;
         private BattleState _currentState;
         private BattleLogger _logger;
@@ -201,11 +204,13 @@ namespace DungeonCrawler.Gameplay.Battle
         private void EnterPreparation()
         {
             SetStatus(BattleStatus.Preparation);
+            _gridDragAndDropController.enabled = true;
         }
 
         private void ExitPreparation()
         {
             SetStatus(BattleStatus.Progress);
+            _gridDragAndDropController.enabled = false;
             _context.Queue = new BattleQueue(_context.Squads);
         }
 
