@@ -14,6 +14,7 @@ namespace DungeonCrawler.Gameplay.Battle
     {
         private readonly IReadOnlyList<UnitAction> _availableActions;
         private readonly GameEventBus _sceneEventBus;
+        private readonly Random _random = new Random();
 
         public AISquadsController(IReadOnlyList<UnitAction> availableActions, GameEventBus sceneEventBus)
         {
@@ -27,7 +28,7 @@ namespace DungeonCrawler.Gameplay.Battle
             CancellationToken cancellationToken)
         {
             await Task.Delay(TimeSpan.FromSeconds(2), cancellationToken);
-            var action = ChooseActionDefinition(actor, context);
+            var action = ChooseActionDefinition();
             var validTargets = action.GetValidTargets(actor, context);
             var chosenTargets = ChooseTargets(action, validTargets, actor, context);
 
@@ -35,9 +36,9 @@ namespace DungeonCrawler.Gameplay.Battle
             return planned;
         }
 
-        private UnitAction ChooseActionDefinition(SquadModel actor, BattleContext context)
+        private UnitAction ChooseActionDefinition()
         {
-            return _availableActions.First(a => a.Type == ActionType.SkipTurn);
+            return _availableActions.First(a => a.Type == ActionType.Attack);
         }
 
         private IReadOnlyList<SquadModel> ChooseTargets(
@@ -50,8 +51,31 @@ namespace DungeonCrawler.Gameplay.Battle
             {
                 case ActionType.Attack:
                 {
-                    var best = validTargets.OrderBy(t => t.Unit.Stats.CurrentHealth).First();
-                    return new List<SquadModel>() { best };
+                    var roll = _random.NextDouble();
+
+                    if (roll < 0.7)
+                    {
+                        var lowestHealth = validTargets
+                            .OrderBy(t => t.Unit.Stats.CurrentHealth)
+                            .First();
+
+                        return new List<SquadModel> { lowestHealth };
+                    }
+
+                    if (roll < 0.85)
+                    {
+                        var highestInitiative = validTargets
+                            .OrderByDescending(t => t.Unit.Stats.Initiative)
+                            .First();
+
+                        return new List<SquadModel> { highestInitiative };
+                    }
+
+                    var highestTotalHealth = validTargets
+                        .OrderByDescending(t => t.CurrentTotalHealth)
+                        .First();
+
+                    return new List<SquadModel> { highestTotalHealth };
                 }
                 case ActionType.SkipTurn:
                 {
