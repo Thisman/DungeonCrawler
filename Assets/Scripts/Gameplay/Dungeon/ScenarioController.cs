@@ -28,7 +28,11 @@ namespace DungeonCrawler.Gameplay.Dungeon
                     continue;
                 }
 
-                await action.Execute(this);
+                var result = await action.Execute(this);
+                if (result == ActionResult.Break)
+                {
+                    break;
+                }
             }
         }
     }
