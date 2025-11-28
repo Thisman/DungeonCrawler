@@ -1,4 +1,4 @@
-// Handles dragging squad controllers between battle grid slots while enforcing team boundaries.
+// Handles dragging squad controllers between battle grid slots while enforcing team boundaries and slot highlighting.
 using System.Collections.Generic;
 using Assets.Scripts.Gameplay.Battle;
 using UnityEngine;
@@ -13,12 +13,20 @@ namespace DungeonCrawler.Gameplay.Battle
         [SerializeField]
         private string _draggableTag = "Unit";
 
+        [SerializeField]
+        [Tooltip("Для подсветки и наведения на слоты добавьте SpriteRenderer на объекты слотов (или их потомков) и убедитесь, что у него корректный размер под слот в сцене.")]
+        private Color _validSlotColor = Color.green;
+
+        [SerializeField]
+        private Color _invalidSlotColor = Color.red;
+
         [Inject]
         private readonly BattleGridController _gridController;
 
         private Camera _camera;
         private Transform _originSlot;
         private Transform _hoveredSlot;
+        private Transform _highlightedSlot;
         private Transform _draggedObject;
         private Transform _originalParent;
         private Vector3 _originalPosition;
@@ -43,6 +51,7 @@ namespace DungeonCrawler.Gameplay.Battle
 
             if (_draggedObject == null)
             {
+                ResetHighlights();
                 return;
             }
 
@@ -112,6 +121,7 @@ namespace DungeonCrawler.Gameplay.Battle
         {
             UpdateDraggedObjectPosition();
             _hoveredSlot = FindSlotUnderPointer();
+            UpdateSlotHighlight();
         }
 
         private void FinishDrag()
@@ -142,9 +152,63 @@ namespace DungeonCrawler.Gameplay.Battle
 
             RestoreDragObjectColliders();
 
+            ResetHighlights();
+
             _draggedObject = null;
             _originSlot = null;
             _hoveredSlot = null;
+        }
+
+        private void UpdateSlotHighlight()
+        {
+            if (_draggedObject == null || _gridController == null)
+            {
+                return;
+            }
+
+            if (_hoveredSlot == null)
+            {
+                ClearHighlightedSlot();
+                return;
+            }
+
+            bool isValid = TryGetPlacementInfo(_hoveredSlot, out var resolvedSlot, out _);
+            var targetSlot = isValid ? resolvedSlot : _hoveredSlot;
+
+            if (_highlightedSlot != null && _highlightedSlot != targetSlot)
+            {
+                _gridController.ResetSlotHighlight(_highlightedSlot);
+            }
+
+            _highlightedSlot = targetSlot;
+
+            if (_highlightedSlot != null)
+            {
+                var color = isValid ? _validSlotColor : _invalidSlotColor;
+                _gridController.HighlightSlot(_highlightedSlot, color);
+            }
+        }
+
+        private void ResetHighlights()
+        {
+            if (_gridController == null)
+            {
+                return;
+            }
+
+            _gridController.ResetAllHighlights();
+            _highlightedSlot = null;
+        }
+
+        private void ClearHighlightedSlot()
+        {
+            if (_highlightedSlot == null || _gridController == null)
+            {
+                return;
+            }
+
+            _gridController.ResetSlotHighlight(_highlightedSlot);
+            _highlightedSlot = null;
         }
 
         private void DisableDragObjectColliders()
@@ -199,37 +263,23 @@ namespace DungeonCrawler.Gameplay.Battle
 
         private void UpdateDraggedObjectPosition()
         {
-            if (!TryGetPointerScreenPosition(out var pointerPosition))
+            if (!TryGetPointerWorldPosition(out var worldPosition))
             {
                 return;
             }
 
-            Vector3 mousePosition = pointerPosition;
-
-            if (_camera.orthographic)
-            {
-                mousePosition.z = _dragPlaneDistance;
-                Vector3 worldPosition = _camera.ScreenToWorldPoint(mousePosition);
-                worldPosition.z = _draggedObject.position.z;
-                _draggedObject.position = worldPosition;
-            }
-            else
-            {
-                var ray = _camera.ScreenPointToRay(mousePosition);
-                Vector3 worldPosition = ray.origin + ray.direction * _dragPlaneDistance;
-                _draggedObject.position = worldPosition;
-            }
+            _draggedObject.position = worldPosition;
         }
 
         private Transform FindSlotUnderPointer()
         {
-            var hit = RaycastForTransform();
-            if (hit == null)
+            if (TryGetPointerWorldPosition(out var pointerWorld) && _gridController.TryResolveSlot(pointerWorld, out var slot))
             {
-                return null;
+                return slot;
             }
 
-            return _gridController.TryResolveSlot(hit, out var slot) ? slot : null;
+            var hit = RaycastForTransform();
+            return hit != null && _gridController.TryResolveSlot(hit, out var hitSlot) ? hitSlot : null;
         }
 
         private Transform RaycastForDraggable()
@@ -322,6 +372,32 @@ namespace DungeonCrawler.Gameplay.Battle
             var definition = squadModel?.Unit?.Definition;
 
             return definition != null && definition.IsFriendly();
+        }
+
+        private bool TryGetPointerWorldPosition(out Vector3 worldPosition)
+        {
+            worldPosition = default;
+
+            if (_camera == null)
+            {
+                return false;
+            }
+
+            if (!TryGetPointerScreenPosition(out var pointerPosition))
+            {
+                return false;
+            }
+
+            if (_camera.orthographic)
+            {
+                pointerPosition.z = _dragPlaneDistance;
+                worldPosition = _camera.ScreenToWorldPoint(pointerPosition);
+                return true;
+            }
+
+            var ray = _camera.ScreenPointToRay(pointerPosition);
+            worldPosition = ray.origin + ray.direction * _dragPlaneDistance;
+            return true;
         }
 
         private bool TryGetPlacementInfo(Transform slot, out Transform resolvedSlot, out Transform occupantToSwap)
