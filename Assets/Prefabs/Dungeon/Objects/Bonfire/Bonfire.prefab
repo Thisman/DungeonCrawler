@@ -100,7 +100,7 @@ MonoBehaviour:
   _light: {fileID: 3787821195317729992}
   _baseIntensity: 1.2
   _intensityJitter: 0.3
-  _baseOuterRadius: 2.5
+  _baseOuterRadius: 8
   _radiusJitter: 0.35
   _changeInterval: 0.2
   _smoothFactor: 6
