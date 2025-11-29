@@ -350,6 +350,7 @@ GameObject:
   m_Component:
   - component: {fileID: 847457854}
   - component: {fileID: 847457855}
+  - component: {fileID: 847457857}
   - component: {fileID: 847457856}
   m_Layer: 0
   m_Name: SceneLauncher
@@ -413,6 +414,32 @@ MonoBehaviour:
   _branchLengthRange: {x: 2, y: 3}
   _loopConnectionChance: 0.8
   _generateOnStart: 1
+  _enemyGenerator: {fileID: 847457857}
+  _baseEnemySpawnChance: 0.25
+  _spawnChanceGrowthPerRoom: 0.05
+--- !u!114 &847457857
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 847457853}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11f9f467c605380459941a1e1847cdc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DungeonCrawler.Gameplay.Dungeon.EnemyGenerator
+  _enemyPrefab: {fileID: 8801315762871827341, guid: d899daa5019227544a7a2f98905d8dd6, type: 3}
+  _unitPool:
+  - {fileID: 11400000, guid: 5e12ea5cbcf92814099a315e26ef77c5, type: 2}
+  - {fileID: 11400000, guid: 79dd6a74af2578949b00a175a60586eb, type: 2}
+  - {fileID: 11400000, guid: fcd8e4c736d0f1445911c55a9e66ce0b, type: 2}
+  - {fileID: 11400000, guid: 11a987f804306524d923b36b59050f20, type: 2}
+  - {fileID: 11400000, guid: 0127f0532166432428be9b03ce1c8284, type: 2}
+  - {fileID: 11400000, guid: a2de09684ccba99428aaea2d3fc4a9dc, type: 2}
+  _minUnitsPerSquad: 5
+  _maxUnitsPerSquad: 20
+  _strongerEnemyChanceStep: 0.05
 --- !u!1 &1850378975
 GameObject:
   m_ObjectHideFlags: 0

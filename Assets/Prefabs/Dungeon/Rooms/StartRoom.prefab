@@ -306,6 +306,37 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!1 &3386376340077301472
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2982359156396132262}
+  m_Layer: 0
+  m_Name: EastEnemySpawn
+  m_TagString: Untagged
+  m_Icon: {fileID: 5132851093641282708, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2982359156396132262
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3386376340077301472}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 8, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5233394198170123674}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &3853148246102431955
 GameObject:
   m_ObjectHideFlags: 0
@@ -326,7 +357,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &3385996222266882377
 Transform:
   m_ObjectHideFlags: 0
@@ -583,7 +614,17 @@ CompositeCollider2D:
   m_GeometryType: 0
   m_GenerationType: 0
   m_EdgeRadius: 0
-  m_ColliderPaths: []
+  m_ColliderPaths:
+  - m_Collider: {fileID: 5699439731947287600}
+    m_ColliderPaths:
+    - - X: 10000000
+        Y: 45312500
+      - X: -10000000
+        Y: 45312500
+      - X: -10000000
+        Y: 40000000
+      - X: 10000000
+        Y: 40000000
   m_CompositePaths:
     m_Paths:
     - - {x: 0.99997073, y: 4}
@@ -1458,7 +1499,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &6117000509460521621
 Transform:
   m_ObjectHideFlags: 0
@@ -1724,7 +1765,17 @@ CompositeCollider2D:
   m_GeometryType: 0
   m_GenerationType: 0
   m_EdgeRadius: 0
-  m_ColliderPaths: []
+  m_ColliderPaths:
+  - m_Collider: {fileID: 3192114056587121193}
+    m_ColliderPaths:
+    - - X: -80000000
+        Y: 20000000
+      - X: -90000000
+        Y: 20000000
+      - X: -90000000
+        Y: -10000000
+      - X: -80000000
+        Y: -10000000
   m_CompositePaths:
     m_Paths:
     - - {x: -8.00003, y: -1}
@@ -6871,6 +6922,37 @@ TilemapRenderer:
   m_Mode: 0
   m_DetectChunkCullingBounds: 0
   m_MaskInteraction: 0
+--- !u!1 &5449512320382685720
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8243059159343058185}
+  m_Layer: 0
+  m_Name: SouthEnemySpawn
+  m_TagString: Untagged
+  m_Icon: {fileID: 5132851093641282708, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8243059159343058185
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5449512320382685720}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: -4, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5233394198170123674}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &5490291718754486747
 GameObject:
   m_ObjectHideFlags: 0
@@ -7729,7 +7811,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &734197374034274655
 Transform:
   m_ObjectHideFlags: 0
@@ -7985,12 +8067,22 @@ CompositeCollider2D:
   m_GeometryType: 0
   m_GenerationType: 0
   m_EdgeRadius: 0
-  m_ColliderPaths: []
+  m_ColliderPaths:
+  - m_Collider: {fileID: 2133434415844584918}
+    m_ColliderPaths:
+    - - X: 10000000
+        Y: -44687500
+      - X: -10000000
+        Y: -44687500
+      - X: -10000000
+        Y: -50000000
+      - X: 10000000
+        Y: -50000000
   m_CompositePaths:
     m_Paths:
     - - {x: 0.99997073, y: -5}
-      - {x: 0.99997073, y: -4}
-      - {x: -1, y: -4.000029}
+      - {x: 0.99997073, y: -4.46875}
+      - {x: -1, y: -4.468779}
       - {x: -0.99997073, y: -5}
   m_VertexDistance: 0.0005
   m_OffsetDistance: 0.00005
@@ -8016,7 +8108,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &5014508720068114334
 Transform:
   m_ObjectHideFlags: 0
@@ -8282,7 +8374,17 @@ CompositeCollider2D:
   m_GeometryType: 0
   m_GenerationType: 0
   m_EdgeRadius: 0
-  m_ColliderPaths: []
+  m_ColliderPaths:
+  - m_Collider: {fileID: 4794165238964142290}
+    m_ColliderPaths:
+    - - X: 90000000
+        Y: 20000000
+      - X: 80000000
+        Y: 20000000
+      - X: 80000000
+        Y: -10000000
+      - X: 90000000
+        Y: -10000000
   m_CompositePaths:
     m_Paths:
     - - {x: 8.99997, y: -1}
@@ -8334,6 +8436,10 @@ Transform:
   - {fileID: 734197374034274655}
   - {fileID: 6117000509460521621}
   - {fileID: 5014508720068114334}
+  - {fileID: 5161761324936213785}
+  - {fileID: 8243059159343058185}
+  - {fileID: 4530529857813539377}
+  - {fileID: 2982359156396132262}
   - {fileID: 3789592309775361067}
   - {fileID: 1311154639717176492}
   m_Father: {fileID: 0}
@@ -8411,11 +8517,15 @@ MonoBehaviour:
   HasNorthExit: 0
   HasSouthExit: 0
   HasWestExit: 0
-  HasEastExit: 1
+  HasEastExit: 0
   _northExit: {fileID: 3853148246102431955}
   _southExit: {fileID: 6985770200084696902}
   _westExit: {fileID: 4123352594493649274}
   _eastExit: {fileID: 7314639121686883909}
+  _northEnemySpawn: {fileID: 7980701024119013366}
+  _southEnemySpawn: {fileID: 5449512320382685720}
+  _westEnemySpawn: {fileID: 8086116783640290003}
+  _eastEnemySpawn: {fileID: 3386376340077301472}
   _collider: {fileID: 7869770265781113741}
 --- !u!114 &7504836035064181486
 MonoBehaviour:
@@ -8430,6 +8540,68 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DungeonCrawler.Gameplay.Dungeon.RoomCameraController
   _trigger: {fileID: 7869770265781113741}
+--- !u!1 &7980701024119013366
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5161761324936213785}
+  m_Layer: 0
+  m_Name: NorthEnemySpawn
+  m_TagString: Untagged
+  m_Icon: {fileID: 5132851093641282708, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5161761324936213785
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7980701024119013366}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 4, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5233394198170123674}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &8086116783640290003
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4530529857813539377}
+  m_Layer: 0
+  m_Name: WestEnemySpawn
+  m_TagString: Untagged
+  m_Icon: {fileID: 5132851093641282708, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4530529857813539377
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8086116783640290003}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -8, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5233394198170123674}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &2215965921926117420
 PrefabInstance:
   m_ObjectHideFlags: 0

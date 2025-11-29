@@ -20,10 +20,12 @@ namespace DungeonCrawler.Gameplay.Battle
         [SerializeField]
         private Color _invalidSlotColor = Color.red;
 
+        [SerializeField]
+        private Camera _camera;
+
         [Inject]
         private readonly BattleGridController _gridController;
 
-        private Camera _camera;
         private Transform _originSlot;
         private Transform _hoveredSlot;
         private Transform _highlightedSlot;
