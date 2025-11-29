@@ -12,6 +12,9 @@ namespace DungeonCrawler.Gameplay.Dungeon
         [SerializeField]
         private SpriteRenderer _spriteRenderer;
 
+        [SerializeField]
+        private SpriteRenderer[] _mirrors;
+
         private void Awake()
         {
             if (_enemyArmyController == null)
@@ -27,27 +30,39 @@ namespace DungeonCrawler.Gameplay.Dungeon
 
         private void Start()
         {
-            if (_enemyArmyController == null)
+            TryApplySquadIcon(_spriteRenderer);
+            foreach (var item in _mirrors)
             {
-                _enemyArmyController = GetComponent<EnemyArmyController>();
+                TryApplySquadIcon(item);
             }
-
-            TryApplySquadIcon();
         }
 
-        private void TryApplySquadIcon()
+        public void ShowMirror(DungeonSide side) {
+            var mirrorIndex = side switch
+            {
+                DungeonSide.North => 0,
+                DungeonSide.South => 1,
+                DungeonSide.West => 2,
+                DungeonSide.East => 3,
+                _ => -1,
+            };
+
+            _mirrors[mirrorIndex].gameObject.SetActive(true);
+        }
+
+        private void TryApplySquadIcon(SpriteRenderer spriteRenderer)
         {
-            if (_spriteRenderer == null || _enemyArmyController?.Squads == null || _enemyArmyController.Squads.Count == 0)
+            if (spriteRenderer == null || _enemyArmyController.Squads == null || _enemyArmyController.Squads.Count == 0)
             {
                 return;
             }
 
             var leadSquad = _enemyArmyController.Squads[0];
-            var icon = leadSquad?.Unit?.Definition?.Icon;
+            var icon = leadSquad?.Unit.Definition.Icon;
 
             if (icon != null)
             {
-                _spriteRenderer.sprite = icon;
+                spriteRenderer.sprite = icon;
             }
         }
     }

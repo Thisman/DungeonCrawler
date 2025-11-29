@@ -1,4 +1,5 @@
-﻿using DungeonCrawler.Gameplay.Dungeon;
+// Generates dungeon layout, configures rooms, and populates them with enemies.
+using DungeonCrawler.Gameplay.Dungeon;
 using System.Collections.Generic;
 using UnityEngine;
 using VContainer;
@@ -48,6 +49,16 @@ namespace DungeonCrawler.Gameplay.Dungeon
         [Header("Debug")]
         [SerializeField]
         private bool _generateOnStart = true;
+
+        [Header("Enemies")]
+        [SerializeField]
+        private EnemyGenerator _enemyGenerator;
+
+        [SerializeField, Range(0f, 1f)]
+        private float _baseEnemySpawnChance = 0.25f;
+
+        [SerializeField, Range(0f, 1f)]
+        private float _spawnChanceGrowthPerRoom = 0.05f;
 
         [Inject]
         private readonly IObjectResolver _resolver;
@@ -340,6 +351,7 @@ namespace DungeonCrawler.Gameplay.Dungeon
         private void SpawnRoomsWithExits()
         {
             var exitMap = BuildExitMap();
+            var roomControllers = new Dictionary<Vector2Int, RoomController>(_allCells.Count);
 
             for (int i = 0; i < _allCells.Count; i++)
             {
@@ -382,7 +394,11 @@ namespace DungeonCrawler.Gameplay.Dungeon
                     hasWest: exits.HasWest,
                     hasEast: exits.HasEast
                 );
+
+                roomControllers[cell] = roomController;
             }
+
+            SpawnEnemies(exitMap, roomControllers);
         }
 
         private GameObject GetPrefabForCell(Vector2Int cell)
@@ -445,6 +461,120 @@ namespace DungeonCrawler.Gameplay.Dungeon
             }
 
             return result;
+        }
+
+        private void SpawnEnemies(Dictionary<Vector2Int, ExitFlags> exitMap, Dictionary<Vector2Int, RoomController> roomControllers)
+        {
+            if (_enemyGenerator == null || exitMap == null || roomControllers == null)
+            {
+                return;
+            }
+
+            var occupiedExits = new Dictionary<Vector2Int, HashSet<DungeonSide>>();
+
+            for (int i = 0; i < _allCells.Count; i++)
+            {
+                var cell = _allCells[i];
+
+                if (!roomControllers.TryGetValue(cell, out var roomController) || roomController == null)
+                {
+                    continue;
+                }
+
+                if (!exitMap.TryGetValue(cell, out var exits))
+                {
+                    continue;
+                }
+
+                var roomChance = CalculateEnemySpawnChance(i);
+
+                TrySpawnEnemyAtExit(cell, roomController, DungeonSide.North, exits.HasNorth, roomChance, i, occupiedExits);
+                TrySpawnEnemyAtExit(cell, roomController, DungeonSide.East, exits.HasEast, roomChance, i, occupiedExits);
+                TrySpawnEnemyAtExit(cell, roomController, DungeonSide.West, exits.HasWest, roomChance, i, occupiedExits);
+                TrySpawnEnemyAtExit(cell, roomController, DungeonSide.South, exits.HasSouth, roomChance, i, occupiedExits);
+            }
+        }
+
+        private void TrySpawnEnemyAtExit(Vector2Int cell, RoomController roomController, DungeonSide side, bool hasExit, float roomChance, int roomIndex, Dictionary<Vector2Int, HashSet<DungeonSide>> occupiedExits)
+        {
+            if (!hasExit)
+            {
+                return;
+            }
+
+            if (HasEnemyAtNeighboringExit(cell, side, occupiedExits))
+            {
+                return;
+            }
+
+            if (Random.value > roomChance)
+            {
+                return;
+            }
+
+            var enemy = _enemyGenerator.CreateEnemy(roomIndex, roomController.transform);
+            var enemyAnimationController = enemy.GetComponent<EnemyAnimationController>();
+
+            if (enemy == null)
+            {
+                return;
+            }
+
+            enemyAnimationController.ShowMirror(side);
+            roomController.PlaceObjectAtExit(enemy, side);
+            MarkExitAsOccupied(cell, side, occupiedExits);
+        }
+
+        private float CalculateEnemySpawnChance(int roomIndex)
+        {
+            return Mathf.Clamp01(_baseEnemySpawnChance + _spawnChanceGrowthPerRoom * roomIndex);
+        }
+
+        private bool HasEnemyAtNeighboringExit(Vector2Int cell, DungeonSide exit, Dictionary<Vector2Int, HashSet<DungeonSide>> occupiedExits)
+        {
+            var neighbourCell = cell + GetDirection(exit);
+
+            if (!occupiedExits.TryGetValue(neighbourCell, out var neighbourExits))
+            {
+                return false;
+            }
+
+            return neighbourExits.Contains(GetOppositeExit(exit));
+        }
+
+        private void MarkExitAsOccupied(Vector2Int cell, DungeonSide exit, Dictionary<Vector2Int, HashSet<DungeonSide>> occupiedExits)
+        {
+            if (!occupiedExits.TryGetValue(cell, out var exits))
+            {
+                exits = new HashSet<DungeonSide>();
+                occupiedExits[cell] = exits;
+            }
+
+            exits.Add(exit);
+        }
+
+        private static Vector2Int GetDirection(DungeonSide exit)
+        {
+            return exit switch
+            {
+                DungeonSide.North => North,
+                DungeonSide.South => South,
+                DungeonSide.West => West,
+                DungeonSide.East => East,
+                _ => Vector2Int.zero
+            };
+        }
+
+        private static DungeonSide GetOppositeExit(DungeonSide exit)
+        {
+            return exit switch
+            {
+                DungeonSide.North => DungeonSide.South,
+                DungeonSide.South => DungeonSide.North,
+                DungeonSide.West => DungeonSide.East,
+                DungeonSide.East => DungeonSide.West,
+                _ => exit
+            };
         }
 
         #endregion
