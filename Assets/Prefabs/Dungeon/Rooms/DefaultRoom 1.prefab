@@ -7883,7 +7883,7 @@ GameObject:
   - component: {fileID: 2169310130087071776}
   - component: {fileID: 3580944026000205861}
   m_Layer: 0
-  m_Name: DefaultRoom
+  m_Name: DefaultRoom 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8016,11 +8016,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 879959202290912003, guid: bf5a7e9a0883d2a4193ca3a407374cc9, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 3.790001
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 879959202290912003, guid: bf5a7e9a0883d2a4193ca3a407374cc9, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.069999695
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 879959202290912003, guid: bf5a7e9a0883d2a4193ca3a407374cc9, type: 3}
       propertyPath: m_LocalPosition.z
@@ -8078,11 +8078,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 879959202290912003, guid: bf5a7e9a0883d2a4193ca3a407374cc9, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -3.2600002
+      value: -2
       objectReference: {fileID: 0}
     - target: {fileID: 879959202290912003, guid: bf5a7e9a0883d2a4193ca3a407374cc9, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.069999695
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 879959202290912003, guid: bf5a7e9a0883d2a4193ca3a407374cc9, type: 3}
       propertyPath: m_LocalPosition.z

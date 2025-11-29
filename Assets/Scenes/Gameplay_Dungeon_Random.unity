@@ -400,7 +400,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DungeonCrawler.Gameplay.Dungeon.DungeonGenerator
   _startRoomPrefab: {fileID: 7733281229158172203, guid: 7176cdb6333a8b144b860f90d1d5842c, type: 3}
   _endRoomPrefab: {fileID: 8445753150445442732, guid: 88f040bdcf8ee894fb9576f452ea3dc6, type: 3}
-  _defaultRoomPrefab: {fileID: 7596345401158497137, guid: 2141e918b718da445bc98bcfe25dc5a6, type: 3}
+  _defaultRoomPrefab:
+  - {fileID: 7596345401158497137, guid: 2141e918b718da445bc98bcfe25dc5a6, type: 3}
+  - {fileID: 7596345401158497137, guid: 56f0505bd0e686e41aafda8503cd8f57, type: 3}
+  - {fileID: 7596345401158497137, guid: 988ffb18ee177bd4a86a7af391dfa1e7, type: 3}
   _gridSize: {x: 8, y: 10}
   _mainPathLength: 15
   _roomSize: {x: 18, y: 10}

@@ -16,7 +16,7 @@ namespace DungeonCrawler.Gameplay.Dungeon
         private GameObject _endRoomPrefab;
 
         [SerializeField]
-        private GameObject _defaultRoomPrefab;
+        private GameObject[] _defaultRoomPrefab;
 
         [Header("Grid Bounds (in rooms)")]
         [SerializeField]
@@ -396,7 +396,8 @@ namespace DungeonCrawler.Gameplay.Dungeon
                     return _endRoomPrefab;
             }
 
-            return _defaultRoomPrefab;
+            var roomIndex = Random.Range(0, _defaultRoomPrefab.Length);
+            return _defaultRoomPrefab[roomIndex];
         }
 
         private string GetNameForCell(Vector2Int cell, int index)
