@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d1f029b1efd6cb41a8a0ce2575f9e93, type: 3}
   m_Name: Enemy_Skeleton
   m_EditorClassIdentifier: Assembly-CSharp::DungeonCrawler.Gameplay.Unit.UnitDefinition
-  Icon: {fileID: 3891796401534313901, guid: 4b352e952093f734c855535193b627e6, type: 3}
-  Name: Enemy_Default
+  Icon: {fileID: 3671900364904746485, guid: 4b352e952093f734c855535193b627e6, type: 3}
+  Name: Skeleton
   Kind: 2
   AttackType: 0
   DamageType: 0

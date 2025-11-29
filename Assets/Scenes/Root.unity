@@ -154,12 +154,16 @@ MonoBehaviour:
     UnitCount: 1
     Level: 0
   - Definition: {fileID: 11400000, guid: 2d51902cf15ac3b4fb3639f08468879a, type: 2}
-    Id: Unit Default 1
-    UnitCount: 10
+    Id: Knight
+    UnitCount: 5
     Level: 0
   - Definition: {fileID: 11400000, guid: 733081a3d0c46484f8b35adaba75b9b4, type: 2}
-    Id: Unit Default 2
+    Id: Archer
     UnitCount: 10
+    Level: 0
+  - Definition: {fileID: 11400000, guid: 41020d08112a3ac40b103262eab0bc87, type: 2}
+    Id: Rouge
+    UnitCount: 15
     Level: 0
   _additiveScenes:
   - Gameplay_Dungeon_Random
