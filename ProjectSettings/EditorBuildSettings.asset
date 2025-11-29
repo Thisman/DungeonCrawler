@@ -15,7 +15,7 @@ EditorBuildSettings:
     path: Assets/Scenes/UI_InGameMenu.unity
     guid: e7bb61dc101a1f24b896d771bcb54391
   - enabled: 1
-    path: Assets/Scenes/Dungeons/Gameplay_Dungeon_Random.unity
+    path: Assets/Scenes/Gameplay_Dungeon_Random.unity
     guid: 21a34d7fbbc084042b48c6a2b75eb3de
   - enabled: 1
     path: Assets/Scenes/Gamplay_BattleScene.unity
