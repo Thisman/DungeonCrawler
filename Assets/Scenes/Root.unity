@@ -162,7 +162,7 @@ MonoBehaviour:
     UnitCount: 10
     Level: 0
   _additiveScenes:
-  - Gameplay_Dungeon_EducationScene
+  - Gameplay_Dungeon_Random
 --- !u!4 &1519717169
 Transform:
   m_ObjectHideFlags: 0

@@ -1,12 +1,11 @@
 ﻿using UnityEngine;
-using System.Collections;
 
 namespace DungeonCrawler.Gameplay.Dungeon
 {
     [RequireComponent(typeof(BoxCollider2D))]
     public class RoomController : MonoBehaviour
-	{
-		public bool HasNorthExit = false;
+    {
+        public bool HasNorthExit = false;
         public bool HasSouthExit = false;
         public bool HasWestExit = false;
         public bool HasEastExit = false;
@@ -28,12 +27,36 @@ namespace DungeonCrawler.Gameplay.Dungeon
 
         public Vector2 Center => _collider.bounds.center;
 
-        public void Awake()
-		{
-            _northExit.SetActive(!HasNorthExit);
-            _southExit.SetActive(!HasSouthExit);
-            _westExit.SetActive(!HasWestExit);
-            _eastExit.SetActive(!HasEastExit);
-		}
-	}
+        private void Awake()
+        {
+            UpdateExits();
+        }
+
+        public void ConfigureExits(bool hasNorth, bool hasSouth, bool hasWest, bool hasEast)
+        {
+            HasNorthExit = hasNorth;
+            HasSouthExit = hasSouth;
+            HasWestExit = hasWest;
+            HasEastExit = hasEast;
+
+            UpdateExits();
+        }
+
+        private void UpdateExits()
+        {
+            // Предполагаем, что объекты _northExit/_southExit/... – это "заглушки" (стены),
+            // которые должны быть активны, когда прохода НЕТ.
+            if (_northExit != null)
+                _northExit.SetActive(!HasNorthExit);
+
+            if (_southExit != null)
+                _southExit.SetActive(!HasSouthExit);
+
+            if (_westExit != null)
+                _westExit.SetActive(!HasWestExit);
+
+            if (_eastExit != null)
+                _eastExit.SetActive(!HasEastExit);
+        }
+    }
 }
