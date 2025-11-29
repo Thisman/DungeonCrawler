@@ -18,6 +18,10 @@ namespace DungeonCrawler.Gameplay.Dungeon
         [SerializeField]
         private GameObject _defaultRoomPrefab;
 
+        [Header("Grid Bounds (in rooms)")]
+        [SerializeField]
+        private Vector2Int _gridSize = new(5, 10); // width (X), height (Y)
+
         [Header("Main Path Settings")]
         [SerializeField, Min(2)]
         private int _mainPathLength = 8;
@@ -73,6 +77,15 @@ namespace DungeonCrawler.Gameplay.Dungeon
         /// <summary>Граф соединений: каждая клетка → множество соседей, с которыми ЕСТЬ проход.</summary>
         private readonly Dictionary<Vector2Int, HashSet<Vector2Int>> _connections = new();
 
+        // Границы по сетке
+        private int _minX;
+        private int _maxX;
+        private int _minY;
+        private int _maxY;
+
+        // Стартовая клетка в координатах сетки
+        private Vector2Int _startCell;
+
         private void Start()
         {
             if (_generateOnStart)
@@ -83,7 +96,9 @@ namespace DungeonCrawler.Gameplay.Dungeon
 
         public void Generate()
         {
-            // На будущее: можно добавить очистку уже заспавненных комнат
+            // Настраиваем границы
+            SetupBounds();
+
             _occupied.Clear();
             _mainPathCells.Clear();
             _allCells.Clear();
@@ -94,11 +109,32 @@ namespace DungeonCrawler.Gameplay.Dungeon
             SpawnRoomsWithExits();
         }
 
+        private void SetupBounds()
+        {
+            // Минимум 1x1
+            int width = Mathf.Max(1, _gridSize.x);
+            int height = Mathf.Max(1, _gridSize.y);
+
+            _minX = 0;
+            _maxX = width - 1;
+            _minY = 0;
+            _maxY = height - 1;
+
+            // Стартовая клетка — центр прямоугольника
+            _startCell = new Vector2Int(width / 2, height / 2);
+        }
+
+        private bool InBounds(Vector2Int cell)
+        {
+            return cell.x >= _minX && cell.x <= _maxX &&
+                   cell.y >= _minY && cell.y <= _maxY;
+        }
+
         #region Main Path
 
         private void GenerateMainPath()
         {
-            var current = Vector2Int.zero;
+            var current = _startCell;
 
             _mainPathCells.Add(current);
             _allCells.Add(current);
@@ -108,31 +144,41 @@ namespace DungeonCrawler.Gameplay.Dungeon
 
             while (_mainPathCells.Count < _mainPathLength)
             {
-                var nextDirection = ChooseNextDirection(currentDirection);
-                var nextCell = current + nextDirection;
-
-                // Не допускаем самопересечений
-                if (_occupied.Contains(nextCell))
+                // Сначала собираем все допустимые направления (внутри границ и в свободные клетки)
+                var possibleDirs = new List<Vector2Int>();
+                foreach (var dir in Directions)
                 {
-                    bool found = false;
-                    foreach (var dir in Directions)
-                    {
-                        var candidate = current + dir;
-                        if (_occupied.Contains(candidate))
-                            continue;
+                    var candidate = current + dir;
+                    if (!InBounds(candidate))
+                        continue;
+                    if (_occupied.Contains(candidate))
+                        continue;
 
-                        nextDirection = dir;
-                        nextCell = candidate;
-                        found = true;
-                        break;
-                    }
-
-                    if (!found)
-                    {
-                        Debug.LogWarning("[DungeonGenerator] Не удалось продолжить главный путь, путь получился короче заданного.");
-                        break;
-                    }
+                    possibleDirs.Add(dir);
                 }
+
+                if (possibleDirs.Count == 0)
+                {
+                    Debug.LogWarning("[DungeonGenerator] Главный путь упёрся в границы/сам себя раньше заданной длины.");
+                    break;
+                }
+
+                Vector2Int nextDirection;
+
+                // Если можем двигаться дальше в текущем направлении и сработала вероятность — продолжаем
+                if (possibleDirs.Contains(currentDirection) &&
+                    Random.value < _keepDirectionProbability)
+                {
+                    nextDirection = currentDirection;
+                }
+                else
+                {
+                    // Иначе выбираем случайное допустимое направление
+                    var index = Random.Range(0, possibleDirs.Count);
+                    nextDirection = possibleDirs[index];
+                }
+
+                var nextCell = current + nextDirection;
 
                 _mainPathCells.Add(nextCell);
                 _allCells.Add(nextCell);
@@ -143,18 +189,6 @@ namespace DungeonCrawler.Gameplay.Dungeon
                 current = nextCell;
                 currentDirection = nextDirection;
             }
-        }
-
-        private Vector2Int ChooseNextDirection(Vector2Int currentDirection)
-        {
-            if (currentDirection != Vector2Int.zero &&
-                Random.value < _keepDirectionProbability)
-            {
-                return currentDirection;
-            }
-
-            var index = Random.Range(0, Directions.Length);
-            return Directions[index];
         }
 
         #endregion
@@ -168,22 +202,33 @@ namespace DungeonCrawler.Gameplay.Dungeon
 
             int branchesCreated = 0;
 
-            // не трогаем старт и финиш для веток (по желанию можно изменить)
-            for (int i = 1; i < _mainPathCells.Count - 1; i++)
+            // Ветки можем создавать из ЛЮБОЙ существующей комнаты (кроме старт/финиш),
+            // _allCells будет расти по мере генерации веток → подветвление.
+            for (int i = 0; i < _allCells.Count; i++)
             {
                 if (branchesCreated >= _maxBranches)
                     break;
 
+                var startCell = _allCells[i];
+
+                // Не ветвимся от стартовой и конечной комнаты (по желанию)
+                if (_mainPathCells.Count > 0)
+                {
+                    if (startCell == _mainPathCells[0] ||
+                        startCell == _mainPathCells[_mainPathCells.Count - 1])
+                        continue;
+                }
+
                 if (Random.value > _branchChancePerMainRoom)
                     continue;
-
-                var startCell = _mainPathCells[i];
 
                 // Выбираем возможные направления для начала ветки
                 var availableDirs = new List<Vector2Int>();
                 foreach (var dir in Directions)
                 {
                     var candidate = startCell + dir;
+                    if (!InBounds(candidate))
+                        continue;
                     if (_occupied.Contains(candidate))
                         continue;
 
@@ -206,27 +251,26 @@ namespace DungeonCrawler.Gameplay.Dungeon
                 {
                     var next = current + currentDirection;
 
-                    // Если следующая клетка занята — раньше заканчиваем ветку
-                    if (_occupied.Contains(next))
+                    // Если вышли за границы или упёрлись в занятую клетку — заканчиваем ветку
+                    if (!InBounds(next) || _occupied.Contains(next))
                     {
                         break;
                     }
 
                     _occupied.Add(next);
                     _allCells.Add(next);
-
                     ConnectCells(current, next);
 
                     current = next;
 
-                    // Возможная петля: соединяемся с уже существующей комнатой по соседству,
-                    // но только если ещё нет соединения (чтобы реально создать новый путь).
+                    // Попытка сделать петлю из этой комнаты
                     if (Random.value < _loopConnectionChance)
                     {
                         TryCreateLoopFrom(current);
                     }
 
-                    // По желанию можно добавить смену направления ветки, но пока оставим прямой.
+                    // Здесь можно добавить смену направления внутри ветки, если нужно:
+                    // например, с маленькой вероятностью выбрать новое допустимое направление.
                 }
 
                 branchesCreated++;
@@ -246,6 +290,9 @@ namespace DungeonCrawler.Gameplay.Dungeon
             foreach (var dir in Directions)
             {
                 var candidate = cell + dir;
+
+                if (!InBounds(candidate))
+                    continue;
 
                 if (!_occupied.Contains(candidate))
                     continue;
@@ -297,9 +344,13 @@ namespace DungeonCrawler.Gameplay.Dungeon
             for (int i = 0; i < _allCells.Count; i++)
             {
                 var cell = _allCells[i];
+
+                // Привязываем стартовую комнату к (0,0) в мире,
+                // остальные — относительно неё.
+                var offsetFromStart = cell - _startCell;
                 var worldPos = new Vector3(
-                    cell.x * _roomSize.x,
-                    cell.y * _roomSize.y,
+                    offsetFromStart.x * _roomSize.x,
+                    offsetFromStart.y * _roomSize.y,
                     0f
                 );
 
